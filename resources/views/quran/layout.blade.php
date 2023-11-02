@@ -16,7 +16,14 @@
   </head>
   <body>
     @yield('search')
+    <div class="info">
+        <h3>Data berdasarkan : </h3>
+        <a href="https://quran-api.santrikoding.com/">Santrikoding</a>
+    </div>
     @yield('surah')
     @yield('content')
+    <div class="footer">
+        <h3>Copyright© Iwan 2023</h3>
+    </div>
   </body>
 </html>

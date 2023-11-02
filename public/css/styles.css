@@ -44,6 +44,7 @@
 #main-body {
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 40px;
     width: 90%;
     display: flex;
     flex-wrap: wrap;
@@ -259,4 +260,39 @@
 
 .data-empty {
     text-align: center;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 40px;
+    width: 100%;
+    background-color: rgb(142, 239, 239);
+    padding-bottom: 10px;
+}
+
+.footer > h2 {
+    margin: 0;
+}
+
+.info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.info > h3 {
+    margin-bottom: 10px;
+}
+
+.info > a {
+    margin: 0;
+    text-decoration: none;
+    color: rgb(88, 108, 108);
+    cursor: pointer;
+    font-style: italic;
+}
+
+.info > a:hover {
+    color: rgb(142, 239, 239);
 }

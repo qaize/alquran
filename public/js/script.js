@@ -7,6 +7,7 @@ const searchButton = document.getElementById("search-button");
 const searchInput = document.getElementById("search-input");
 const pagination = document.getElementById("pagination");
 const titleDetailSurah = document.getElementById("title-detail-surah");
+const info = document.querySelector(".info");
 
 let partialSurah = [];
 let allDataSurahPromise = null;
@@ -131,6 +132,7 @@ function loadPagingSurah(currentIndex, totalData) {
             // Initiate Data
             titleDetailSurah.innerHTML = "";
             mainBody.innerHTML = "";
+            info.style.display = "block";
             const data = allData;
             totalPage = Math.ceil(data.length / offset);
             overflow = data.length % offset;
@@ -241,6 +243,7 @@ function loadSurahDetails(nomorSurah) {
         .then((data) => {
             // titleDetailSurah.style.display = "block";
             titleDetailSurah.innerHTML = "";
+            info.style.display = "none";
             titleDetailSurah.appendChild(titleSurah(data));
 
             mainBody.innerHTML = "";
