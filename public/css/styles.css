@@ -164,6 +164,8 @@
 
 .isi-ayat {
     width: 100%;
+    border-bottom: 2px solid rgb(66, 199, 226);
+    margin-bottom: 5px;
 }
 
 .urutan-ayat > span {
@@ -268,8 +270,9 @@
     left: 0;
     height: 40px;
     width: 100%;
-    background-color: rgb(142, 239, 239);
+    background-color: rgb(66, 199, 226);
     padding-bottom: 10px;
+    padding-left: 20px;
 }
 
 .footer > h2 {

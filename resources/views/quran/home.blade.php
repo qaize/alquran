@@ -21,3 +21,8 @@
       <button id="next" class="buttons">Next</button>
     </div>
 @endsection
+
+
+@section('script')
+<script src="{{asset('js/script.js')}}"></script>
+@endsection
