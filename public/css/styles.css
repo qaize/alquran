@@ -1,0 +1,179 @@
+body {
+    /* background: grey; */
+}
+
+.banner {
+    text-align: center;
+}
+
+#search {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    align-items: center;
+    width: 50%;
+    margin-bottom: 20px;
+}
+
+#search > input {
+    width: 100%;
+    border: 2px solid #dddddd;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-right-width: 0;
+    padding: 0 10px;
+    height: 40px;
+}
+
+#search > button {
+    height: 43.2px;
+    width: 100px;
+    background: rgb(66, 199, 226);
+    border: 2px solid #dddddd;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-left-width: 0;
+}
+
+#search > button:hover {
+    background: #dddddd;
+    color: #000000;
+}
+
+#search > button > i {
+    font-size: 12px;
+    color: #ffffff;
+}
+
+#main-body {
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: white;
+    padding: 20px;
+}
+
+.surah-card {
+    display: flex;
+    border: 2px solid rgb(142, 239, 239);
+    width: 25%;
+    height: 80px;
+    padding-left: 10px;
+    padding-right: 20px;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.surah-card > div {
+    width: 50%;
+}
+
+.surah-card > button {
+    width: auto;
+    height: 30px;
+}
+
+.surah-card > a {
+    display: flex;
+    text-decoration: none;
+    width: 80px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination {
+    text-align: center;
+}
+
+.buttons {
+    border-radius: 5px;
+    border-style: none;
+}
+
+.buttons:hover {
+    background-color: rgb(142, 239, 239);
+}
+
+.title {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.title > h3 {
+    margin: 0;
+}
+.title > p {
+    font-size: 14px;
+    margin: 0;
+}
+.pagination .buttons {
+    width: 100px;
+    height: 30px;
+}
+
+.detailSurah {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+.detail {
+    width: 30%;
+    margin-right: 30px;
+}
+
+.deskripsi {
+    text-align: justify;
+}
+
+.ayat {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: right;
+}
+
+.barisSurah {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nomor-ayat {
+    padding-top: 20px;
+    margin-left: 10px;
+    width: 40px;
+    text-align: center;
+}
+
+.urutan-ayat {
+    padding-top: 5px;
+    border: 1px solid black;
+    height: 20px;
+    width: 25px;
+    border-radius: 50%;
+    text-align: center;
+}
+
+.urutan-ayat > span {
+    font-weight: normal;
+    font-size: 20px;
+}
+
+.terjemahaan-ayat {
+    display: none;
+}
+
+.terjemahaan {
+    text-align: justify;
+    position: relative;
+}
