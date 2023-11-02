@@ -15,6 +15,8 @@
     <title>al - qur'an</title>
   </head>
   <body>
+    @yield('search')
+    @yield('surah')
     @yield('content')
   </body>
 </html>

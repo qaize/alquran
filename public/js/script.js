@@ -6,6 +6,7 @@ const nextButton = document.getElementById("next");
 const searchButton = document.getElementById("search-button");
 const searchInput = document.getElementById("search-input");
 const pagination = document.getElementById("pagination");
+const titleDetailSurah = document.getElementById("title-detail-surah");
 
 let partialSurah = [];
 let allDataSurahPromise = null;
@@ -31,6 +32,7 @@ searchInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         searchSurah = searchInput.value;
         isDataLoaded = false;
+        mainBody.innerHTML = "";
         loadPagingSurah(currentIndex, page * offset);
     }
 });
@@ -38,6 +40,7 @@ searchInput.addEventListener("keypress", (e) => {
 searchButton.addEventListener("click", () => {
     searchSurah = searchInput.value;
     isDataLoaded = false;
+    mainBody.innerHTML = "";
     loadPagingSurah(currentIndex, page * offset);
 });
 
@@ -63,6 +66,19 @@ nextButton.addEventListener("click", () => {
     }
 });
 
+/*
+
+
+
+
+    fetch all Surah
+
+
+
+
+*/
+
+// fetch all surah or search
 function loadAllSurah() {
     if (!isDataLoaded) {
         allDataSurahPromise = new Promise((resolve, reject) => {
@@ -108,10 +124,12 @@ function loadAllSurah() {
     return allDataSurahPromise;
 }
 
+// filtered surah at home
 function loadPagingSurah(currentIndex, totalData) {
     loadAllSurah()
         .then((allData) => {
             // Initiate Data
+            titleDetailSurah.innerHTML = "";
             mainBody.innerHTML = "";
             const data = allData;
             totalPage = Math.ceil(data.length / offset);
@@ -136,22 +154,35 @@ function loadPagingSurah(currentIndex, totalData) {
                 prevButton.style.display = "none";
             }
 
-            // Show Data
-            for (currentIndex - 1; currentIndex < totalData; currentIndex++) {
-                if (typeof data[currentIndex] === "undefined") {
-                    break;
+            if (data.length == 1) {
+                loadSurahDetails(data[0].nomor);
+            } else if (data.length == 0) {
+                const notFound = document.createElement("h1");
+                notFound.classList.add("data-empty");
+                notFound.innerHTML = "DATA NOT FOUND";
+                mainBody.appendChild(notFound);
+            } else {
+                // Show Data
+                for (
+                    currentIndex - 1;
+                    currentIndex < totalData;
+                    currentIndex++
+                ) {
+                    if (typeof data[currentIndex] === "undefined") {
+                        break;
+                    }
+                    mainBody.appendChild(surahCard(data[currentIndex]));
+
+                    const buttonDetail = document.getElementById(
+                        `button${data[currentIndex].nomor}`
+                    );
+
+                    (function (index) {
+                        buttonDetail.addEventListener("click", () => {
+                            loadSurahDetails(index);
+                        });
+                    })(data[currentIndex].nomor);
                 }
-                mainBody.appendChild(surahCard(data[currentIndex]));
-
-                const buttonDetail = document.getElementById(
-                    `button${data[currentIndex].nomor}`
-                );
-
-                (function (index) {
-                    buttonDetail.addEventListener("click", () => {
-                        loadSurahDetails(index);
-                    });
-                })(data[currentIndex].nomor);
             }
         })
         .catch((error) => {
@@ -159,6 +190,7 @@ function loadPagingSurah(currentIndex, totalData) {
         });
 }
 
+// card element surah
 function surahCard(surah) {
     const card = document.createElement("div");
     card.classList.add("surah-card");
@@ -174,52 +206,22 @@ function surahCard(surah) {
     return card;
 }
 
+// insiasi home
 loadPagingSurah(currentIndex, totalData);
 
-function loadSurahDetails(nomorSurah) {
-    fetchFromUrl(nomorSurah)
-        .then((data) => {
-            mainBody.innerHTML = "";
-            mainBody.appendChild(detailSurahPage(data));
+/*
 
-            // intiate terjemahaan
-            data.ayat.forEach((ayat) => {
-                const ayatSurah = document.getElementById(
-                    `isiAyat${ayat.nomor}`
-                );
-                intiateTerjemaahan(ayat).then((element) => {
-                    ayatSurah.appendChild(element);
 
-                    const button = document.getElementById(
-                        `actionTerjemaah${ayat.nomor}`
-                    );
 
-                    const showTerjamaah = document.getElementById(
-                        `terjemahaan${ayat.nomor}`
-                    );
 
-                    showTerjamaah.style.display = "none";
-                    let show = true;
-                    button.addEventListener("click", () => {
-                        if (show) {
-                            showTerjamaah.style.display = "block";
-                            button.innerHTML = "Hide Terjemaahan";
-                            show = false;
-                        } else {
-                            showTerjamaah.style.display = "none";
-                            button.innerHTML = "Show Terjemaahan";
-                            show = true;
-                        }
-                    });
-                });
-            });
-            pagination.style.display = "none";
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-}
+    Detail Surah
 
+
+
+
+*/
+
+// fetch detail surah from api
 function fetchFromUrl(nomor) {
     return new Promise((resolve, reject) => {
         fetch(`https://quran-api.santrikoding.com/api/surah/${nomor}`)
@@ -233,31 +235,135 @@ function fetchFromUrl(nomor) {
     });
 }
 
-function numberToArabic(number) {
-    const arabicNumeral = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
-    return String(number)
-        .split("")
-        .map((digit) => arabicNumeral[parseInt(digit)])
-        .join("");
+// tampilkan detail surah
+function loadSurahDetails(nomorSurah) {
+    fetchFromUrl(nomorSurah)
+        .then((data) => {
+            // titleDetailSurah.style.display = "block";
+            titleDetailSurah.innerHTML = "";
+            titleDetailSurah.appendChild(titleSurah(data));
+
+            mainBody.innerHTML = "";
+
+            detailSurahPage(data).then((surah) => {
+                mainBody.appendChild(surah);
+
+                const hideDetailButton =
+                    document.getElementById("hide-detail-button");
+                const surahInformation = document.querySelector(".detail");
+                const ayat = document.querySelector(".ayat");
+
+                let showDetail = true;
+                hideDetailButton.addEventListener("click", () => {
+                    if (showDetail) {
+                        hideDetailButton.innerHTML = `
+                        <span> >> </span>
+
+                        `;
+                        surahInformation.style.display = "none";
+                        ayat.style.width = "100%";
+                        showDetail = false;
+                    } else {
+                        hideDetailButton.innerHTML = `
+                        <span> << </span>
+
+                        `;
+                        ayat.style.width = "60%";
+                        surahInformation.style.display = "block";
+                        showDetail = true;
+                    }
+                });
+
+                // intiate terjemahaan
+                data.ayat.forEach((ayat) => {
+                    const ayatSurah = document.getElementById(
+                        `isiAyat${ayat.nomor}`
+                    );
+                    intiateTerjemaahan(ayat).then((element) => {
+                        ayatSurah.appendChild(element);
+
+                        const button = document.getElementById(
+                            `actionTerjemaah${ayat.nomor}`
+                        );
+
+                        const showTerjamaah = document.getElementById(
+                            `terjemahaan${ayat.nomor}`
+                        );
+
+                        let show = true;
+                        button.addEventListener("click", () => {
+                            if (show) {
+                                showTerjamaah.style.display = "block";
+                                button.innerHTML = "Sembunyikan Terjemaahan";
+                                show = false;
+                            } else {
+                                showTerjamaah.style.display = "none";
+                                button.innerHTML = "Lihat Terjemaahan";
+                                show = true;
+                            }
+                        });
+                    });
+                });
+            });
+
+            pagination.style.display = "none";
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 }
 
-function detailSurahPage(surah) {
-    const detailSurah = document.createElement("div");
+// function title surah
+function titleSurah(surah) {
+    const title = document.createElement("div");
+    title.classList.add("title-Surah");
 
-    const ayat = document.createElement("div");
-    ayat.classList.add("ayat");
-    let isiAyat = "";
-    surah.ayat.forEach((ayat) => {
-        isiAyat += `
+    title.innerHTML = `
+    <h2>${surah.nama_latin} (${surah.nama}) </h2>
+     <h3>${surah.arti}</h3>
+
+    `;
+
+    return title;
+}
+
+// function detail surah
+
+function detailSurahPage(surah) {
+    return new Promise((resolve, reject) => {
+        const detailSurah = document.createElement("div");
+        detailSurah.classList.add("detailSurah");
+
+        //info surah
+        detailSurah.innerHTML = `
+    <div class="detail">
+        <p>Jumlah Ayat :${surah.jumlah_ayat}</p>
+        <p>Tempat Turun : ${surah.tempat_turun}</p>
+    <div class="deskripsi">
+        <label>Deskripsi : </label>
+        <p id="label${surah.nomor}">${surah.deskripsi}</p>
+    </div>
+    </div>
+    <div class="hide-detail">
+        <a id="hide-detail-button"> <span> << </span> </a>
+    </div>
+    `;
+
+        // map ayat surah
+        const ayat = document.createElement("div");
+        ayat.classList.add("ayat");
+        let isiAyat = "";
+        surah.ayat.forEach((ayat) => {
+            isiAyat += `
         <div class="barisSurah">
         <div id="isiAyat${ayat.nomor}" class="isi-ayat">
             <div class="ayat-nav">
                 <h1 class="tulisan-arab">${ayat.ar}</h1>
             </div>
             <div class="ayat-action">
-                <button id="actionTerjemaah${
+                <a id="actionTerjemaah${
                     ayat.nomor
-                }" class="show-hide-terjemahaan">show terjemahaan</button>
+                }" class="show-hide-terjemahaan">Lihat terjemahaan</a>
             </div>
         </div>
         <div class="nomor-ayat">
@@ -269,42 +375,33 @@ function detailSurahPage(surah) {
         </div>
 
         `;
+        });
+
+        ayat.innerHTML = isiAyat;
+
+        detailSurah.appendChild(ayat);
+        resolve(detailSurah);
     });
-
-    ayat.innerHTML = isiAyat;
-
-    detailSurah.classList.add("detailSurah");
-
-    detailSurah.innerHTML = `
-    <div class="detail">
-        <h2>${surah.nama_latin} (${surah.nama}) </h2>
-        <h3>${surah.arti}</h3>
-        <p>Jumlah Ayat :${surah.jumlah_ayat}</p>
-        <p>Tempat Turun : ${surah.tempat_turun}</p>
-    <div class="deskripsi">
-        <label>Deskripsi : </label>
-        <p id="label${surah.nomor}">${surah.deskripsi}</p>
-    </div>
-    </div>
-    `;
-
-    detailSurah.appendChild(ayat);
-
-    return detailSurah;
 }
 
 function intiateTerjemaahan(ayat) {
     return new Promise((resolve, reject) => {
         const terjemah = document.createElement("div");
-        // terjemah.classList.add("terjemahan-ayat");
         terjemah.setAttribute("id", "terjemahan-ayat");
-        // Check if ayat.nomor is defined and not an empty string before setting the id
         terjemah.innerHTML = `
-        <div id="terjemahaan${ayat.nomor}">
+        <div id="terjemahaan${ayat.nomor}" class="terjemahaan-ayat">
             <p class="tulisan-latin">${ayat.tr}</p>
-            <p class="terjemahaan"> ${ayat.idn}</p>
+            <p class="terjemahaan">artinya :  "${ayat.idn}"</p>
         </div>
         `;
         resolve(terjemah);
     });
+}
+
+function numberToArabic(number) {
+    const arabicNumeral = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+    return String(number)
+        .split("")
+        .map((digit) => arabicNumeral[parseInt(digit)])
+        .join("");
 }
