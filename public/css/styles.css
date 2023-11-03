@@ -1,24 +1,58 @@
+* {
+    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+        "Lucida Sans", Arial, sans-serif;
+}
+/* body {
+    height: 100%;
+} */
+
 .banner {
     text-align: center;
 }
 
 #search {
     display: flex;
+    position: relative;
     margin-left: auto;
     margin-right: auto;
     align-items: center;
     width: 50%;
-    margin-bottom: 20px;
+}
+
+.suggestion {
+    display: none;
+    position: absolute;
+    border: 2px solid rgb(142, 239, 239);
+    background: white;
+    height: 100px;
+    top: 100%;
+    left: 0;
+    align-items: center;
+    width: 99.5%;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top: none;
+    z-index: 99;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #search > input {
     width: 100%;
+    outline: none;
     border: 2px solid #dddddd;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
     border-right-width: 0;
     padding: 0 10px;
     height: 40px;
+}
+
+#search > input:focus {
+    border: 2px solid rgb(142, 239, 239);
+    border-bottom-left-radius: 0;
+    border-bottom: none;
 }
 
 #search > button {
@@ -44,13 +78,23 @@
 #main-body {
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 40px;
     width: 90%;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     background-color: white;
     padding: 20px;
+    z-index: 1;
+    animation: mainBodyAnimation 2s;
+}
+
+@keyframes mainBodyAnimation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .surah-card {
@@ -127,6 +171,16 @@
 .detail {
     width: 30%;
     margin-right: 30px;
+    animation: detailAnimation 1s;
+}
+
+@keyframes detailAnimation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .deskripsi {
@@ -177,41 +231,14 @@
     display: none;
 }
 .terjemahaan-ayat > p {
-    animation-name: terjemaahAnimation;
-    animation-duration: 0.5s;
+    animation: terjemaahAnimation 0.5s;
 }
 
 @keyframes terjemaahAnimation {
     0% {
         opacity: 0;
     }
-    10% {
-        opacity: 0.1;
-    }
-    20% {
-        opacity: 0.2;
-    }
-    30% {
-        opacity: 0.3;
-    }
-    40% {
-        opacity: 0.4;
-    }
-    50% {
-        opacity: 0.5;
-    }
-    60% {
-        opacity: 0.6;
-    }
-    70% {
-        opacity: 0.7;
-    }
-    80% {
-        opacity: 0.8;
-    }
-    90% {
-        opacity: 0.9;
-    }
+
     100% {
         opacity: 1;
     }
@@ -265,18 +292,16 @@
 }
 
 .footer {
-    position: fixed;
     bottom: 0;
     left: 0;
     height: 40px;
     width: 100%;
     background-color: rgb(66, 199, 226);
-    padding-bottom: 10px;
-    padding-left: 20px;
+    text-align: center;
 }
-
 .footer > h2 {
-    margin: 0;
+    display: block;
+    margin: 0 auto;
 }
 
 .info {
@@ -298,4 +323,35 @@
 
 .info > a:hover {
     color: rgb(142, 239, 239);
+}
+
+#loading-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 9999;
+    text-align: center;
+}
+
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin: 20% auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
