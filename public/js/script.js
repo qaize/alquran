@@ -8,6 +8,7 @@ const searchInput = document.getElementById("search-input");
 const pagination = document.getElementById("pagination");
 const titleDetailSurah = document.getElementById("title-detail-surah");
 const info = document.querySelector(".info");
+const suggestion = document.querySelector(".suggestion");
 
 let partialSurah = [];
 let allDataSurahPromise = null;
@@ -36,6 +37,27 @@ searchInput.addEventListener("keypress", (e) => {
         mainBody.innerHTML = "";
         loadPagingSurah(currentIndex, page * offset);
     }
+});
+
+document.addEventListener("click", function (event) {
+    if (event.target !== searchInput) {
+        searchButton.style.borderRightColor = "#dddddd";
+        searchButton.style.borderTopColor = "#dddddd";
+        searchButton.style.borderLeftColor = "#dddddd";
+        searchButton.style.borderBottomRightRadius = "10px";
+        suggestion.style.display = "none";
+        searchInput.blur(); // Remove focus from the input
+    }
+});
+
+searchInput.addEventListener("keyup", () => {
+    searchButton.style.borderRightColor = "rgb(142, 239, 239)";
+    searchButton.style.borderTopColor = "rgb(142, 239, 239)";
+    searchButton.style.borderLeftColor = "rgb(142, 239, 239)";
+    searchButton.style.borderBottomRightRadius = "0";
+    suggestion.style.display = "flex";
+    suggestion.innerHTML = "";
+    SuggestSurah();
 });
 
 searchButton.addEventListener("click", () => {
@@ -127,9 +149,11 @@ function loadAllSurah() {
 
 // filtered surah at home
 function loadPagingSurah(currentIndex, totalData) {
+    showLoadingScreen();
     loadAllSurah()
         .then((allData) => {
             // Initiate Data
+            hideLoadingScreen();
             titleDetailSurah.innerHTML = "";
             mainBody.innerHTML = "";
             info.style.display = "block";
@@ -229,7 +253,7 @@ function fetchFromUrl(nomor) {
         fetch(`https://quran-api.santrikoding.com/api/surah/${nomor}`)
             .then((response) => response.json())
             .then((data) => {
-                resolve(data);
+                setTimeout(resolve(data), 1000);
             })
             .catch((error) => {
                 reject(error);
@@ -407,4 +431,38 @@ function numberToArabic(number) {
         .split("")
         .map((digit) => arabicNumeral[parseInt(digit)])
         .join("");
+}
+
+function showLoadingScreen() {
+    document.getElementById("loading-screen").style.display = "block";
+}
+
+// Function to hide the loading screen
+function hideLoadingScreen() {
+    document.getElementById("loading-screen").style.display = "none";
+}
+
+/*
+
+suggest
+
+*/
+
+function SuggestSurah() {
+    loadAllSurah().then((allData) => {
+        allData.forEach((data) => {
+            suggestion.appendChild(CreateSuggestedSurah(data));
+        });
+    });
+}
+
+function CreateSuggestedSurah(surah) {
+    const card = document.createElement("div");
+    card.classList.add("suggestedContent");
+
+    card.innerHTML = `
+    <p>${surah.nama_latin}</p>
+    `;
+
+    return card;
 }

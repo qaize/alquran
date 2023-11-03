@@ -21,9 +21,9 @@
     </div>
     @yield('surah')
     @yield('content')
-    <div class="footer">
+    <footer class="footer">
         <h3>Copyright © Iwan 2023</h3>
-    </div>
+    </footer>
     @yield('script')
   </body>
 </html>
