@@ -51,8 +51,6 @@
 
 #search > input:focus {
     border: 2px solid rgb(142, 239, 239);
-    border-bottom-left-radius: 0;
-    border-bottom: none;
 }
 
 #search > button {
@@ -292,16 +290,19 @@
 }
 
 .footer {
+    position: fixed;
     bottom: 0;
     left: 0;
-    height: 40px;
+    height: 30px;
     width: 100%;
     background-color: rgb(66, 199, 226);
     text-align: center;
+    padding-bottom: 20px;
 }
 .footer > h2 {
     display: block;
-    margin: 0 auto;
+    margin: 0;
+    padding: 0;
 }
 
 .info {
