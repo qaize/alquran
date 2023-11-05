@@ -35,6 +35,11 @@ searchInput.addEventListener("keypress", (e) => {
         searchSurah = searchInput.value;
         isDataLoaded = false;
         mainBody.innerHTML = "";
+        suggestion.style.display = "none";
+        suggestion.innerHTML = "";
+        searchInput.blur();
+        searchInput.style.borderBottomLeftRadius = "10px";
+        searchInput.style.borderBottom = "2px solid #dddddd";
         loadPagingSurah(currentIndex, page * offset);
     }
 });
@@ -45,18 +50,23 @@ document.addEventListener("click", function (event) {
         searchButton.style.borderTopColor = "#dddddd";
         searchButton.style.borderLeftColor = "#dddddd";
         searchButton.style.borderBottomRightRadius = "10px";
+        searchInput.style.borderBottomLeftRadius = "10px";
+        searchInput.style.borderBottom = "2px solid #dddddd";
         suggestion.style.display = "none";
+        suggestion.innerHTML = "";
         searchInput.blur(); // Remove focus from the input
     }
 });
 
-searchInput.addEventListener("keyup", () => {
+searchInput.addEventListener("keydown", () => {
+    suggestion.innerHTML = "";
     searchButton.style.borderRightColor = "rgb(142, 239, 239)";
     searchButton.style.borderTopColor = "rgb(142, 239, 239)";
     searchButton.style.borderLeftColor = "rgb(142, 239, 239)";
     searchButton.style.borderBottomRightRadius = "0";
+    searchInput.style.borderBottomLeftRadius = "0";
+    searchInput.style.borderBottom = "none";
     suggestion.style.display = "flex";
-    suggestion.innerHTML = "";
     SuggestSurah();
 });
 
