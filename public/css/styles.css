@@ -2,12 +2,20 @@
     font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
         "Lucida Sans", Arial, sans-serif;
 }
-/* body {
-    height: 100%;
-} */
+body {
+    padding-bottom: 30px;
+}
 
 .banner {
     text-align: center;
+}
+.banner a {
+    text-decoration: none;
+    cursor: pointer;
+    color: #6a6a6a;
+}
+
+.banner a:visited {
 }
 
 #search {
@@ -187,9 +195,10 @@
 
 .ayat {
     width: 60%;
-    margin-left: auto;
-    margin-right: auto;
+    height: 600px;
     text-align: right;
+    padding-right: 5px;
+    overflow-y: auto;
 }
 
 .barisSurah {
@@ -208,15 +217,16 @@
 .urutan-ayat {
     padding-top: 5px;
     border: 1px solid black;
-    height: 20px;
-    width: 25px;
+    height: 35px;
+    width: 40px;
     border-radius: 50%;
     text-align: center;
 }
 
 .isi-ayat {
     width: 100%;
-    border-bottom: 2px solid rgb(66, 199, 226);
+    padding-bottom: 5px;
+    border-bottom: 2px solid #dddddd;
     margin-bottom: 5px;
 }
 
@@ -249,7 +259,7 @@
 }
 
 .show-hide-terjemahaan:hover {
-    color: #6a6a6a;
+    color: rgb(142, 239, 239);
     font-weight: bolder;
 }
 
@@ -270,6 +280,11 @@
     text-align: center;
 }
 
+.hide-detail {
+    display: flex;
+    flex-direction: column;
+}
+
 #hide-detail-button {
     margin: 0 10px;
 }
@@ -282,7 +297,20 @@
 }
 
 #hide-detail-button > span:hover {
-    color: rgb(50, 50, 50);
+    color: rgb(142, 239, 239);
+}
+
+#show-all-terjemaahan-button {
+    text-align: center;
+    cursor: pointer;
+}
+
+#show-all-terjemaahan-button > i {
+    font-size: 30px;
+    color: rgb(131, 130, 129);
+}
+#show-all-terjemaahan-button > i:hover {
+    color: rgb(142, 239, 239);
 }
 
 .data-empty {
