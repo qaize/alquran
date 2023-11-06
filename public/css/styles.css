@@ -15,9 +15,6 @@ body {
     color: #6a6a6a;
 }
 
-.banner a:visited {
-}
-
 #search {
     display: flex;
     position: relative;
