@@ -8,7 +8,6 @@ const searchInput = document.getElementById("search-input");
 const pagination = document.getElementById("pagination");
 const titleDetailSurah = document.getElementById("title-detail-surah");
 const info = document.querySelector(".info");
-const suggestion = document.querySelector(".suggestion");
 
 let partialSurah = [];
 let allDataSurahPromise = null;
@@ -35,11 +34,6 @@ searchInput.addEventListener("keypress", (e) => {
         searchSurah = searchInput.value;
         isDataLoaded = false;
         mainBody.innerHTML = "";
-        suggestion.style.display = "none";
-        suggestion.innerHTML = "";
-        searchInput.blur();
-        searchInput.style.borderBottomLeftRadius = "10px";
-        searchInput.style.borderBottom = "2px solid #dddddd";
         loadPagingSurah(currentIndex, page * offset);
     }
 });
@@ -52,22 +46,12 @@ document.addEventListener("click", function (event) {
         searchButton.style.borderBottomRightRadius = "10px";
         searchInput.style.borderBottomLeftRadius = "10px";
         searchInput.style.borderBottom = "2px solid #dddddd";
-        suggestion.style.display = "none";
-        suggestion.innerHTML = "";
         searchInput.blur(); // Remove focus from the input
     }
 });
 
-searchInput.addEventListener("keydown", () => {
-    suggestion.innerHTML = "";
-    searchButton.style.borderRightColor = "rgb(142, 239, 239)";
-    searchButton.style.borderTopColor = "rgb(142, 239, 239)";
-    searchButton.style.borderLeftColor = "rgb(142, 239, 239)";
-    searchButton.style.borderBottomRightRadius = "0";
-    searchInput.style.borderBottomLeftRadius = "0";
-    searchInput.style.borderBottom = "none";
-    suggestion.style.display = "flex";
-    SuggestSurah();
+searchInput.addEventListener("focus", () => {
+    searchInput.style.borderBottom = "2px solid rgb(142, 239, 239)";
 });
 
 searchButton.addEventListener("click", () => {
@@ -258,7 +242,7 @@ loadPagingSurah(currentIndex, totalData);
 */
 
 // fetch detail surah from api
-function fetchFromUrl(nomor) {
+function fetchDetailInformasiSurah(nomor) {
     return new Promise((resolve, reject) => {
         fetch(`https://quran-api.santrikoding.com/api/surah/${nomor}`)
             .then((response) => response.json())
@@ -271,14 +255,28 @@ function fetchFromUrl(nomor) {
     });
 }
 
+function fetchSurahDetail(nomor) {
+    return new Promise((resolve, reject) => {
+        fetch(`https://web-api.qurankemenag.net/quran-ayah?surah=${nomor}`)
+            .then((response) => response.json())
+            .then((data) => {
+                setTimeout(resolve(data), 1000);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
+
 // tampilkan detail surah
 function loadSurahDetails(nomorSurah) {
-    fetchFromUrl(nomorSurah)
+    fetchDetailInformasiSurah(nomorSurah)
         .then((data) => {
             // titleDetailSurah.style.display = "block";
             titleDetailSurah.innerHTML = "";
             info.style.display = "none";
             titleDetailSurah.appendChild(titleSurah(data));
+            const jumpTo = document.getElementById("scroll-input");
 
             mainBody.innerHTML = "";
 
@@ -341,6 +339,19 @@ function loadSurahDetails(nomorSurah) {
                         });
                     });
                 });
+
+                jumpTo.addEventListener("keypress", (e) => {
+                    if (e.key === "Enter") {
+                        const nomorAyat = jumpTo.value;
+                        const elementToJump = document.getElementById(
+                            `isiAyat${nomorAyat}`
+                        );
+
+                        elementToJump.scrollIntoView();
+                        console.log(elementToJump);
+                        console.log(jumpTo.value);
+                    }
+                });
             });
 
             pagination.style.display = "none";
@@ -357,7 +368,11 @@ function titleSurah(surah) {
 
     title.innerHTML = `
     <h2>${surah.nama_latin} (${surah.nama}) </h2>
-     <h3>${surah.arti}</h3>
+    <h3>${surah.arti}</h3>
+    <div class='scroll-navigation'>
+    <label for ='scroll-input'>jump to ayat :</label>
+    <input id='scroll-input' type="number" value="1">
+    </div>
 
     `;
 
@@ -382,7 +397,8 @@ function detailSurahPage(surah) {
     </div>
     </div>
     <div class="hide-detail">
-        <a id="hide-detail-button"> <span> << </span> </a>
+        <a id="hide-detail-button"> <span><<</span> </a>
+        <a id="show-all-terjemaahan-button"> <i class="fa-solid fa-eye"></i> </a>
     </div>
     `;
 
@@ -450,29 +466,4 @@ function showLoadingScreen() {
 // Function to hide the loading screen
 function hideLoadingScreen() {
     document.getElementById("loading-screen").style.display = "none";
-}
-
-/*
-
-suggest
-
-*/
-
-function SuggestSurah() {
-    loadAllSurah().then((allData) => {
-        allData.forEach((data) => {
-            suggestion.appendChild(CreateSuggestedSurah(data));
-        });
-    });
-}
-
-function CreateSuggestedSurah(surah) {
-    const card = document.createElement("div");
-    card.classList.add("suggestedContent");
-
-    card.innerHTML = `
-    <p>${surah.nama_latin}</p>
-    `;
-
-    return card;
 }

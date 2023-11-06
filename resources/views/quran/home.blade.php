@@ -1,7 +1,7 @@
 @extends('quran.layout')
 
 @section('search')
-<div class="banner"><h1>Al Qur'an</h1></div>
+<div class="banner"><a href="/home"><h1>Al Qur'an</h1></a></div>
 <div id="search">
   <input id="search-input" type="text" placeholder="Cari berdasarkan Surah, Nomor Surah, Arti Surah" />
   <button id="search-button">
@@ -31,4 +31,24 @@
 
 @section('script')
 <script src="{{asset('js/script.js')}}"></script>
+<link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+         rel = "stylesheet">
+      <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+      <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+<script>
+    $(function() {
+       var availableTutorials  =  [];
+       loadAllSurah().then((data)=>{
+        data.forEach(element => {
+            availableTutorials.push(element.nama_latin)
+
+        });
+       });
+
+       $( "#search-input" ).autocomplete({
+          source: availableTutorials
+       });
+    });
+ </script>
 @endsection
