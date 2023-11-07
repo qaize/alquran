@@ -385,7 +385,7 @@ function componentDetailSurah(surah) {
         <div class="barisSurah">
         <div id="isi-ayat${ayat.nomor}" class="isi-ayat">
             <div class="ayat-nav">
-                <h1 class="tulisan-arab">${ayat.ar}</h1>
+                <h1 class="arabic">${ayat.ar}</h1>
             </div>
             <div class="ayat-action">
                 <a id="toggleTerjemaahan${

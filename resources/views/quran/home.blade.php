@@ -1,7 +1,7 @@
 @extends('quran.layout')
 
 @section('search')
-    @include('quran.component.search')
+    @include('quran.component._search')
 @endsection
 
 @section('surah')
@@ -9,12 +9,12 @@
 @endsection
 
 @section('content')
-    @include('quran.component.homepage')
+    @include('quran.component._homepage')
 @endsection
 
 
 @section('script')
-    @include('quran.component.script')
+    @include('quran.component._script')
     $(function() {
        var listSurah  =  [];
        loadAllSurah().then((data)=>{
