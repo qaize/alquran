@@ -1,15 +1,7 @@
 @extends('quran.layout')
 
 @section('search')
-<div class="banner"><a href="/home"><h1>Al Qur'an</h1></a></div>
-<div id="search">
-  <input id="search-input" type="text" placeholder="Cari berdasarkan Surah, Nomor Surah, Arti Surah" />
-  <button id="search-button">
-    <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-  <div class="suggestion"></div>
-</div>
-
+    @include('quran.component.search')
 @endsection
 
 @section('surah')
@@ -17,37 +9,23 @@
 @endsection
 
 @section('content')
-    <div id="main-body" class="main-body"></div>
-    <div id="loading-screen">
-        <div class="loader"></div>
-        <p>Loading...</p>
-      </div>
-    <div id="pagination" class="pagination">
-      <button id="prev" class="buttons">Prev</button>
-      <button id="next" class="buttons">Next</button>
-    </div>
+    @include('quran.component.homepage')
 @endsection
 
 
 @section('script')
-<script src="{{asset('js/script.js')}}"></script>
-<link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
-         rel = "stylesheet">
-      <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
-      <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-
-<script>
+    @include('quran.component.script')
     $(function() {
-       var availableTutorials  =  [];
+       var listSurah  =  [];
        loadAllSurah().then((data)=>{
         data.forEach(element => {
-            availableTutorials.push(element.nama_latin)
+            listSurah.push(element.nama_latin)
 
         });
        });
 
        $( "#search-input" ).autocomplete({
-          source: availableTutorials
+          source: listSurah
        });
     });
  </script>
