@@ -52,6 +52,7 @@ body {
     border-right-width: 0;
     padding: 0 10px;
     height: 40px;
+    overflow-y: auto;
 }
 
 #search > input:focus {
@@ -380,4 +381,10 @@ body {
     100% {
         transform: rotate(360deg);
     }
+}
+
+#scroll-input {
+    height: 30px;
+    border: 2px solid rgb(131, 130, 129);
+    padding: 0 10px;
 }
