@@ -62,7 +62,7 @@ body {
 #search > button {
     height: 43.2px;
     width: 100px;
-    background: rgb(66, 199, 226);
+    background: #dddddd;
     border: 2px solid #dddddd;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -70,7 +70,7 @@ body {
 }
 
 #search > button:hover {
-    background: #dddddd;
+    background: rgb(66, 199, 226);
     color: #000000;
 }
 
@@ -112,7 +112,7 @@ body {
     align-items: center;
     margin: 5px 10px;
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
 .surah-card > div {
@@ -121,7 +121,8 @@ body {
 
 .surah-card > button {
     width: auto;
-    height: 30px;
+    height: 40px;
+    width: 80px;
 }
 
 .surah-card > a {
@@ -132,6 +133,10 @@ body {
     align-items: center;
     justify-content: center;
 }
+.surah-card p {
+    margin-left: 10px;
+    font-size: 35px;
+}
 
 .pagination {
     text-align: center;
@@ -140,6 +145,7 @@ body {
 .buttons {
     border-radius: 5px;
     border-style: none;
+    font-size: large;
 }
 
 .buttons:hover {
@@ -196,7 +202,10 @@ body {
     height: 600px;
     text-align: right;
     padding-right: 5px;
+    padding-left: 10px;
     overflow-y: auto;
+    border: 1px solid #dddddd;
+    border-radius: 20px;
 }
 
 .barisSurah {
@@ -401,4 +410,24 @@ body {
 .scroll-navigation {
     display: flex;
     justify-content: space-evenly;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.scroll-navigation input {
+    border-radius: 10px;
+}
+
+.scroll-navigation button {
+    cursor: pointer;
+    width: 80px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: large;
+    color: #6a6a6a;
+    border-style: none;
+    background-color: white;
+}
+.scroll-navigation button:hover {
+    color: #0c0c0c;
 }
