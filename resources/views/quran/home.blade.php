@@ -4,11 +4,8 @@
     @include('quran.component._search')
 @endsection
 
-@section('surah')
-<div id='title-detail-surah'></div>
-@endsection
-
 @section('content')
+    <div id='title-detail-surah'></div>
     @include('quran.component._homepage')
 @endsection
 

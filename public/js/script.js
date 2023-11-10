@@ -221,6 +221,9 @@ function loadPagingSurah(currentIndex, totalData) {
         });
 }
 
+// insiasi home
+loadPagingSurah(currentIndex, totalData);
+
 /*
     Detail Surah
 
@@ -249,6 +252,21 @@ function loadSurahDetails(nomorSurah) {
             // Set Surah title and its navigation
             titleSurah.appendChild(componentTitleSurah(data));
             const jumpTo = document.getElementById("scroll-input");
+            const nextSurah = document.getElementById("surah-next");
+            const prevSurah = document.getElementById("surah-prev");
+            if (nomorSurah == 1) {
+                prevSurah.style.display = "none";
+            }
+            if (nomorSurah == 114) {
+                nextSurah.style.display = "none";
+            }
+            prevSurah.addEventListener("click", () => {
+                loadSurahDetails(nomorSurah - 1);
+            });
+            nextSurah.addEventListener("click", () => {
+                loadSurahDetails(nomorSurah + 1);
+            });
+            // remove body
             mainBody.innerHTML = "";
 
             // Set ayat
@@ -323,8 +341,12 @@ function loadSurahDetails(nomorSurah) {
                         const elementToJump = document.getElementById(
                             `isi-ayat${nomorAyat}`
                         );
-
+                        elementToJump.style.backgroundColor = "#dddddd";
                         elementToJump.scrollIntoView();
+
+                        elementToJump.addEventListener("mouseout", () => {
+                            elementToJump.style.backgroundColor = null;
+                        });
                     }
                 });
             });
@@ -345,8 +367,10 @@ function componentTitleSurah(surah) {
     <h2>${surah.nama_latin} (${surah.nama}) </h2>
     <h3>${surah.arti}</h3>
     <div class='scroll-navigation'>
-    <label for ='scroll-input'>jump to ayat :</label>
-    <input id='scroll-input' maxlength="3" type="number" value="1">
+    <button id="surah-prev">Previous</button>
+    <div><label for ='scroll-input'>jump to ayat :</label>
+    <input id='scroll-input' maxlength="3" type="number" value="1"></div>
+    <button id="surah-next">Next</button>
     </div>
 
     `;
@@ -443,6 +467,3 @@ function numberToArabic(number) {
         .map((digit) => arabicNumeral[parseInt(digit)])
         .join("");
 }
-
-// insiasi home
-loadPagingSurah(currentIndex, totalData);

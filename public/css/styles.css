@@ -203,6 +203,11 @@ body {
     display: flex;
     justify-content: flex-end;
     flex-grow: 1;
+    padding: 2px;
+}
+.barisSurah:hover {
+    background-color: #f1f9f9;
+    border-radius: 5px;
 }
 
 .nomor-ayat {
@@ -257,7 +262,7 @@ body {
 }
 
 .show-hide-terjemahaan:hover {
-    color: rgb(142, 239, 239);
+    color: rgb(82, 82, 82);
     font-weight: bolder;
 }
 
@@ -387,4 +392,13 @@ body {
     height: 30px;
     border: 2px solid rgb(131, 130, 129);
     padding: 0 10px;
+}
+
+#scroll-input:focus {
+    outline-color: #3498db;
+}
+
+.scroll-navigation {
+    display: flex;
+    justify-content: space-evenly;
 }
