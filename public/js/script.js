@@ -275,6 +275,11 @@ function loadSurahDetails(nomorSurah) {
 
                 const hideDetailButton =
                     document.getElementById("hide-detail-button");
+
+                const showAllTerjemah = document.getElementById(
+                    "show-all-terjemahan-button"
+                );
+
                 const surahInformation = document.querySelector(".detail");
                 const ayat = document.querySelector(".ayat");
 
@@ -299,39 +304,14 @@ function loadSurahDetails(nomorSurah) {
                     }
                 });
 
-                // intiate terjemahaan
-                data.ayat.forEach((ayat) => {
-                    const ayatSurah = document.getElementById(
-                        `isi-ayat${ayat.nomor}`
-                    );
+                // intiate terjemahan
+                initiateTerjemah(data.ayat);
 
-                    // function add terhemahaan in ayat
-                    ComponentTerjemaahan(ayat).then((element) => {
-                        ayatSurah.appendChild(element);
-
-                        const toggleTerjemahaan = document.getElementById(
-                            `toggleTerjemaahan${ayat.nomor}`
-                        );
-
-                        const bodyTerjemahaan = document.getElementById(
-                            `terjemahaan${ayat.nomor}`
-                        );
-
-                        let show = true;
-                        toggleTerjemahaan.addEventListener("click", () => {
-                            if (show) {
-                                bodyTerjemahaan.style.display = "block";
-                                toggleTerjemahaan.innerHTML =
-                                    "Sembunyikan Terjemaahan";
-                                show = false;
-                            } else {
-                                bodyTerjemahaan.style.display = "none";
-                                toggleTerjemahaan.innerHTML =
-                                    "Lihat Terjemaahan";
-                                show = true;
-                            }
-                        });
-                    });
+                // Toggle Terjemahan
+                let condition = true;
+                showAllTerjemah.addEventListener("click", () => {
+                    showHideTerjemah(data.ayat, condition);
+                    condition = !condition;
                 });
 
                 // Navigate to ayat ...
@@ -341,7 +321,7 @@ function loadSurahDetails(nomorSurah) {
                         const elementToJump = document.getElementById(
                             `isi-ayat${nomorAyat}`
                         );
-                        elementToJump.style.backgroundColor = "#dddddd";
+                        elementToJump.style.backgroundColor = "#f1f9f9";
                         elementToJump.scrollIntoView();
 
                         elementToJump.addEventListener("mouseout", () => {
@@ -396,7 +376,7 @@ function componentDetailSurah(surah) {
     </div>
     <div class="hide-detail">
         <a id="hide-detail-button"> <span><<</span> </a>
-        <a id="show-all-terjemaahan-button"> <i class="fa-solid fa-eye"></i> </a>
+        <a id="show-all-terjemahan-button"> <i class="fa-solid fa-eye"></i> </a>
     </div>
     `;
 
@@ -412,9 +392,9 @@ function componentDetailSurah(surah) {
                 <h1 class="arabic">${ayat.ar}</h1>
             </div>
             <div class="ayat-action">
-                <a id="toggleTerjemaahan${
+                <a id="toggleTerjemahan${
                     ayat.nomor
-                }" class="show-hide-terjemahaan">Lihat terjemahaan</a>
+                }" class="show-hide-terjemahan">Lihat terjemahan</a>
             </div>
         </div>
         <div class="nomor-ayat">
@@ -435,21 +415,80 @@ function componentDetailSurah(surah) {
     });
 }
 
-// Toggle Terjemaahan
-function ComponentTerjemaahan(ayat) {
+// Toggle Terjemahan
+
+function showHideTerjemah(listAyat, condition) {
+    return new Promise((resolve) => {
+        listAyat.forEach((ayat) => {
+            const terjemah = document.getElementById(`terjemahan${ayat.nomor}`);
+            const terjemahAction = document.getElementById(
+                `toggleTerjemahan${ayat.nomor}`
+            );
+
+            if (condition) {
+                terjemah.style.display = "block";
+                terjemahAction.innerHTML = "Sembunyikan Terjemahan";
+            } else {
+                terjemah.style.display = "none";
+                terjemahAction.innerHTML = "Lihat Terjemahan";
+            }
+        });
+
+        resolve();
+    });
+}
+
+function initiateTerjemah(listAyat) {
+    return new Promise((resolve, reject) => {
+        listAyat.forEach((ayat) => {
+            const ayatSurah = document.getElementById(`isi-ayat${ayat.nomor}`);
+
+            // function add terjemahan in ayat
+            ComponentTerjemahan(ayat).then((element) => {
+                ayatSurah.appendChild(element);
+
+                const toggleTerjemahan = document.getElementById(
+                    `toggleTerjemahan${ayat.nomor}`
+                );
+
+                const bodyTerjemahan = document.getElementById(
+                    `terjemahan${ayat.nomor}`
+                );
+
+                let show = true;
+                toggleTerjemahan.addEventListener("click", () => {
+                    if (show) {
+                        bodyTerjemahan.style.display = "block";
+                        toggleTerjemahan.innerHTML = "Sembunyikan Terjemahan";
+                        show = false;
+                    } else {
+                        bodyTerjemahan.style.display = "none";
+                        toggleTerjemahan.innerHTML = "Lihat Terjemahan";
+                        show = true;
+                    }
+                });
+            });
+        });
+
+        resolve();
+    });
+}
+
+function ComponentTerjemahan(ayat) {
     return new Promise((resolve, reject) => {
         const terjemah = document.createElement("div");
-        terjemah.setAttribute("id", "terjemahan-ayat");
+        // terjemah.setAttribute("id", "terjemahan-ayat");
         terjemah.innerHTML = `
-        <div id="terjemahaan${ayat.nomor}" class="terjemahaan-ayat">
+        <div id="terjemahan${ayat.nomor}" class="terjemahan-ayat">
             <p class="tulisan-latin">${ayat.tr}</p>
-            <p class="terjemahaan">artinya :  "${ayat.idn}"</p>
+            <p class="terjemahan">artinya :  "${ayat.idn}"</p>
         </div>
         `;
         resolve(terjemah);
     });
 }
 
+// Loading screen
 function showLoadingScreen() {
     document.getElementById("loading-screen").style.display = "block";
 }
