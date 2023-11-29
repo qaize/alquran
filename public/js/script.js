@@ -310,7 +310,7 @@ function loadSurahDetails(nomorSurah) {
                 // Toggle Terjemahan
                 let condition = true;
                 showAllTerjemah.addEventListener("click", () => {
-                    showHideTerjemah(data.ayat, condition);
+                    showHideAllTerjemah(data.ayat, condition);
                     condition = !condition;
                 });
 
@@ -417,7 +417,7 @@ function componentDetailSurah(surah) {
 
 // Toggle Terjemahan
 
-function showHideTerjemah(listAyat, condition) {
+function showHiTerjemah(listAyat, condition) {
     return new Promise((resolve) => {
         listAyat.forEach((ayat) => {
             const terjemah = document.getElementById(`terjemahan${ayat.nomor}`);
