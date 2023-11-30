@@ -314,13 +314,20 @@ function loadSurahDetails(nomorSurah) {
                     condition = !condition;
                 });
 
+                let totalAyat = data.ayat.length;
+                jumpTo.max = totalAyat;
+
                 // Navigate to ayat ...
                 jumpTo.addEventListener("keypress", (e) => {
                     if (e.key === "Enter") {
                         const nomorAyat = jumpTo.value;
+                        if (nomorAyat > totalAyat || nomorAyat <= 0) {
+                            alert("Ayat yang anda masukan tidak tersedia!");
+                        }
                         const elementToJump = document.getElementById(
                             `isi-ayat${nomorAyat}`
                         );
+
                         elementToJump.style.backgroundColor = "#f1f9f9";
                         elementToJump.scrollIntoView();
 
@@ -417,7 +424,7 @@ function componentDetailSurah(surah) {
 
 // Toggle Terjemahan
 
-function showHiTerjemah(listAyat, condition) {
+function showHideAllTerjemah(listAyat, condition) {
     return new Promise((resolve) => {
         listAyat.forEach((ayat) => {
             const terjemah = document.getElementById(`terjemahan${ayat.nomor}`);
