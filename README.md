@@ -2,3 +2,5 @@
 
 quran app indonesian translate
 Just run it use full javascript for view and need some connection to use it, dont forget add .env if missing
+
+To access Project result : https://myquranq.000webhostapp.com/ In webview only
