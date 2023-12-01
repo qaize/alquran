@@ -3,7 +3,7 @@
         "Lucida Sans", Arial, sans-serif;
 }
 body {
-    padding-bottom: 30px;
+    padding-bottom: 40px;
 }
 
 .banner {
@@ -434,4 +434,99 @@ body {
 }
 .scroll-navigation button:hover {
     color: #0c0c0c;
+}
+
+@media only screen and (max-width: 600px) {
+    .surah-card {
+        display: flex;
+        border: 2px solid rgb(142, 239, 239);
+        width: 100%;
+        height: 80px;
+        padding-left: 10px;
+        padding-right: 20px;
+        justify-content: space-between;
+        align-items: center;
+        margin: 5px 10px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .surah-card > div {
+        width: 50%;
+    }
+
+    .surah-card > button {
+        width: auto;
+        height: 40px;
+        width: 80px;
+    }
+
+    .surah-card > a {
+        display: flex;
+        text-decoration: none;
+        width: 80px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+    }
+    .surah-card p {
+        margin-left: 10px;
+        font-size: 14px;
+    }
+
+    .detailSurah {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .detail {
+        width: 50%;
+        margin-right: 5px;
+        animation: detailAnimation 1s;
+    }
+
+    body {
+        padding-bottom: 60px;
+    }
+
+    .hide-detail {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #hide-detail-button {
+        margin: 0 5px;
+    }
+
+    #hide-detail-button > span {
+        text-decoration: none;
+        font-size: 15px;
+        cursor: pointer;
+        color: rgb(131, 130, 129);
+    }
+
+    #hide-detail-button > span:hover {
+        color: rgb(142, 239, 239);
+    }
+
+    #show-all-terjemahan-button > i {
+        font-size: 15px;
+        color: rgb(131, 130, 129);
+    }
+
+    #main-body {
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        background-color: white;
+        padding: 5px;
+        z-index: 1;
+        animation: mainBodyAnimation 2s;
+    }
 }
