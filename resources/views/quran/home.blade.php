@@ -9,7 +9,6 @@
     @include('quran.component._homepage')
 @endsection
 
-
 @section('script')
     @include('quran.component._script')
     $(function() {
