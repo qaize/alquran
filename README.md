@@ -1,6 +1,9 @@
-<h1>THIS PROJECT LARAVEL 10 BASED</h1>
-
-quran app indonesian translate
-Just run it use full javascript for view and need some connection to use it, dont forget add .env if missing
-
-To access Project result : https://myquranq.000webhostapp.com/ In webview only
+<h1>LARAVEL 10 BASED</h1>
+<h3>Al-Quran App indonesian translate </h3>
+<br>
+Just run it use full javascript view and need some connection to use it, dont forget add .env if missing
+<br>
+Or you can access it here : <br>
+[Al-Quran Online](https://myquranq.000webhostapp.com/)
+<br>
+No Database needed, full api project
