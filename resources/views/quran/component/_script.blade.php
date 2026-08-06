@@ -41,7 +41,7 @@ function removeFavorite(nomor) {
     const starBtn = document.getElementById(`star-${nomor}`);
     if (starBtn) {
         starBtn.classList.remove('favorited');
-        starBtn.title = 'Tambah ke favorit';
+        starBtn.title = t('add_favorite');
     }
 }
 
@@ -64,12 +64,12 @@ function renderFavorites() {
         const item = document.createElement('div');
         item.className = 'fav-item';
         item.innerHTML = `
-            <button class="fav-read-btn" title="Baca surah ini">
+            <button class="fav-read-btn" title="${t('read_surah')}">
                 <span class="fav-nomor">${fav.nomor}</span>
                 <span class="fav-name">${fav.namaLatin}</span>
                 <span class="fav-arti">${fav.arti}</span>
             </button>
-            <button class="fav-remove-btn" title="Hapus dari favorit" data-nomor="${fav.nomor}">
+            <button class="fav-remove-btn" title="${t('remove_favorite')}" data-nomor="${fav.nomor}">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         `;
@@ -96,18 +96,228 @@ function toggleFavorite(nomor, namaLatin, arti) {
         const starBtn = document.getElementById(`star-${nomor}`);
         if (starBtn) {
             starBtn.classList.add('favorited');
-            starBtn.title = 'Hapus dari favorit';
+            starBtn.title = t('remove_favorite');
         }
     }
 }
 
 // Init saat halaman load
 document.addEventListener('DOMContentLoaded', function () {
+    initI18n();
     renderFavorites();
     initSettings();
     initLastRead();
     initBookmarks();
+    initMobileDrawer();
+    initJuz();
 });
+
+/* ──────────────────────────────────────────────
+   I18N — Sistem terjemahan antarmuka
+   ────────────────────────────────────────────── */
+const I18N_KEY = 'quran_lang';
+
+const I18N = {
+    id: {
+        nav_home:             'Beranda',
+        nav_juz:              'Juz',
+        nav_last_read:        'Terakhir Dibaca',
+        nav_bookmark:         'Bookmark',
+        nav_settings:         'Pengaturan',
+        data_source_label:    'Data berdasarkan:',
+        banner_subtitle:      'Bacaan Mulia, Panduan Abadi',
+        bismillah_subtitle:   'Dengan menyebut nama Allah Yang Maha Pengasih lagi Maha Penyayang',
+        search_placeholder:   'Cari surah, nomor, atau arti...',
+        search_btn:           'Cari',
+        tab_favorites:        'Favorit',
+        tab_bookmarks:        'Bookmark',
+        fav_empty:            'Belum ada favorit.',
+        fav_empty_hint:       'Klik ★ pada kartu surah untuk menambahkan.',
+        bm_empty:             'Belum ada bookmark.',
+        bm_empty_hint:        'Buka surah, lalu arahkan kursor ke ayat — tombol 🔖 akan muncul di samping nomor ayat.',
+        loading:              'Memuat data...',
+        juz_title:            'Daftar Juz',
+        juz_subtitle:         'Al-Qur\'an 30 Juz',
+        close:                'Tutup',
+        menu:                 'Menu',
+        favorites_bookmark:   'Favorit & Bookmark',
+        settings_title:       'Pengaturan',
+        settings_font_size:   'Ukuran Teks Arab',
+        font_decrease:        'Perkecil',
+        font_increase:        'Perbesar',
+        settings_bg_color:    'Warna Latar Bacaan',
+        settings_selected:    'Dipilih:',
+        settings_language:    'Bahasa Antarmuka',
+        settings_reset:       'Reset ke Default',
+        bm_panel_title:       'Bookmark Ayat Saya',
+        ayat_word:            'ayat',
+        bm_search_placeholder:'Cari surah atau teks ayat...',
+        bm_clear_all:         'Hapus Semua',
+        bm_panel_empty:       'Belum ada ayat yang disimpan.',
+        bm_panel_empty_hint:  'Cara menyimpan bookmark:\n1. Buka salah satu surah\n2. Arahkan kursor ke ayat\n3. Klik tombol 🔖 di samping nomor ayat',
+        // JS-rendered strings
+        read_btn:             'Baca',
+        add_favorite:         'Tambah ke favorit',
+        remove_favorite:      'Hapus dari favorit',
+        read_surah:           'Baca surah ini',
+        prev_surah:           'Surah Sebelumnya',
+        next_surah:           'Surah Berikutnya',
+        jump_to_ayat:         'Lompat ke ayat:',
+        show_translation:     'Tampilkan Terjemahan',
+        hide_translation:     'Sembunyikan Terjemahan',
+        see_translation:      'Lihat terjemahan',
+        hide_translation_s:   'Sembunyikan terjemahan',
+        last_read_saved:      'Bacaan terakhir disimpan',
+        confirm_clear_bm:     'Hapus semua bookmark?',
+        open_ayat:            'Buka Ayat',
+        delete:               'Hapus',
+        open:                 'Buka',
+        surah_word:           'Surah',
+        ayat_ref:             'Ayat',
+        data_not_found:       'Data tidak ditemukan',
+        total_ayat:           'Jumlah Ayat:',
+        place_revealed:       'Tempat Turun:',
+        description:          'Deskripsi:',
+        save_bookmark:        'Simpan bookmark ayat ini',
+        prev_page:            'Sebelumnya',
+        next_page:            'Berikutnya',
+        translation_suffix:   'artinya:',
+    },
+    en: {
+        nav_home:             'Home',
+        nav_juz:              'Juz',
+        nav_last_read:        'Last Read',
+        nav_bookmark:         'Bookmark',
+        nav_settings:         'Settings',
+        data_source_label:    'Data source:',
+        banner_subtitle:      'Noble Reading, Eternal Guide',
+        bismillah_subtitle:   'In the name of Allah, the Most Gracious, the Most Merciful',
+        search_placeholder:   'Search surah, number, or meaning...',
+        search_btn:           'Search',
+        tab_favorites:        'Favorites',
+        tab_bookmarks:        'Bookmarks',
+        fav_empty:            'No favorites yet.',
+        fav_empty_hint:       'Click ★ on a surah card to add.',
+        bm_empty:             'No bookmarks yet.',
+        bm_empty_hint:        'Open a surah, hover over a verse — the 🔖 button will appear next to the verse number.',
+        loading:              'Loading data...',
+        juz_title:            'Juz List',
+        juz_subtitle:         'Qur\'an 30 Juz',
+        close:                'Close',
+        menu:                 'Menu',
+        favorites_bookmark:   'Favorites & Bookmarks',
+        settings_title:       'Settings',
+        settings_font_size:   'Arabic Text Size',
+        font_decrease:        'Decrease',
+        font_increase:        'Increase',
+        settings_bg_color:    'Reading Background Color',
+        settings_selected:    'Selected:',
+        settings_language:    'Interface Language',
+        settings_reset:       'Reset to Default',
+        bm_panel_title:       'My Verse Bookmarks',
+        ayat_word:            'verses',
+        bm_search_placeholder:'Search surah or verse text...',
+        bm_clear_all:         'Clear All',
+        bm_panel_empty:       'No saved verses yet.',
+        bm_panel_empty_hint:  'How to bookmark:\n1. Open a surah\n2. Hover over a verse\n3. Click 🔖 next to the verse number',
+        // JS-rendered strings
+        read_btn:             'Read',
+        add_favorite:         'Add to favorites',
+        remove_favorite:      'Remove from favorites',
+        read_surah:           'Read this surah',
+        prev_surah:           'Previous Surah',
+        next_surah:           'Next Surah',
+        jump_to_ayat:         'Jump to verse:',
+        show_translation:     'Show Translation',
+        hide_translation:     'Hide Translation',
+        see_translation:      'View translation',
+        hide_translation_s:   'Hide translation',
+        last_read_saved:      'Last reading saved',
+        confirm_clear_bm:     'Delete all bookmarks?',
+        open_ayat:            'Open Verse',
+        delete:               'Delete',
+        open:                 'Open',
+        surah_word:           'Surah',
+        ayat_ref:             'Verse',
+        data_not_found:       'Data not found',
+        total_ayat:           'Total Verses:',
+        place_revealed:       'Revealed at:',
+        description:          'Description:',
+        save_bookmark:        'Save verse bookmark',
+        prev_page:            'Previous',
+        next_page:            'Next',
+        translation_suffix:   'meaning:',
+    }
+};
+
+function getCurrentLang() {
+    return localStorage.getItem(I18N_KEY) || 'id';
+}
+
+function t(key) {
+    const lang = getCurrentLang();
+    return (I18N[lang] && I18N[lang][key]) ? I18N[lang][key] : (I18N['id'][key] || key);
+}
+
+function applyI18n() {
+    const lang = getCurrentLang();
+
+    // Update <html lang="">
+    document.documentElement.lang = lang;
+
+    // Teks biasa: [data-i18n]
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const val = t(key);
+        if (val) el.textContent = val;
+    });
+
+    // Placeholder: [data-i18n-placeholder]
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const val = t(key);
+        if (val) el.placeholder = val;
+    });
+
+    // Title attribute: [data-i18n-title]
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        const val = t(key);
+        if (val) el.title = val;
+    });
+
+    // Update tombol bahasa aktif
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+
+    // Update label bg-selected-name sesuai bahasa
+    const selectedBgBtn = document.querySelector('.bg-option.selected');
+    if (selectedBgBtn) {
+        const nameKey = lang === 'en' ? 'data-name-en' : 'data-name-id';
+        const name = selectedBgBtn.getAttribute(nameKey) || selectedBgBtn.getAttribute('data-name-id');
+        const lbl = document.getElementById('bg-selected-name');
+        if (lbl && name) lbl.textContent = name;
+    }
+
+    // Update pagination buttons
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    if (prevBtn) prevBtn.innerHTML = `<i class="fa-solid fa-chevron-left"></i> ${t('prev_page')}`;
+    if (nextBtn) nextBtn.innerHTML = `${t('next_page')} <i class="fa-solid fa-chevron-right"></i>`;
+}
+
+function initI18n() {
+    applyI18n();
+
+    // Pasang event listener tombol bahasa
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            localStorage.setItem(I18N_KEY, btn.dataset.lang);
+            applyI18n();
+        });
+    });
+}
 
 /* ──────────────────────────────────────────────
    SETTINGS — localStorage
@@ -133,27 +343,27 @@ function saveSettings(obj) {
 }
 
 function applySettings(s) {
-    // Ukuran font Arab
-    document.documentElement.style.setProperty('--arabic-font-size', s.fontSize + 'px');
+    const root = document.documentElement;
 
-    // Background area baca (.ayat)
-    // Jika dark navy, teks Arab jadi putih/emas
-    const ayatEls = document.querySelectorAll('.ayat');
-    ayatEls.forEach(el => {
-        el.style.background = s.bgColor;
-        if (s.bgColor === '#1a2e45') {
-            el.style.color = '#e8c97a';
-            el.classList.add('ayat-dark');
-        } else {
-            el.style.color = '';
-            el.classList.remove('ayat-dark');
-        }
-    });
+    // Ukuran font Arab
+    root.style.setProperty('--arabic-font-size', s.fontSize + 'px');
+
+    // Background & warna teks — pakai CSS variable di :root
+    root.style.setProperty('--ayat-bg', s.bgColor);
+
+    if (s.bgColor === '#1a2e45') {
+        root.classList.add('theme-dark');
+    } else {
+        root.classList.remove('theme-dark');
+    }
 }
 
 function initSettings() {
     const s = getSettings();
     applySettings(s);
+
+    // Re-apply setiap kali ayat dirender (surah dibuka)
+    document.addEventListener('ayat-rendered', () => applySettings(getSettings()));
 
     const overlay     = document.getElementById('settings-overlay');
     const openBtn     = document.getElementById('open-settings-btn');
@@ -209,7 +419,8 @@ function initSettings() {
     bgOptions.forEach(btn => {
         btn.addEventListener('click', () => {
             const color = btn.dataset.color;
-            const name  = btn.dataset.name;
+            const lang  = getCurrentLang();
+            const name  = (lang === 'en' ? btn.dataset.nameEn : btn.dataset.nameId) || btn.dataset.nameId || btn.dataset.name || '';
             const cur = getSettings();
             cur.bgColor = color;
             cur.bgName  = name;
@@ -265,8 +476,8 @@ function showLastReadToast(namaLatin, nomorAyat) {
     toast.innerHTML = `
         <div class="toast-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
         <div class="toast-body">
-            <span class="toast-label">Bacaan terakhir disimpan</span>
-            <span class="toast-info">${namaLatin} — Ayat ${nomorAyat}</span>
+            <span class="toast-label">${t('last_read_saved')}</span>
+            <span class="toast-info">${namaLatin} — ${t('ayat_ref')} ${nomorAyat}</span>
         </div>
         <button class="toast-close" onclick="this.parentElement.remove()">
             <i class="fa-solid fa-xmark"></i>
@@ -286,9 +497,9 @@ function renderLastReadBadge() {
     const badge = document.getElementById('last-read-badge');
     if (!badge) return;
     if (lr) {
-        badge.textContent = lr.nomorAyat;
+        badge.textContent = `${lr.nomorSurah}:${lr.nomorAyat}`;
         badge.style.display = 'inline-flex';
-        badge.title = `${lr.namaLatin} : Ayat ${lr.nomorAyat}`;
+        badge.title = `${lr.namaLatin} : ${t('ayat_ref')} ${lr.nomorAyat}`;
     } else {
         badge.style.display = 'none';
     }
@@ -426,7 +637,7 @@ function buildBookmarkItem(bm, isPanel) {
                 <div class="bm-panel-surah">
                     <i class="fa-solid fa-book-quran"></i>
                     <span class="bm-panel-name">${bm.namaLatin}</span>
-                    <span class="bm-panel-num">Ayat ${bm.nomorAyat}</span>
+                    <span class="bm-panel-num">${t('ayat_ref')} ${bm.nomorAyat}</span>
                 </div>
                 <span class="bm-panel-date">${dateStr}</span>
             </div>
@@ -435,11 +646,11 @@ function buildBookmarkItem(bm, isPanel) {
             <p class="bm-panel-idn">${bm.teksIndonesia || '—'}</p>
             <div class="bm-panel-actions">
                 <button class="bookmark-go-btn bm-panel-go-btn">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Ayat
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> ${t('open_ayat')}
                 </button>
                 <button class="bookmark-del-btn bm-panel-del-btn"
                     data-surah="${bm.nomorSurah}" data-ayat="${bm.nomorAyat}">
-                    <i class="fa-solid fa-trash-can"></i> Hapus
+                    <i class="fa-solid fa-trash-can"></i> ${t('delete')}
                 </button>
             </div>
         `;
@@ -448,13 +659,13 @@ function buildBookmarkItem(bm, isPanel) {
         item.innerHTML = `
             <div class="bookmark-header">
                 <span class="bookmark-surah-name">${bm.namaLatin}</span>
-                <span class="bookmark-ayat-num">Ayat ${bm.nomorAyat}</span>
+                <span class="bookmark-ayat-num">${t('ayat_ref')} ${bm.nomorAyat}</span>
             </div>
             <p class="bookmark-arab">${bm.teksArab}</p>
             <p class="bookmark-idn">${bm.teksIndonesia || '—'}</p>
             <div class="bookmark-actions">
                 <button class="bookmark-go-btn">
-                    <i class="fa-solid fa-arrow-right"></i> Buka
+                    <i class="fa-solid fa-arrow-right"></i> ${t('open')}
                 </button>
                 <button class="bookmark-del-btn"
                     data-surah="${bm.nomorSurah}" data-ayat="${bm.nomorAyat}">
@@ -505,7 +716,7 @@ function renderBookmarkPanel(filter = '') {
         );
     }
 
-    if (panelCount) panelCount.textContent = `${getBookmarks().length} ayat`;
+    if (panelCount) panelCount.textContent = `${getBookmarks().length} ${t('ayat_word')}`;
 
     if (list.length === 0) {
         if (panelEmpty) panelEmpty.style.display = 'flex';
@@ -567,7 +778,7 @@ function initBookmarks() {
     const clearBtn = document.getElementById('bookmark-clear-all-btn');
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            if (!confirm('Hapus semua bookmark?')) return;
+            if (!confirm(t('confirm_clear_bm'))) return;
             saveBookmarks([]);
             document.querySelectorAll('.btn-bookmark-ayat').forEach(b => b.classList.remove('bookmarked'));
             renderBookmarks();
@@ -592,6 +803,138 @@ function syncBookmarkButtons() {
         if (btnNomorSurah === bm.nomorSurah) {
             btn.classList.add('bookmarked');
         }
+    });
+}
+
+/* ──────────────────────────────────────────────
+   MOBILE DRAWER
+   ────────────────────────────────────────────── */
+function initMobileDrawer() {
+    const sidebarLeft  = document.querySelector('.sidebar-left');
+    const sidebarRight = document.querySelector('.sidebar-right');
+    const backdrop     = document.getElementById('drawer-backdrop');
+    const burgerLeft   = document.getElementById('burger-left-btn');
+    const burgerRight  = document.getElementById('burger-right-btn');
+
+    if (!sidebarLeft || !backdrop) return;
+
+    function openDrawer(side) {
+        closeAllDrawers();
+        if (side === 'left')  sidebarLeft.classList.add('drawer-open');
+        if (side === 'right') sidebarRight && sidebarRight.classList.add('drawer-open');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAllDrawers() {
+        sidebarLeft.classList.remove('drawer-open');
+        sidebarRight && sidebarRight.classList.remove('drawer-open');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    burgerLeft  && burgerLeft.addEventListener('click',  () => openDrawer('left'));
+    burgerRight && burgerRight.addEventListener('click', () => openDrawer('right'));
+    backdrop.addEventListener('click', closeAllDrawers);
+
+    // Tutup drawer saat klik nav item di dalam sidebar kiri (mobile)
+    sidebarLeft.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) closeAllDrawers();
+        });
+    });
+}
+
+/* ──────────────────────────────────────────────
+   JUZ — mapping & panel
+   ────────────────────────────────────────────── */
+const JUZ_MAP = [
+    { juz:  1, surah:   1, ayat:   1, namaLatin: 'Al-Fatihah'   },
+    { juz:  2, surah:   2, ayat: 142, namaLatin: 'Al-Baqarah'   },
+    { juz:  3, surah:   2, ayat: 253, namaLatin: 'Al-Baqarah'   },
+    { juz:  4, surah:   3, ayat:  93, namaLatin: 'Ali Imran'     },
+    { juz:  5, surah:   4, ayat:  24, namaLatin: 'An-Nisa'       },
+    { juz:  6, surah:   4, ayat: 148, namaLatin: 'An-Nisa'       },
+    { juz:  7, surah:   5, ayat:  82, namaLatin: 'Al-Maidah'     },
+    { juz:  8, surah:   6, ayat: 111, namaLatin: 'Al-Anam'       },
+    { juz:  9, surah:   7, ayat:  88, namaLatin: 'Al-Araf'       },
+    { juz: 10, surah:   8, ayat:  41, namaLatin: 'Al-Anfal'      },
+    { juz: 11, surah:   9, ayat:  93, namaLatin: 'At-Taubah'     },
+    { juz: 12, surah:  11, ayat:   6, namaLatin: 'Hud'           },
+    { juz: 13, surah:  12, ayat:  53, namaLatin: 'Yusuf'         },
+    { juz: 14, surah:  15, ayat:   1, namaLatin: 'Al-Hijr'       },
+    { juz: 15, surah:  17, ayat:   1, namaLatin: 'Al-Isra'       },
+    { juz: 16, surah:  18, ayat:  75, namaLatin: 'Al-Kahf'       },
+    { juz: 17, surah:  21, ayat:   1, namaLatin: 'Al-Anbiya'     },
+    { juz: 18, surah:  23, ayat:   1, namaLatin: 'Al-Muminun'    },
+    { juz: 19, surah:  25, ayat:  21, namaLatin: 'Al-Furqan'     },
+    { juz: 20, surah:  27, ayat:  56, namaLatin: 'An-Naml'       },
+    { juz: 21, surah:  29, ayat:  46, namaLatin: 'Al-Ankabut'    },
+    { juz: 22, surah:  33, ayat:  31, namaLatin: 'Al-Ahzab'      },
+    { juz: 23, surah:  36, ayat:  28, namaLatin: 'Yasin'         },
+    { juz: 24, surah:  39, ayat:  32, namaLatin: 'Az-Zumar'      },
+    { juz: 25, surah:  41, ayat:  47, namaLatin: 'Fussilat'      },
+    { juz: 26, surah:  46, ayat:   1, namaLatin: 'Al-Ahqaf'      },
+    { juz: 27, surah:  51, ayat:  31, namaLatin: 'Az-Zariyat'    },
+    { juz: 28, surah:  58, ayat:   1, namaLatin: 'Al-Mujadila'   },
+    { juz: 29, surah:  67, ayat:   1, namaLatin: 'Al-Mulk'       },
+    { juz: 30, surah:  78, ayat:   1, namaLatin: 'An-Naba'       },
+];
+
+function initJuz() {
+    const overlay  = document.getElementById('juz-panel-overlay');
+    const openBtn  = document.getElementById('nav-juz-btn');
+    const closeBtn = document.getElementById('close-juz-panel-btn');
+    const listEl   = document.getElementById('juz-panel-list');
+    if (!overlay || !listEl) return;
+
+    // Render list juz
+    JUZ_MAP.forEach(j => {
+        const item = document.createElement('button');
+        item.className = 'juz-item';
+        item.innerHTML = `
+            <div class="juz-number">
+                <span class="juz-num-label">Juz</span>
+                <span class="juz-num-val">${j.juz}</span>
+            </div>
+            <div class="juz-info">
+                <span class="juz-surah-name">${j.namaLatin}</span>
+                <span class="juz-ayat-ref">${t('surah_word')} ${j.surah}, ${t('ayat_ref')} ${j.ayat}</span>
+            </div>
+            <div class="juz-arrow">
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        `;
+        item.addEventListener('click', () => {
+            overlay.classList.remove('open');
+            // Tutup mobile drawer juga
+            document.querySelector('.sidebar-left')?.classList.remove('drawer-open');
+            document.getElementById('drawer-backdrop')?.classList.remove('active');
+            document.body.style.overflow = '';
+
+            // Buka surah lalu jump ke ayat
+            loadSurahDetails(j.surah);
+            setTimeout(() => {
+                jumpToLastRead({ nomorAyat: j.ayat });
+            }, 950);
+        });
+        listEl.appendChild(item);
+    });
+
+    // Open
+    openBtn && openBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        overlay.classList.add('open');
+        // Tutup mobile drawer
+        document.querySelector('.sidebar-left')?.classList.remove('drawer-open');
+        document.getElementById('drawer-backdrop')?.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    // Close
+    closeBtn && closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('open');
     });
 }
 
