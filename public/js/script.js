@@ -88,7 +88,7 @@ nextButton.addEventListener("click", () => {
 
 // fetch all surah or search
 function loadAllSurah() {
-    const urlAllSurah = "https://quran-api.santrikoding.com/api/surah";
+    const urlAllSurah = "https://equran.id/api/v2/surat";
     if (!isDataLoaded) {
         allDataSurahPromise = new Promise((resolve, reject) => {
             const allDataSurah = new Array();
@@ -99,26 +99,29 @@ function loadAllSurah() {
                 if (xhttp.readyState == 4 && xhttp.status === 200) {
                     const responses = JSON.parse(xhttp.responseText);
 
-                    // Filter
-                    responses.forEach((element) => {
-                        let searchNamaSurah = element.nama_latin.toLowerCase();
+                    // Filter — support both wrapped { data: [...] } and plain array response
+                    const surahList = Array.isArray(responses)
+                        ? responses
+                        : responses.data;
+                    surahList.forEach((element) => {
+                        let searchNamaSurah = element.namaLatin.toLowerCase();
                         let searchArtiSurah = element.arti.toLowerCase();
                         let searchNomor = element.nomor;
                         if (
                             searchNamaSurah.includes(
-                                searchSurah.toLowerCase()
+                                searchSurah.toLowerCase(),
                             ) ||
                             searchArtiSurah.includes(
-                                searchSurah.toLowerCase()
+                                searchSurah.toLowerCase(),
                             ) ||
                             searchNomor == searchSurah
                         ) {
                             allDataSurah.push(
                                 new Surah(
                                     element.nomor,
-                                    element.nama_latin,
-                                    element.arti
-                                )
+                                    element.namaLatin,
+                                    element.arti,
+                                ),
                             );
                         }
                     });
@@ -139,13 +142,28 @@ function surahCard(surah) {
     const card = document.createElement("div");
     card.classList.add("surah-card");
 
+    // Cek apakah sudah difavoritkan (fungsi isFavorite dari _script.blade.php)
+    const favClass =
+        typeof isFavorite === "function" && isFavorite(surah.nomor)
+            ? "favorited"
+            : "";
+    const favTitle = favClass ? "Hapus dari favorit" : "Tambah ke favorit";
+
     card.innerHTML = `
-  <p>${numberToArabic(surah.nomor)}</p>
-  <div class="title">
-  <h3>${surah.nama_latin}</h3>
-  <p>${surah.arti}</p>
+  <div class="card-nomor">${numberToArabic(surah.nomor)}</div>
+  <div class="card-info">
+    <h3 class="card-name">${surah.nama_latin}</h3>
+    <p class="card-arti">${surah.arti}</p>
   </div>
-  <button id="button${surah.nomor}" class="buttons">Read</button>
+  <div class="card-actions">
+    <button id="button${surah.nomor}" class="btn-read">
+      <i class="fa-solid fa-book-open"></i> Baca
+    </button>
+    <button id="star-${surah.nomor}" class="btn-star ${favClass}" title="${favTitle}"
+      onclick="toggleFavorite(${surah.nomor}, '${surah.nama_latin.replace(/'/g, "\\'")}', '${surah.arti.replace(/'/g, "\\'")}')">
+      <i class="fa-solid fa-star"></i>
+    </button>
+  </div>
   `;
     return card;
 }
@@ -205,7 +223,7 @@ function loadPagingSurah(currentIndex, totalData) {
                     mainBody.appendChild(surahCard(data[currentIndex]));
 
                     const buttonDetail = document.getElementById(
-                        `button${data[currentIndex].nomor}`
+                        `button${data[currentIndex].nomor}`,
                     );
 
                     (function (index) {
@@ -213,6 +231,19 @@ function loadPagingSurah(currentIndex, totalData) {
                             loadSurahDetails(index);
                         });
                     })(data[currentIndex].nomor);
+                }
+
+                // Sync state bintang favorit dari localStorage setelah semua kartu dirender
+                if (typeof isFavorite === 'function') {
+                    data.forEach((surah) => {
+                        if (isFavorite(surah.nomor)) {
+                            const starBtn = document.getElementById(`star-${surah.nomor}`);
+                            if (starBtn) {
+                                starBtn.classList.add('favorited');
+                                starBtn.title = 'Hapus dari favorit';
+                            }
+                        }
+                    });
                 }
             }
         })
@@ -232,9 +263,12 @@ loadPagingSurah(currentIndex, totalData);
 // fetch detail surah from api
 function fetchDetailInformasiSurah(nomor) {
     return new Promise((resolve, reject) => {
-        fetch(`https://quran-api.santrikoding.com/api/surah/${nomor}`)
+        fetch(`https://equran.id/api/v2/surat/${nomor}`)
             .then((response) => response.json())
-            .then((data) => {
+            .then((response) => {
+                // Support wrapped { code, message, data: {...} } and plain object
+                const data =
+                    response.data !== undefined ? response.data : response;
                 setTimeout(resolve(data), 1000);
             })
             .catch((error) => {
@@ -249,22 +283,40 @@ function loadSurahDetails(nomorSurah) {
         .then((data) => {
             titleSurah.innerHTML = "";
             info.style.display = "none";
+
             // Set Surah title and its navigation
             titleSurah.appendChild(componentTitleSurah(data));
             const jumpTo = document.getElementById("scroll-input");
             const nextSurah = document.getElementById("surah-next");
             const prevSurah = document.getElementById("surah-prev");
-            if (nomorSurah == 1) {
+
+            // Gunakan suratSebelumnya / suratSelanjutnya dari JSON baru,
+            // fallback ke nomor ± 1 jika field tidak tersedia
+            const suratSebelumnya = data.suratSebelumnya;
+            const suratSelanjutnya = data.suratSelanjutnya;
+
+            if (!suratSebelumnya || nomorSurah == 1) {
                 prevSurah.style.display = "none";
+            } else {
+                prevSurah.style.display = "inline-block";
             }
-            if (nomorSurah == 114) {
+            if (!suratSelanjutnya || nomorSurah == 114) {
                 nextSurah.style.display = "none";
+            } else {
+                nextSurah.style.display = "inline-block";
             }
+
             prevSurah.addEventListener("click", () => {
-                loadSurahDetails(nomorSurah - 1);
+                const prevNomor = suratSebelumnya
+                    ? suratSebelumnya.nomor
+                    : nomorSurah - 1;
+                loadSurahDetails(prevNomor);
             });
             nextSurah.addEventListener("click", () => {
-                loadSurahDetails(nomorSurah + 1);
+                const nextNomor = suratSelanjutnya
+                    ? suratSelanjutnya.nomor
+                    : nomorSurah + 1;
+                loadSurahDetails(nextNomor);
             });
             // remove body
             mainBody.innerHTML = "";
@@ -273,46 +325,121 @@ function loadSurahDetails(nomorSurah) {
             componentDetailSurah(data).then((surah) => {
                 mainBody.appendChild(surah);
 
+                // Re-apply settings (font size, bg color) ke .ayat yang baru dibuat
+                if (typeof applySettings === 'function') {
+                    applySettings(getSettings());
+                }
+
+                // Sync tombol bookmark yang sudah tersimpan
+                document.dispatchEvent(new Event('ayat-rendered'));
+
+                // Double click pada ayat → simpan last read
+                data.ayat.forEach((ayat) => {
+                    const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
+                    const el = document.getElementById(`isi-ayat${nomorAyat}`);
+                    if (!el) return;
+                    el.addEventListener('dblclick', () => {
+                        if (typeof saveLastRead === 'function') {
+                            saveLastRead(nomorSurah, data.namaLatin ?? data.nama_latin, nomorAyat);
+                        }
+                        // Feedback visual singkat
+                        el.style.outline = '2px solid var(--gold)';
+                        setTimeout(() => el.style.outline = '', 800);
+                    });
+                });
+
                 const hideDetailButton =
                     document.getElementById("hide-detail-button");
 
                 const showAllTerjemah = document.getElementById(
-                    "show-all-terjemahan-button"
+                    "show-all-terjemahan-button",
                 );
 
                 const surahInformation = document.querySelector(".detail");
-                const ayat = document.querySelector(".ayat");
+                const ayatContainer = document.querySelector(".ayat");
 
-                let showDetail = true;
-                hideDetailButton.addEventListener("click", () => {
-                    if (showDetail) {
-                        hideDetailButton.innerHTML = `
-                        <span> >> </span>
+                // Default: full-width Arabic-only mode
+                ayatContainer.classList.add("ayat-fullwidth");
+                // Ubah detailSurah container ke block agar ayat melebar penuh
+                const detailSurahEl = ayatContainer.closest(".detailSurah");
+                if (detailSurahEl) detailSurahEl.classList.add("fullwidth-mode");
 
-                        `;
-                        surahInformation.style.display = "none";
-                        ayat.style.width = "100%";
-                        showDetail = false;
-                    } else {
-                        hideDetailButton.innerHTML = `
-                        <span> << </span>
+                // Legacy hide-detail button (now hidden but keep wired)
+                let showDetail = false;
+                if (hideDetailButton) {
+                    hideDetailButton.addEventListener("click", () => {
+                        if (showDetail) {
+                            hideDetailButton.innerHTML = `<span> >> </span>`;
+                            surahInformation.style.display = "none";
+                            ayatContainer.classList.add("ayat-fullwidth");
+                            if (detailSurahEl) detailSurahEl.classList.add("fullwidth-mode");
+                            showDetail = false;
+                        } else {
+                            hideDetailButton.innerHTML = `<span> << </span>`;
+                            ayatContainer.classList.remove("ayat-fullwidth");
+                            if (detailSurahEl) detailSurahEl.classList.remove("fullwidth-mode");
+                            surahInformation.style.display = "block";
+                            showDetail = true;
+                        }
+                    });
+                }
 
-                        `;
-                        ayat.style.width = "60%";
-                        surahInformation.style.display = "block";
-                        showDetail = true;
-                    }
-                });
-
-                // intiate terjemahan
+                // intiate terjemahan (inserted but hidden by default)
                 initiateTerjemah(data.ayat);
 
-                // Toggle Terjemahan
+                // ── NEW: Show/Hide Translation toggle button ──
+                let translationVisible = false; // hidden by default
+
+                const toggleTranslationBtn = document.getElementById(
+                    "toggle-translation-btn",
+                );
+                if (toggleTranslationBtn) {
+                    toggleTranslationBtn.addEventListener("click", () => {
+                        translationVisible = !translationVisible;
+
+                        // Update button label & icon
+                        if (translationVisible) {
+                            toggleTranslationBtn.innerHTML = `
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Show Translation</span>
+                            `;
+                            toggleTranslationBtn.classList.add("active");
+                        } else {
+                            toggleTranslationBtn.innerHTML = `
+                                <i class="fa-solid fa-eye-slash"></i>
+                                <span>Hide Translation</span>
+                            `;
+                            toggleTranslationBtn.classList.remove("active");
+                        }
+
+                        // Show/hide all per-ayat action rows and terjemahan blocks
+                        data.ayat.forEach((ayat) => {
+                            const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
+                            const actionRow = document.querySelector(
+                                `#isi-ayat${nomorAyat} .ayat-action`,
+                            );
+                            const terjemahanBlock = document.getElementById(
+                                `terjemahan${nomorAyat}`,
+                            );
+                            if (actionRow)
+                                actionRow.style.display = translationVisible
+                                    ? "block"
+                                    : "none";
+                            if (terjemahanBlock)
+                                terjemahanBlock.style.display =
+                                    translationVisible ? "block" : "none";
+                        });
+                    });
+                }
+
+                // Legacy toggle all (show-all-terjemahan-button, still wired)
                 let condition = true;
-                showAllTerjemah.addEventListener("click", () => {
-                    showHideAllTerjemah(data.ayat, condition);
-                    condition = !condition;
-                });
+                if (showAllTerjemah) {
+                    showAllTerjemah.addEventListener("click", () => {
+                        showHideAllTerjemah(data.ayat, condition);
+                        condition = !condition;
+                    });
+                }
 
                 let totalAyat = data.ayat.length;
                 jumpTo.max = totalAyat;
@@ -325,7 +452,7 @@ function loadSurahDetails(nomorSurah) {
                             alert("Ayat yang anda masukan tidak tersedia!");
                         }
                         const elementToJump = document.getElementById(
-                            `isi-ayat${nomorAyat}`
+                            `isi-ayat${nomorAyat}`,
                         );
 
                         elementToJump.style.backgroundColor = "#f1f9f9";
@@ -351,15 +478,20 @@ function componentTitleSurah(surah) {
     title.classList.add("title-Surah");
 
     title.innerHTML = `
-    <h2>${surah.nama_latin} (${surah.nama}) </h2>
+    <h2>${surah.namaLatin ?? surah.nama_latin} (${surah.nama}) </h2>
     <h3>${surah.arti}</h3>
     <div class='scroll-navigation'>
-    <button id="surah-prev">Previous</button>
-    <div><label for ='scroll-input'>jump to ayat :</label>
-    <input id='scroll-input' maxlength="3" type="number" value="1"></div>
-    <button id="surah-next">Next</button>
+      <button id="surah-prev">Previous</button>
+      <div class="jump-group">
+        <label for='scroll-input'>jump to ayat :</label>
+        <input id='scroll-input' maxlength="3" type="number" value="1">
+      </div>
+      <button id="toggle-translation-btn" class="btn-toggle-translation" title="Tampilkan / Sembunyikan Terjemahan">
+        <i class="fa-solid fa-eye-slash"></i>
+        <span>Hide Translation</span>
+      </button>
+      <button id="surah-next">Next</button>
     </div>
-
     `;
 
     return title;
@@ -371,17 +503,17 @@ function componentDetailSurah(surah) {
         const detailSurah = document.createElement("div");
         detailSurah.classList.add("detailSurah");
 
-        //info surah
+        //info surah — hidden by default, full-width Arabic view
         detailSurah.innerHTML = `
-    <div class="detail">
-        <p>Jumlah Ayat :${surah.jumlah_ayat}</p>
-        <p>Tempat Turun : ${surah.tempat_turun}</p>
+    <div class="detail" style="display:none;">
+        <p>Jumlah Ayat :${surah.jumlahAyat ?? surah.jumlah_ayat}</p>
+        <p>Tempat Turun : ${surah.tempatTurun ?? surah.tempat_turun}</p>
     <div class="deskripsi">
         <label>Deskripsi : </label>
         <p id="label${surah.nomor}">${surah.deskripsi}</p>
     </div>
     </div>
-    <div class="hide-detail">
+    <div class="hide-detail" style="display:none;">
         <a id="hide-detail-button"> <span><<</span> </a>
         <a id="show-all-terjemahan-button"> <i class="fa-solid fa-eye"></i> </a>
     </div>
@@ -392,26 +524,31 @@ function componentDetailSurah(surah) {
         ayat.classList.add("ayat");
         let isiAyat = "";
         surah.ayat.forEach((ayat) => {
+            // Support new API fields (nomorAyat, teksArab) and old fields (nomor, ar)
+            const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
+            const teksArab = ayat.teksArab ?? ayat.ar;
             isiAyat += `
         <div class="barisSurah">
-        <div id="isi-ayat${ayat.nomor}" class="isi-ayat">
+        <div id="isi-ayat${nomorAyat}" class="isi-ayat">
             <div class="ayat-nav">
-                <span class="arabic">${ayat.ar}</span>
+                <span class="arabic">${teksArab}</span>
             </div>
-            <div class="ayat-action">
-                <a id="toggleTerjemahan${
-                    ayat.nomor
-                }" class="show-hide-terjemahan">Lihat terjemahan</a>
+            <div class="ayat-action" style="display:none;">
+                <a id="toggleTerjemahan${nomorAyat}" class="show-hide-terjemahan">Lihat terjemahan</a>
             </div>
         </div>
         <div class="nomor-ayat">
             <div class="urutan-ayat">
-                <span >${numberToArabic(ayat.nomor)} </span>
+                <span>${numberToArabic(nomorAyat)}</span>
             </div>
+            <button class="btn-bookmark-ayat"
+                id="bookmark-btn-${nomorAyat}"
+                title="Simpan bookmark ayat ini"
+                onclick="toggleBookmarkAyat(${surah.nomor}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g,"\\'")}', ${nomorAyat})">
+                <i class="fa-solid fa-bookmark"></i>
+            </button>
         </div>
-
         </div>
-
         `;
         });
 
@@ -427,9 +564,10 @@ function componentDetailSurah(surah) {
 function showHideAllTerjemah(listAyat, condition) {
     return new Promise((resolve) => {
         listAyat.forEach((ayat) => {
-            const terjemah = document.getElementById(`terjemahan${ayat.nomor}`);
+            const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
+            const terjemah = document.getElementById(`terjemahan${nomorAyat}`);
             const terjemahAction = document.getElementById(
-                `toggleTerjemahan${ayat.nomor}`
+                `toggleTerjemahan${nomorAyat}`,
             );
 
             if (condition) {
@@ -448,18 +586,19 @@ function showHideAllTerjemah(listAyat, condition) {
 function initiateTerjemah(listAyat) {
     return new Promise((resolve, reject) => {
         listAyat.forEach((ayat) => {
-            const ayatSurah = document.getElementById(`isi-ayat${ayat.nomor}`);
+            const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
+            const ayatSurah = document.getElementById(`isi-ayat${nomorAyat}`);
 
             // function add terjemahan in ayat
             ComponentTerjemahan(ayat).then((element) => {
                 ayatSurah.appendChild(element);
 
                 const toggleTerjemahan = document.getElementById(
-                    `toggleTerjemahan${ayat.nomor}`
+                    `toggleTerjemahan${nomorAyat}`,
                 );
 
                 const bodyTerjemahan = document.getElementById(
-                    `terjemahan${ayat.nomor}`
+                    `terjemahan${nomorAyat}`,
                 );
 
                 let show = true;
@@ -483,12 +622,16 @@ function initiateTerjemah(listAyat) {
 
 function ComponentTerjemahan(ayat) {
     return new Promise((resolve, reject) => {
+        // Support new API fields and old fields as fallback
+        const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
+        const teksLatin = ayat.teksLatin ?? ayat.tr;
+        const teksIndonesia = ayat.teksIndonesia ?? ayat.idn;
+
         const terjemah = document.createElement("div");
-        // terjemah.setAttribute("id", "terjemahan-ayat");
         terjemah.innerHTML = `
-        <div id="terjemahan${ayat.nomor}" class="terjemahan-ayat">
-            <p class="tulisan-latin">${ayat.tr}</p>
-            <p class="terjemahan">artinya :  "${ayat.idn}"</p>
+        <div id="terjemahan${nomorAyat}" class="terjemahan-ayat">
+            <p class="tulisan-latin">${teksLatin}</p>
+            <p class="terjemahan">artinya : "${teksIndonesia}"</p>
         </div>
         `;
         resolve(terjemah);
