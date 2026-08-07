@@ -71,6 +71,10 @@
             <span data-i18n="nav_bookmark">Bookmark</span>
             <span id="bookmark-count-badge" class="last-read-badge" style="display:none;"></span>
           </a>
+          <a href="#" class="nav-item" id="nav-tajwid-guide-btn">
+            <i class="fa-solid fa-graduation-cap nav-icon"></i>
+            <span data-i18n="nav_tajwid_guide">Panduan Tajwid</span>
+          </a>
           <a href="#" class="nav-item" id="open-settings-btn">
             <i class="fa-solid fa-gear nav-icon"></i>
             <span data-i18n="nav_settings">Pengaturan</span>
@@ -79,8 +83,10 @@
 
         <div class="sidebar-footer-info">
           <div class="ornament-divider">﴾ ✦ ﴿</div>
-          <p class="data-source-label" data-i18n="data_source_label">Data berdasarkan:</p>
-          <a href="https://equran.id/" target="_blank" class="data-source-link">equran.id</a>
+          <button class="data-source-btn" id="open-datasource-btn">
+            <i class="fa-solid fa-database"></i>
+            <span data-i18n="data_source_label">Sumber Data</span>
+          </button>
         </div>
       </aside>
 
@@ -162,7 +168,7 @@
 
     <footer class="footer">
       <span class="footer-ornament">❋</span>
-      <h3>Copyright © Al Quran Digital 2024</h3>
+      <h3>Copyright © Al Quran Digital 2026</h3>
       <span class="footer-ornament">❋</span>
     </footer>
 
@@ -209,7 +215,9 @@
           </button>
         </div>
 
-        {{-- Font Size --}}
+        <div class="settings-panel-body">
+
+        {{-- Font Size Arab --}}
         <div class="settings-section">
           <label class="settings-label">
             <i class="fa-solid fa-text-height"></i>
@@ -222,13 +230,62 @@
           </div>
           <input type="range" id="font-size-slider" class="settings-slider"
             min="24" max="64" step="2" value="36">
+          <p class="settings-preview settings-preview-arab" id="arab-size-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ</p>
         </div>
 
-        {{-- Background Color --}}
+        {{-- Font Size Latin --}}
+        <div class="settings-section">
+          <label class="settings-label">
+            <i class="fa-solid fa-italic"></i>
+            <span data-i18n="settings_latin_font_size">Ukuran Teks Latin</span>
+          </label>
+          <div class="font-size-controls">
+            <button class="font-btn" id="latin-font-decrease" title="Perkecil">A−</button>
+            <span id="latin-font-size-display" class="font-size-display">13px</span>
+            <button class="font-btn" id="latin-font-increase" title="Perbesar">A+</button>
+          </div>
+          <input type="range" id="latin-font-size-slider" class="settings-slider"
+            min="11" max="20" step="1" value="13">
+          <p class="settings-preview settings-preview-latin" id="latin-size-preview">Bismillāhir-raḥmānir-raḥīm</p>
+        </div>
+
+        {{-- Font Size Terjemahan --}}
+        <div class="settings-section">
+          <label class="settings-label">
+            <i class="fa-solid fa-book-open-reader"></i>
+            <span data-i18n="settings_translation_font_size">Ukuran Teks Terjemahan</span>
+          </label>
+          <div class="font-size-controls">
+            <button class="font-btn" id="trans-font-decrease" title="Perkecil">A−</button>
+            <span id="trans-font-size-display" class="font-size-display">13px</span>
+            <button class="font-btn" id="trans-font-increase" title="Perbesar">A+</button>
+          </div>
+          <input type="range" id="trans-font-size-slider" class="settings-slider"
+            min="11" max="20" step="1" value="13">
+          <p class="settings-preview settings-preview-trans" id="trans-size-preview">Dengan menyebut nama Allah Yang Maha Pengasih lagi Maha Penyayang</p>
+        </div>
+
+        {{-- Jenis Font Arab --}}
+        <div class="settings-section">
+          <label class="settings-label">
+            <i class="fa-solid fa-pen-nib"></i>
+            <span data-i18n="settings_arab_font">Jenis Font Arab</span>
+          </label>
+          <select id="arab-font-select" class="settings-select">
+            <option value="Amiri Quran">Amiri Quran</option>
+            <option value="Scheherazade">Scheherazade</option>
+            <option value="Noorehuda">Noorehuda</option>
+            <option value="KFGQPC Hafs">KFGQPC Hafs (Uthmani)</option>
+            <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
+          </select>
+          <p class="settings-preview settings-preview-arab" id="arab-font-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
+        </div>
+
+        {{-- Warna Latar --}}
         <div class="settings-section">
           <label class="settings-label">
             <i class="fa-solid fa-palette"></i>
-            <span data-i18n="settings_bg_color">Warna Latar Bacaan</span>
+            <span data-i18n="settings_bg_color">Tema Warna Latar</span>
           </label>
           <div class="bg-color-options">
             <button class="bg-option" data-color="#ffffff" data-name-id="Putih" data-name-en="White" style="background:#ffffff;" title="Putih">
@@ -253,11 +310,11 @@
           <p class="settings-selected-label"><span data-i18n="settings_selected">Dipilih:</span> <span id="bg-selected-name">Putih</span></p>
         </div>
 
-        {{-- Language Toggle --}}
+        {{-- Bahasa --}}
         <div class="settings-section">
           <label class="settings-label">
-            <i class="fa-solid fa-language"></i>
-            <span data-i18n="settings_language">Bahasa Antarmuka</span>
+            <i class="fa-solid fa-globe"></i>
+            <span data-i18n="settings_language">Bahasa Tampilan</span>
           </label>
           <div class="lang-options">
             <button class="lang-btn active" id="lang-id-btn" data-lang="id">
@@ -273,7 +330,7 @@
         <div class="settings-section">
           <label class="settings-label">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span data-i18n="settings_tajweed">Tajwid Berwarna</span>
+            <span data-i18n="settings_tajweed">Warna Tajwid</span>
           </label>
           <div class="tajweed-toggle-wrap">
             <label class="toggle-switch">
@@ -282,18 +339,131 @@
             </label>
             <span class="tajweed-toggle-label" id="tajweed-toggle-label" data-i18n="tajweed_off">Nonaktif</span>
           </div>
-          <p class="settings-hint" data-i18n="settings_tajweed_hint">Menampilkan warna pada huruf Arab sesuai hukum tajwid.</p>
+          <p class="settings-hint" data-i18n="settings_tajweed_hint">Mewarnai huruf Arab sesuai hukum bacaan tajwid.</p>
           <div class="tajweed-legend" id="tajweed-legend" style="display:none;">
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#AAAAAA"></span> <span data-i18n="tj_hamzat_wasl">Hamzat Wasl / Lam Syamsiyyah</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#537FFF"></span> <span data-i18n="tj_madd_normal">Mad Normal</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#4050FF"></span> <span data-i18n="tj_madd_permissible">Mad Jaiz</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#000EBC"></span> <span data-i18n="tj_madd_necessary">Mad Wajib/Lazim</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#DD0008"></span> <span data-i18n="tj_qalqalah">Qalqalah</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#9400A8"></span> <span data-i18n="tj_ikhfa">Ikhfa</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#26BFFD"></span> <span data-i18n="tj_iqlab">Iqlab</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#169777"></span> <span data-i18n="tj_idgham_ghunnah">Idgham dengan Ghunnah</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#169200"></span> <span data-i18n="tj_idgham_no_ghunnah">Idgham tanpa Ghunnah</span></div>
-            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#FF7E1E"></span> <span data-i18n="tj_ghunnah">Ghunnah</span></div>
+            <h4 class="tajweed-legend-title"><i class="fa-solid fa-palette"></i> Keterangan Warna Tajwid</h4>
+
+            <div class="tajweed-legend-group">
+              <span class="tajweed-group-label">Huruf Tidak Dibaca</span>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#AAAAAA"></span>
+                <div class="tj-legend-text">
+                  <strong>Hamzat Wasl</strong>
+                  <small>Hamzah disambung, tidak dibaca di tengah kalimat</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#AAAAAA"></span>
+                <div class="tj-legend-text">
+                  <strong>Lam Syamsiyyah</strong>
+                  <small>Lam "ال" yang tidak dibaca (idgham ke huruf setelahnya)</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="tajweed-legend-group">
+              <span class="tajweed-group-label">Mad (Panjang)</span>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#537FFF"></span>
+                <div class="tj-legend-text">
+                  <strong>Mad Thabi'i (Normal)</strong>
+                  <small>Panjang 2 harakat — mad asli</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#4050FF"></span>
+                <div class="tj-legend-text">
+                  <strong>Mad Jaiz Munfashil</strong>
+                  <small>Panjang 2, 4, atau 6 harakat — boleh dipanjangkan</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#2144C1"></span>
+                <div class="tj-legend-text">
+                  <strong>Mad Wajib Muttashil</strong>
+                  <small>Panjang 4–5 harakat — wajib dipanjangkan</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#000EBC"></span>
+                <div class="tj-legend-text">
+                  <strong>Mad Lazim</strong>
+                  <small>Panjang 6 harakat — wajib penuh</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="tajweed-legend-group">
+              <span class="tajweed-group-label">Hukum Nun Mati & Tanwin</span>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#9400A8"></span>
+                <div class="tj-legend-text">
+                  <strong>Ikhfa Haqiqi</strong>
+                  <small>Nun mati/tanwin disembunyikan (samar) + dengung</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#D500B7"></span>
+                <div class="tj-legend-text">
+                  <strong>Ikhfa Syafawi</strong>
+                  <small>Mim mati bertemu Ba — bibir hampir tertutup + dengung</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#26BFFD"></span>
+                <div class="tj-legend-text">
+                  <strong>Iqlab</strong>
+                  <small>Nun mati/tanwin bertemu Ba — berubah jadi Mim + dengung</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#169777"></span>
+                <div class="tj-legend-text">
+                  <strong>Idgham dengan Ghunnah</strong>
+                  <small>Nun mati/tanwin + huruf يَنْمُو — lebur dengan dengung</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#169200"></span>
+                <div class="tj-legend-text">
+                  <strong>Idgham tanpa Ghunnah</strong>
+                  <small>Nun mati/tanwin + ل atau ر — lebur tanpa dengung</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#58B800"></span>
+                <div class="tj-legend-text">
+                  <strong>Idgham Syafawi (Mimi)</strong>
+                  <small>Mim mati bertemu Mim — lebur dengan dengung</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="tajweed-legend-group">
+              <span class="tajweed-group-label">Hukum Lainnya</span>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#DD0008"></span>
+                <div class="tj-legend-text">
+                  <strong>Qalqalah</strong>
+                  <small>Memantul pada huruf ق ط ب ج د saat sukun/waqaf</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#FF7E1E"></span>
+                <div class="tj-legend-text">
+                  <strong>Ghunnah</strong>
+                  <small>Dengung 2 harakat pada Nun/Mim bertasydid</small>
+                </div>
+              </div>
+              <div class="tajweed-legend-item">
+                <span class="tj-swatch" style="background:#A1A1A1"></span>
+                <div class="tj-legend-text">
+                  <strong>Idgham Mutajanisain / Mutaqaribain</strong>
+                  <small>Huruf makhraj-nya sama/berdekatan — lebur ke huruf kedua</small>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -304,6 +474,7 @@
           </button>
         </div>
 
+        </div>{{-- .settings-panel-body --}}
       </div>
     </div>
 

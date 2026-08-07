@@ -3,9 +3,9 @@
 <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script>
-/* ──────────────────────────────────────────────
-   FAVORITES — localStorage
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   FAVORITES â€” localStorage
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const FAVORITES_KEY = 'quran_favorites';
 
 function getFavorites() {
@@ -56,6 +56,7 @@ function renderFavorites() {
     const list = getFavorites();
     if (list.length === 0) {
         if (emptyMsg) emptyMsg.style.display = 'flex';
+        renderFavoritesBadge();
         return;
     }
     if (emptyMsg) emptyMsg.style.display = 'none';
@@ -73,7 +74,7 @@ function renderFavorites() {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         `;
-        // Klik nama → buka surah
+        // Klik nama â†’ buka surah
         item.querySelector('.fav-read-btn').addEventListener('click', () => {
             loadSurahDetails(fav.nomor);
         });
@@ -103,9 +104,9 @@ function toggleFavorite(nomor, namaLatin, arti) {
     }
 }
 
-/* ──────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    FAVORITES NAV PANEL (sidebar kiri)
-   ────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function renderFavoritesPanel() {
     const list      = getFavorites();
     const container = document.getElementById('favorites-panel-list');
@@ -189,6 +190,7 @@ function initFavoritesNav() {
 // Init saat halaman load
 document.addEventListener('DOMContentLoaded', function () {
     try { renderFavorites(); } catch(e) { console.error('renderFavorites error:', e); }
+    try { initI18n(); } catch(e) { console.error('initI18n error:', e); }
     try { initSettings(); } catch(e) { console.error('initSettings error:', e); }
     try { initLastReadPanel(); } catch(e) { console.error('initLastReadPanel error:', e); }
     try { initSaveLastReadSlide(); } catch(e) { console.error('initSaveLastReadSlide error:', e); }
@@ -196,13 +198,15 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initFavoritesNav(); } catch(e) { console.error('initFavoritesNav error:', e); }
     try { initMobileDrawer(); } catch(e) { console.error('initMobileDrawer error:', e); }
     try { initJuz(); } catch(e) { console.error('initJuz error:', e); }
+    try { initDataSourceModal(); } catch(e) { console.error('initDataSourceModal error:', e); }
+    try { initTajwidGuide(); } catch(e) { console.error('initTajwidGuide error:', e); }
     try { initSidebarRightCollapse(); } catch(e) { console.error('initSidebarRightCollapse error:', e); }
     try { initTajweedToggle(); } catch(e) { console.error('initTajweedToggle error:', e); }
 });
 
-/* ──────────────────────────────────────────────
-   TAJWEED — Colored Tajwid from alquran.cloud API
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   TAJWEED â€” Colored Tajwid from alquran.cloud API
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const TAJWEED_KEY = 'quran_tajweed_enabled';
 const tajweedCache = new Map();
 let lastRenderedSurah = null;
@@ -236,10 +240,31 @@ const TAJWEED_MAP = {
     'g': 'ghn'
 };
 
+// Mapping deskripsi tajwid: nama + cara baca
+const TAJWEED_INFO = {
+    'h': { name: 'Hamzat Wasl', desc: 'Hamzah wasal tidak dibaca ketika menyambung bacaan dengan kata sebelumnya. Dibaca hanya saat memulai (ibtida) dari kata tersebut.' },
+    's': { name: 'Huruf Sukun', desc: 'Huruf yang tidak memiliki harakat (tanda baca). Diucapkan dengan mematikan huruf tanpa menambahkan bunyi vokal apapun.' },
+    'l': { name: 'Lam Syamsiyyah', desc: 'Huruf Lam pada kata sandang (al) tidak dibunyikan. Bacaan langsung berpindah ke huruf setelahnya yang dibaca dengan tasydid (penekanan ganda).' },
+    'n': { name: 'Mad Thabi\'i', desc: 'Mad asli. Dipanjangkan selama 2 harakat (satu alif). Terjadi ketika ada huruf mad (Ø§ Ùˆ ÙŠ) dan tidak bertemu hamzah atau sukun setelahnya.' },
+    'p': { name: 'Mad Jaiz Munfashil', desc: 'Mad yang dipisah. Terjadi saat huruf mad di akhir kata bertemu hamzah di awal kata berikutnya. Boleh dibaca 2, 4, atau 5 harakat.' },
+    'm': { name: 'Mad Lazim', desc: 'Mad yang wajib dipanjangkan selama 6 harakat (tiga alif). Terjadi saat huruf mad bertemu huruf bertasydid atau bersukun asli dalam satu kata.' },
+    'q': { name: 'Qalqalah', desc: 'Bunyi pantulan atau getaran pada huruf Qaf, Tha, Ba, Jim, dan Dal (Ù‚Ø·Ø¨Ø¬Ø¯) ketika huruf tersebut bersukun atau saat berhenti (waqaf).' },
+    'o': { name: 'Mad Wajib Muttashil', desc: 'Mad yang wajib disambung. Terjadi saat huruf mad dan hamzah berada dalam satu kata. Wajib dipanjangkan selama 4 sampai 5 harakat.' },
+    'c': { name: 'Ikhfa Syafawi', desc: 'Mim mati bertemu huruf Ba. Mim dibunyikan secara samar-samar melalui bibir yang hampir merapat, disertai dengung selama 2 harakat.' },
+    'f': { name: 'Ikhfa Haqiqi', desc: 'Nun mati atau tanwin bertemu salah satu dari 15 huruf ikhfa. Nun dibunyikan samar (antara izhar dan idgham), disertai dengung selama 2 harakat. Posisi lidah menyesuaikan huruf ikhfa yang ditemui.' },
+    'w': { name: 'Idgham Syafawi', desc: 'Mim mati bertemu huruf Mim. Kedua mim dilebur menjadi satu mim bertasydid. Dibaca dengan dengung selama 2 harakat.' },
+    'i': { name: 'Iqlab', desc: 'Nun mati atau tanwin bertemu huruf Ba. Bunyi nun diganti (ditukar) menjadi bunyi Mim, lalu dibaca dengan dengung selama 2 harakat sambil merapatkan kedua bibir.' },
+    'a': { name: 'Idgham bi Ghunnah', desc: 'Nun mati atau tanwin bertemu huruf Ya, Nun, Mim, atau Waw (ÙŠÙ†Ù…Ùˆ). Nun dilebur ke huruf sesudahnya dan dibaca dengan dengung selama 2 harakat.' },
+    'u': { name: 'Idgham bila Ghunnah', desc: 'Nun mati atau tanwin bertemu huruf Lam atau Ra (Ù„ Ø±). Nun dilebur sepenuhnya ke huruf sesudahnya. Dibaca tanpa dengung sama sekali.' },
+    'd': { name: 'Idgham Mutajanisain', desc: 'Dua huruf yang memiliki makhraj (tempat keluar) yang sama bertemu berurutan. Huruf pertama yang mati dilebur ke huruf kedua yang berharakat.' },
+    'b': { name: 'Idgham Mutaqaribain', desc: 'Dua huruf yang makhrajnya berdekatan bertemu berurutan. Huruf pertama yang mati dilebur ke huruf kedua yang berharakat.' },
+    'g': { name: 'Ghunnah', desc: 'Bunyi dengung yang keluar dari pangkal hidung selama 2 harakat. Terjadi pada huruf Nun atau Mim yang bertasydid (ditandai dengan tasydid/syaddah).' }
+};
+
 /**
  * Parse raw tajweed text from API ke HTML berwarna.
  * Format tag: [X:NUM[TEXT] atau [X[TEXT]
- * Contoh: [h:1[ٱ] atau [n[مَٰ]
+ * Contoh: [h:1[Ù±] atau [n[Ù…ÙŽÙ°]
  */
 function parseTajweedText(rawText) {
     if (!rawText) return '';
@@ -274,7 +299,10 @@ function parseTajweedText(rawText) {
                         textContent += rawText[j];
                         j++;
                     }
-                    result += `<span class="tj-${cssClass}">${textContent}</span>`;
+                    const info = TAJWEED_INFO[identifier] || {};
+                    const tjName = (info.name || '').replace(/"/g, '&quot;');
+                    const tjDesc = (info.desc || '').replace(/"/g, '&quot;');
+                    result += `<span class="tj-${cssClass}" data-tj-name="${tjName}" data-tj-desc="${tjDesc}">${textContent}</span>`;
                     i = j + 1; // Skip ']' penutup
                 } else {
                     result += rawText[i];
@@ -390,9 +418,664 @@ function initTajweedToggle() {
     });
 }
 
-/* ──────────────────────────────────────────────
-   SIDEBAR RIGHT — Collapse / Expand
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   PANDUAN TAJWID â€” Modal Besar
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function initTajwidGuide() {
+    const btn = document.getElementById('nav-tajwid-guide-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        let modal = document.getElementById('tajwid-guide-overlay');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'tajwid-guide-overlay';
+            modal.className = 'tajwid-guide-overlay';
+            modal.innerHTML = getTajwidGuideHTML();
+            document.body.appendChild(modal);
+            modal.querySelector('#tajwid-guide-close').addEventListener('click', () => modal.classList.remove('open'));
+            modal.addEventListener('click', (ev) => { if (ev.target === modal) modal.classList.remove('open'); });
+        }
+        modal.classList.add('open');
+        document.querySelector('.sidebar-left')?.classList.remove('drawer-open');
+        document.getElementById('drawer-backdrop')?.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+}
+
+function getTajwidGuideHTML() {
+    return `
+    <div class="tajwid-guide-modal">
+        <div class="tajwid-guide-header">
+            <div class="tajwid-guide-title">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Panduan Ilmu Tajwid</span>
+            </div>
+            <button class="asbab-modal-close" id="tajwid-guide-close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="tajwid-guide-body">
+
+            <section class="tg-section">
+                <h3 class="tg-section-title"><i class="fa-solid fa-circle-info"></i> Hukum Nun Mati &amp; Tanwin</h3>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">1. Izhar Halqi</span>
+                        <span class="tg-rule-badge">Dibaca Jelas</span>
+                    </div>
+                    <p class="tg-rule-desc">Nun mati atau tanwin bertemu salah satu dari 6 huruf halqi (tenggorokan). Dibaca jelas tanpa dengung.</p>
+                    <div class="tg-letters">Huruf: <span class="tg-arab">ء هـ ع ح غ خ</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">مَنْ آمَنَ — يَنْهَوْنَ — مِنْ عِلْمٍ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">2. Idgham bi Ghunnah</span>
+                        <span class="tg-rule-badge tg-badge-green">Lebur + Dengung</span>
+                    </div>
+                    <p class="tg-rule-desc">Nun mati atau tanwin bertemu huruf Ya, Nun, Mim, atau Waw. Dilebur ke huruf sesudahnya dengan dengung 2 harakat.</p>
+                    <div class="tg-letters">Huruf: <span class="tg-arab">ي ن م و</span> (disingkat: يَنْمُو)</div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">مَنْ يَقُولُ — مِنْ نِعْمَةٍ — مِنْ مَاءٍ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">3. Idgham bila Ghunnah</span>
+                        <span class="tg-rule-badge tg-badge-blue">Lebur Tanpa Dengung</span>
+                    </div>
+                    <p class="tg-rule-desc">Nun mati atau tanwin bertemu huruf Lam atau Ra. Dilebur sepenuhnya tanpa dengung.</p>
+                    <div class="tg-letters">Huruf: <span class="tg-arab">ل ر</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">مِنْ رَبِّهِمْ — مِنْ لَدُنْهُ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">4. Iqlab</span>
+                        <span class="tg-rule-badge tg-badge-cyan">Ganti Jadi Mim</span>
+                    </div>
+                    <p class="tg-rule-desc">Nun mati atau tanwin bertemu huruf Ba. Bunyi nun diganti menjadi Mim, disertai dengung 2 harakat.</p>
+                    <div class="tg-letters">Huruf: <span class="tg-arab">ب</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">مِنْ بَعْدِ — أَنْبِئُونِي — سَمِيعٌۢ بَصِيرٌ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">5. Ikhfa Haqiqi</span>
+                        <span class="tg-rule-badge tg-badge-purple">Dibaca Samar + Dengung</span>
+                    </div>
+                    <p class="tg-rule-desc">Nun mati atau tanwin bertemu salah satu dari 15 huruf ikhfa. Dibaca samar (antara izhar dan idgham) disertai dengung 2 harakat.</p>
+                    <div class="tg-letters">Huruf: <span class="tg-arab">ت ث ج د ذ ز س ش ص ض ط ظ ف ق ك</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">مِنْ قَبْلُ — أَنْتُمْ — يُنْفِقُونَ</span></div>
+                </div>
+            </section>
+
+            <section class="tg-section">
+                <h3 class="tg-section-title"><i class="fa-solid fa-circle-info"></i> Hukum Mim Mati</h3>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">1. Idgham Syafawi (Mimi)</span>
+                        <span class="tg-rule-badge tg-badge-green">Lebur + Dengung</span>
+                    </div>
+                    <p class="tg-rule-desc">Mim mati bertemu Mim. Dilebur jadi satu mim bertasydid dengan dengung 2 harakat.</p>
+                    <div class="tg-letters">Huruf: <span class="tg-arab">م</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">لَهُمْ مَا — أَمْ مَنْ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">2. Ikhfa Syafawi</span>
+                        <span class="tg-rule-badge tg-badge-purple">Samar + Dengung</span>
+                    </div>
+                    <p class="tg-rule-desc">Mim mati bertemu Ba. Mim dibunyikan samar dengan bibir hampir merapat, disertai dengung 2 harakat.</p>
+                    <div class="tg-letters">Huruf: <span class="tg-arab">ب</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">تَرْمِيهِمْ بِحِجَارَةٍ — هُمْ بِهِ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">3. Izhar Syafawi</span>
+                        <span class="tg-rule-badge">Dibaca Jelas</span>
+                    </div>
+                    <p class="tg-rule-desc">Mim mati bertemu huruf selain Mim dan Ba. Dibaca jelas tanpa dengung.</p>
+                    <div class="tg-letters">Huruf: seluruh huruf selain <span class="tg-arab">م ب</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">أَمْ لَمْ — هُمْ فِيهَا</span></div>
+                </div>
+            </section>
+
+            <section class="tg-section">
+                <h3 class="tg-section-title"><i class="fa-solid fa-circle-info"></i> Hukum Mad (Panjang)</h3>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Mad Thabi'i (Asli)</span>
+                        <span class="tg-rule-badge tg-badge-blue">2 Harakat</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf mad (alif, waw, ya) tidak bertemu hamzah atau sukun setelahnya. Panjangkan 2 harakat.</p>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">قَالَ — يَقُولُ — فِيهَا</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Mad Wajib Muttashil</span>
+                        <span class="tg-rule-badge tg-badge-blue">4-5 Harakat</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf mad dan hamzah berada dalam satu kata. Wajib dipanjangkan 4-5 harakat.</p>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">جَاءَ — سُوءٌ — جِيءَ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Mad Jaiz Munfashil</span>
+                        <span class="tg-rule-badge tg-badge-blue">2/4/5 Harakat</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf mad di akhir kata bertemu hamzah di awal kata berikutnya. Boleh dipanjangkan 2, 4, atau 5 harakat.</p>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">بِمَا أُنْزِلَ — قَالُوا آمَنَّا</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Mad Lazim</span>
+                        <span class="tg-rule-badge tg-badge-blue">6 Harakat</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf mad bertemu huruf bersukun asli atau bertasydid dalam satu kata. Wajib 6 harakat.</p>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">الضَّالِّينَ — الْحَاقَّةُ — الٓمٓ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Mad 'Aridh lis Sukun</span>
+                        <span class="tg-rule-badge tg-badge-blue">2/4/6 Harakat</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf mad bertemu huruf yang disukun karena waqaf (berhenti). Boleh 2, 4, atau 6 harakat.</p>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">نَسْتَعِينْ — الْعَالَمِينْ</span></div>
+                </div>
+            </section>
+
+            <section class="tg-section">
+                <h3 class="tg-section-title"><i class="fa-solid fa-circle-info"></i> Qalqalah</h3>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Qalqalah Sughra (Kecil)</span>
+                        <span class="tg-rule-badge tg-badge-red">Memantul Ringan</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf qalqalah bersukun di tengah kata. Pantulan ringan.</p>
+                    <div class="tg-letters">Huruf: <span class="tg-arab">ق ط ب ج د</span> (disingkat: قُطْبُ جَدٍّ)</div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">يَجْعَلُونَ — أَقْرَبُ — يَطْمَعُ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Qalqalah Kubra (Besar)</span>
+                        <span class="tg-rule-badge tg-badge-red">Memantul Kuat</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf qalqalah berada di akhir kata saat waqaf (berhenti). Pantulan lebih kuat dan jelas.</p>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">الْفَلَقْ — مُحِيطْ — الْمَسَدْ</span></div>
+                </div>
+            </section>
+
+            <section class="tg-section">
+                <h3 class="tg-section-title"><i class="fa-solid fa-circle-info"></i> Ghunnah &amp; Lainnya</h3>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Ghunnah (Dengung)</span>
+                        <span class="tg-rule-badge tg-badge-orange">2 Harakat</span>
+                    </div>
+                    <p class="tg-rule-desc">Bunyi dengung dari pangkal hidung selama 2 harakat. Terjadi pada Nun atau Mim bertasydid.</p>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">إِنَّ — ثُمَّ — أَنَّهُمْ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Lam Syamsiyyah</span>
+                        <span class="tg-rule-badge">Lam Tidak Dibaca</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf Lam pada kata sandang (ال) tidak dibunyikan saat bertemu huruf syamsiyyah. Langsung baca huruf setelahnya dengan tasydid.</p>
+                    <div class="tg-letters">Huruf Syamsiyyah: <span class="tg-arab">ت ث د ذ ر ز س ش ص ض ط ظ ل ن</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">الشَّمْسُ — النَّاسِ — الرَّحْمَنِ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Lam Qamariyyah</span>
+                        <span class="tg-rule-badge">Lam Dibaca Jelas</span>
+                    </div>
+                    <p class="tg-rule-desc">Huruf Lam pada kata sandang (ال) tetap dibaca jelas saat bertemu huruf qamariyyah.</p>
+                    <div class="tg-letters">Huruf Qamariyyah: <span class="tg-arab">ا ب ج ح خ ع غ ف ق ك م و هـ ي</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">الْقَمَرُ — الْكِتَابُ — الْحَمْدُ</span></div>
+                </div>
+
+                <div class="tg-rule">
+                    <div class="tg-rule-header">
+                        <span class="tg-rule-name">Idgham Mutajanisain</span>
+                        <span class="tg-rule-badge tg-badge-green">Lebur</span>
+                    </div>
+                    <p class="tg-rule-desc">Dua huruf yang memiliki makhraj sama bertemu. Huruf pertama lebur ke huruf kedua.</p>
+                    <div class="tg-letters">Pasangan: <span class="tg-arab">ت/د/ط — ث/ذ/ظ — ب/م</span></div>
+                    <button class="tg-example-toggle" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><i class="fa-solid fa-chevron-down"></i> Lihat Contoh</button>
+                    <div class="tg-example"><span class="tg-arab">قَدْ تَبَيَّنَ — إِذْ ظَلَمُوا</span></div>
+                </div>
+            </section>
+
+            <section class="tg-section tg-source-section">
+                <h3 class="tg-section-title"><i class="fa-solid fa-database"></i> Sumber Referensi</h3>
+                <div class="tg-sources">
+                    <p>&#8226; Tajweed Mushawwar &mdash; Dr. Ayman Rushdi Suwaid</p>
+                    <p>&#8226; Tuhfatul Athfal &mdash; Sulaiman al-Jamzuri</p>
+                    <p>&#8226; Al-Muqaddimah al-Jazariyyah &mdash; Ibn al-Jazari</p>
+                    <p>&#8226; Kemenag RI &mdash; Panduan Baca Quran</p>
+                    <p>&#8226; AlQuran.cloud &mdash; Tajweed Color Guide</p>
+                </div>
+            </section>
+
+        </div>
+    </div>`;
+}
+
+
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   DATA SOURCE â€” Modal
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function initDataSourceModal() {
+    const btn = document.getElementById('open-datasource-btn');
+    if (!btn) return;
+
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        let modal = document.getElementById('datasource-modal-overlay');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'datasource-modal-overlay';
+            modal.className = 'asbab-modal-overlay';
+            modal.innerHTML = `
+                <div class="asbab-modal">
+                    <div class="asbab-modal-header">
+                        <div class="asbab-modal-title">
+                            <i class="fa-solid fa-database"></i>
+                            <span>Sumber Data</span>
+                        </div>
+                        <button class="asbab-modal-close" id="datasource-modal-close">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="asbab-modal-body">
+                        <div class="datasource-list">
+                            <div class="datasource-item">
+                                <div class="datasource-icon"><i class="fa-solid fa-book-quran"></i></div>
+                                <div class="datasource-info">
+                                    <h4>equran.id</h4>
+                                    <p>Teks Arab, terjemahan bahasa Indonesia, transliterasi latin, dan tafsir Kemenag RI.</p>
+                                    <a href="https://equran.id/" target="_blank">equran.id <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                </div>
+                            </div>
+                            <div class="datasource-item">
+                                <div class="datasource-icon"><i class="fa-solid fa-palette"></i></div>
+                                <div class="datasource-info">
+                                    <h4>AlQuran Cloud</h4>
+                                    <p>Data tajwid berwarna (color-coded) untuk setiap huruf Al-Quran berdasarkan hukum bacaan.</p>
+                                    <a href="https://alquran.cloud/" target="_blank">alquran.cloud <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                </div>
+                            </div>
+                            <div class="datasource-item">
+                                <div class="datasource-icon"><i class="fa-solid fa-scroll"></i></div>
+                                <div class="datasource-info">
+                                    <h4>Muslim API</h4>
+                                    <p>Data Asbabun Nuzul (sebab turun ayat) dalam bahasa Indonesia, bersumber dari Kemenag RI.</p>
+                                    <a href="https://muslim-api-three.vercel.app/" target="_blank">muslim-api <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                </div>
+                            </div>
+                            <div class="datasource-item">
+                                <div class="datasource-icon"><i class="fa-solid fa-pen-nib"></i></div>
+                                <div class="datasource-info">
+                                    <h4>Quran Fonts CDN</h4>
+                                    <p>Koleksi font Arab untuk tampilan mushaf (Amiri Quran, Scheherazade, Noorehuda, KFGQPC Hafs, Noto Naskh).</p>
+                                    <a href="https://github.com/fawazahmed0/quran-api" target="_blank">quran-api fonts <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.querySelector('#datasource-modal-close').addEventListener('click', () => modal.classList.remove('open'));
+            modal.addEventListener('click', (ev) => { if (ev.target === modal) modal.classList.remove('open'); });
+        }
+        modal.classList.add('open');
+        // Tutup sidebar mobile jika terbuka
+        document.querySelector('.sidebar-left')?.classList.remove('drawer-open');
+        document.getElementById('drawer-backdrop')?.classList.remove('active');
+    });
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   TAFSIR â€” Modal + Fetch dari equran.id API
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const tafsirCache = new Map();
+
+function openTafsir(nomorSurah, nomorAyat) {
+    let modal = document.getElementById('tafsir-modal-overlay');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'tafsir-modal-overlay';
+        modal.className = 'asbab-modal-overlay';
+        modal.innerHTML = `
+            <div class="asbab-modal">
+                <div class="asbab-modal-header">
+                    <div class="asbab-modal-title">
+                        <i class="fa-solid fa-book"></i>
+                        <span>Tafsir Kemenag</span>
+                    </div>
+                    <button class="asbab-modal-close" id="tafsir-modal-close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="asbab-modal-body" id="tafsir-modal-body">
+                    <div class="asbab-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat tafsir...</div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.querySelector('#tafsir-modal-close').addEventListener('click', () => modal.classList.remove('open'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+    }
+
+    const body = modal.querySelector('#tafsir-modal-body');
+    body.innerHTML = '<div class="asbab-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat tafsir...</div>';
+    modal.classList.add('open');
+
+    fetchTafsirSurah(nomorSurah).then(tafsirList => {
+        const tafsir = tafsirList.find(t => t.ayat === nomorAyat || t.ayat === String(nomorAyat));
+        if (!tafsir || !tafsir.teks) {
+            body.innerHTML = '<div class="asbab-empty"><i class="fa-regular fa-file-lines"></i><p>Tafsir tidak tersedia untuk ayat ini.</p></div>';
+            return;
+        }
+        body.innerHTML = `
+            <div class="asbab-ayat-info">
+                <span class="asbab-ayat-badge">Surah ${nomorSurah} : Ayat ${nomorAyat}</span>
+            </div>
+            <div class="asbab-content">${tafsir.teks.replace(/\n/g, '<br>')}</div>
+        `;
+    }).catch(() => {
+        body.innerHTML = '<div class="asbab-empty"><p>Gagal memuat tafsir. Periksa koneksi internet.</p></div>';
+    });
+}
+
+function fetchTafsirSurah(nomorSurah) {
+    if (tafsirCache.has(nomorSurah)) {
+        return Promise.resolve(tafsirCache.get(nomorSurah));
+    }
+    return fetch(`https://equran.id/api/v2/tafsir/${nomorSurah}`)
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(json => {
+            const data = json.data && json.data.tafsir ? json.data.tafsir : [];
+            tafsirCache.set(nomorSurah, data);
+            return data;
+        });
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ASBABUN NUZUL â€” Modal + Fetch dari Muslim API
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const ASBAB_API = '/api/asbab/surah';
+const asbabCache = new Map(); // cache per surah
+
+function openAsbabunNuzul(nomorSurah, nomorAyat) {
+    // Cari/buat modal
+    let modal = document.getElementById('asbab-modal-overlay');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'asbab-modal-overlay';
+        modal.className = 'asbab-modal-overlay';
+        modal.innerHTML = `
+            <div class="asbab-modal">
+                <div class="asbab-modal-header">
+                    <div class="asbab-modal-title">
+                        <i class="fa-solid fa-scroll"></i>
+                        <span>Asbabun Nuzul</span>
+                    </div>
+                    <button class="asbab-modal-close" id="asbab-modal-close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="asbab-modal-body" id="asbab-modal-body">
+                    <div class="asbab-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data...</div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.querySelector('#asbab-modal-close').addEventListener('click', () => modal.classList.remove('open'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+    }
+
+    // Show modal with loading
+    const body = modal.querySelector('#asbab-modal-body');
+    body.innerHTML = '<div class="asbab-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data...</div>';
+    modal.classList.add('open');
+
+    // Fetch data
+    fetchAsbabForSurah(nomorSurah).then(ayahList => {
+        const ayahData = ayahList.find(a => String(a.ayah) === String(nomorAyat));
+        if (!ayahData || ayahData.asbab === '0' || !ayahData.asbab) {
+            body.innerHTML = `
+                <div class="asbab-empty">
+                    <i class="fa-regular fa-file-lines"></i>
+                    <p>Tidak ada riwayat Asbabun Nuzul untuk ayat ini.</p>
+                    <small>Tidak semua ayat memiliki sebab turun yang diriwayatkan secara khusus.</small>
+                </div>
+            `;
+            return;
+        }
+        // Fetch detail asbab
+        fetchAsbabDetail(ayahData.asbab).then(detail => {
+            body.innerHTML = `
+                <div class="asbab-ayat-info">
+                    <span class="asbab-ayat-badge">Surah ${nomorSurah} : Ayat ${nomorAyat}</span>
+                </div>
+                <div class="asbab-content">
+                    <p>${detail.text || 'Data tidak tersedia.'}</p>
+                </div>
+            `;
+        }).catch(() => {
+            body.innerHTML = '<div class="asbab-empty"><p>Gagal memuat data. Silakan coba lagi.</p></div>';
+        });
+    }).catch(() => {
+        body.innerHTML = '<div class="asbab-empty"><p>Gagal memuat data. Periksa koneksi internet.</p></div>';
+    });
+}
+
+function fetchAsbabForSurah(nomorSurah) {
+    if (asbabCache.has(nomorSurah)) {
+        return Promise.resolve(asbabCache.get(nomorSurah));
+    }
+    return fetch(`${ASBAB_API}/${nomorSurah}`)
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(json => {
+            const data = json.data || [];
+            asbabCache.set(nomorSurah, data);
+            return data;
+        });
+}
+
+function fetchAsbabDetail(asbabId) {
+    return fetch(`/api/asbab/detail/${asbabId}`)
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(json => json.data || {});
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   TAJWEED TOOLTIP â€” JS (appended to body, no overflow clip)
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+(function() {
+    let tooltipEl = null;
+    let modalEl = null;
+
+    // === TOOLTIP (hover only, nama tajwid) ===
+    function createTooltip() {
+        if (tooltipEl) return tooltipEl;
+        tooltipEl = document.createElement('div');
+        tooltipEl.className = 'tj-tooltip';
+        tooltipEl.innerHTML = '<div class="tj-tooltip-arrow"></div><span class="tj-tooltip-name"></span>';
+        document.body.appendChild(tooltipEl);
+        return tooltipEl;
+    }
+
+    function showTooltip(e) {
+        const span = e.target.closest('[data-tj-name]');
+        if (!span) return;
+        const name = span.getAttribute('data-tj-name');
+        if (!name) return;
+
+        const tip = createTooltip();
+        tip.querySelector('.tj-tooltip-name').textContent = name;
+
+        const rect = span.getBoundingClientRect();
+        tip.style.left = rect.left + rect.width / 2 + 'px';
+        tip.style.top = rect.bottom + 8 + 'px';
+        tip.style.transform = 'translateX(-50%)';
+
+        requestAnimationFrame(() => {
+            tip.classList.add('visible');
+            const tipRect = tip.getBoundingClientRect();
+            if (tipRect.right > window.innerWidth - 10) {
+                tip.style.left = (window.innerWidth - tipRect.width - 10) + 'px';
+                tip.style.transform = 'none';
+            }
+            if (tipRect.left < 10) {
+                tip.style.left = '10px';
+                tip.style.transform = 'none';
+            }
+        });
+    }
+
+    function hideTooltip() {
+        if (tooltipEl) tooltipEl.classList.remove('visible');
+    }
+
+    // === MODAL (click, detail lengkap) ===
+    const TAJWEED_COLORS = {
+        'ham_wasl': '#AAAAAA', 'slnt': '#AAAAAA',
+        'madda_normal': '#537FFF', 'madda_permissible': '#4050FF',
+        'madda_necessary': '#000EBC', 'madda_obligatory': '#2144C1',
+        'qlq': '#DD0008', 'ikhf_shfw': '#D500B7', 'ikhf': '#9400A8',
+        'idghm_shfw': '#58B800', 'iqlb': '#26BFFD',
+        'idgh_ghn': '#169777', 'idgh_w_ghn': '#169200',
+        'idgh_mus': '#A1A1A1', 'idgh_mut': '#A1A1A1', 'ghn': '#FF7E1E'
+    };
+
+    function createModal() {
+        if (modalEl) return modalEl;
+        modalEl = document.createElement('div');
+        modalEl.className = 'tj-modal-overlay';
+        modalEl.innerHTML = `
+            <div class="tj-modal">
+                <div class="tj-modal-header">
+                    <span class="tj-modal-title"></span>
+                    <button class="tj-modal-close"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="tj-modal-body">
+                    <div class="tj-modal-letter">
+                        <span class="tj-modal-letter-text"></span>
+                    </div>
+                    <div class="tj-modal-section">
+                        <div class="tj-modal-section-label">Cara Membaca</div>
+                        <div class="tj-modal-section-text tj-modal-desc"></div>
+                    </div>
+                    <div class="tj-modal-color-badge">
+                        <span class="tj-modal-color-dot"></span>
+                        <span class="tj-modal-color-label"></span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalEl);
+
+        // Close handlers
+        modalEl.querySelector('.tj-modal-close').addEventListener('click', closeModal);
+        modalEl.addEventListener('click', (e) => {
+            if (e.target === modalEl) closeModal();
+        });
+
+        return modalEl;
+    }
+
+    function openModal(span) {
+        const name = span.getAttribute('data-tj-name');
+        const desc = span.getAttribute('data-tj-desc');
+        const text = span.textContent;
+        // Get color from class
+        const classes = span.className.split(' ');
+        const tjClass = classes.find(c => c.startsWith('tj-'));
+        const colorKey = tjClass ? tjClass.replace('tj-', '') : '';
+        const color = TAJWEED_COLORS[colorKey] || '#537FFF';
+
+        const modal = createModal();
+        modal.querySelector('.tj-modal-title').textContent = name;
+        modal.querySelector('.tj-modal-letter-text').textContent = text;
+        modal.querySelector('.tj-modal-letter-text').style.color = color;
+        modal.querySelector('.tj-modal-desc').textContent = desc;
+        modal.querySelector('.tj-modal-color-dot').style.background = color;
+        modal.querySelector('.tj-modal-color-label').textContent = 'Warna: ' + name;
+
+        modal.classList.add('open');
+    }
+
+    function closeModal() {
+        if (modalEl) modalEl.classList.remove('open');
+    }
+
+    // === EVENT LISTENERS ===
+    document.addEventListener('mouseover', (e) => {
+        if (e.target.closest('[data-tj-name]')) showTooltip(e);
+    });
+    document.addEventListener('mouseout', (e) => {
+        if (e.target.closest('[data-tj-name]')) hideTooltip();
+    });
+    document.addEventListener('click', (e) => {
+        const span = e.target.closest('[data-tj-name]');
+        if (span) {
+            e.preventDefault();
+            hideTooltip();
+            openModal(span);
+        }
+    });
+})();
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   SIDEBAR RIGHT â€” Collapse / Expand
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const SIDEBAR_RIGHT_KEY = 'quran_sidebar_right_collapsed';
 
 function initSidebarRightCollapse() {
@@ -428,9 +1111,9 @@ function initSidebarRightCollapse() {
     }
 }
 
-/* ──────────────────────────────────────────────
-   I18N — Sistem terjemahan antarmuka
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   I18N â€” Sistem terjemahan antarmuka
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const I18N_KEY = 'quran_lang';
 
 const I18N = {
@@ -439,6 +1122,7 @@ const I18N = {
         nav_juz:              'Juz',
         nav_last_read:        'Terakhir Dibaca',
         nav_bookmark:         'Bookmark',
+        nav_tajwid_guide:     'Panduan Tajwid',
         nav_settings:         'Pengaturan',
         data_source_label:    'Data berdasarkan:',
         banner_subtitle:      'Bacaan Mulia, Panduan Abadi',
@@ -448,9 +1132,9 @@ const I18N = {
         tab_favorites:        'Favorit',
         tab_bookmarks:        'Bookmark',
         fav_empty:            'Belum ada favorit.',
-        fav_empty_hint:       'Klik ★ pada kartu surah untuk menambahkan.',
+        fav_empty_hint:       'Klik â˜… pada kartu surah untuk menambahkan.',
         bm_empty:             'Belum ada bookmark.',
-        bm_empty_hint:        'Buka surah, lalu arahkan kursor ke ayat — tombol 🔖 akan muncul di samping nomor ayat.',
+        bm_empty_hint:        'Buka surah, lalu arahkan kursor ke ayat â€” tombol ðŸ”– akan muncul di samping nomor ayat.',
         loading:              'Memuat data...',
         juz_title:            'Daftar Juz',
         juz_subtitle:         'Al Quran 30 Juz',
@@ -459,18 +1143,21 @@ const I18N = {
         favorites_bookmark:   'Favorit & Bookmark',
         settings_title:       'Pengaturan',
         settings_font_size:   'Ukuran Teks Arab',
+        settings_latin_font_size: 'Ukuran Teks Latin',
+        settings_translation_font_size: 'Ukuran Teks Terjemahan',
+        settings_arab_font:   'Jenis Font Arab',
         font_decrease:        'Perkecil',
         font_increase:        'Perbesar',
-        settings_bg_color:    'Warna Latar Bacaan',
+        settings_bg_color:    'Tema Warna Latar',
         settings_selected:    'Dipilih:',
-        settings_language:    'Bahasa Antarmuka',
+        settings_language:    'Bahasa Tampilan',
         settings_reset:       'Reset ke Default',
         bm_panel_title:       'Bookmark Ayat Saya',
         ayat_word:            'ayat',
         bm_search_placeholder:'Cari surah atau teks ayat...',
         bm_clear_all:         'Hapus Semua',
         bm_panel_empty:       'Belum ada ayat yang disimpan.',
-        bm_panel_empty_hint:  'Cara menyimpan bookmark:\n1. Buka salah satu surah\n2. Arahkan kursor ke ayat\n3. Klik tombol 🔖 di samping nomor ayat',
+        bm_panel_empty_hint:  'Cara menyimpan bookmark:\n1. Buka salah satu surah\n2. Arahkan kursor ke ayat\n3. Klik tombol ðŸ”– di samping nomor ayat',
         // JS-rendered strings
         read_btn:             'Baca',
         add_favorite:         'Tambah ke favorit',
@@ -513,8 +1200,8 @@ const I18N = {
         lr_new_category_slide:'+ Kategori Baru',
         save_lastread:        'Simpan terakhir dibaca',
         // Tajweed
-        settings_tajweed:     'Tajwid Berwarna',
-        settings_tajweed_hint:'Menampilkan warna pada huruf Arab sesuai hukum tajwid.',
+        settings_tajweed:     'Warna Tajwid',
+        settings_tajweed_hint:'Mewarnai huruf Arab sesuai hukum bacaan tajwid.',
         tajweed_on:           'Aktif',
         tajweed_off:          'Nonaktif',
     },
@@ -523,6 +1210,7 @@ const I18N = {
         nav_juz:              'Juz',
         nav_last_read:        'Last Read',
         nav_bookmark:         'Bookmark',
+        nav_tajwid_guide:     'Tajweed Guide',
         nav_settings:         'Settings',
         data_source_label:    'Data source:',
         banner_subtitle:      'Noble Reading, Eternal Guide',
@@ -532,9 +1220,9 @@ const I18N = {
         tab_favorites:        'Favorites',
         tab_bookmarks:        'Bookmarks',
         fav_empty:            'No favorites yet.',
-        fav_empty_hint:       'Click ★ on a surah card to add.',
+        fav_empty_hint:       'Click â˜… on a surah card to add.',
         bm_empty:             'No bookmarks yet.',
-        bm_empty_hint:        'Open a surah, hover over a verse — the 🔖 button will appear next to the verse number.',
+        bm_empty_hint:        'Open a surah, hover over a verse â€” the ðŸ”– button will appear next to the verse number.',
         loading:              'Loading data...',
         juz_title:            'Juz List',
         juz_subtitle:         'Qur\'an 30 Juz',
@@ -543,18 +1231,21 @@ const I18N = {
         favorites_bookmark:   'Favorites & Bookmarks',
         settings_title:       'Settings',
         settings_font_size:   'Arabic Text Size',
+        settings_latin_font_size: 'Latin Text Size',
+        settings_translation_font_size: 'Translation Text Size',
+        settings_arab_font:   'Arabic Font Style',
         font_decrease:        'Decrease',
         font_increase:        'Increase',
-        settings_bg_color:    'Reading Background Color',
+        settings_bg_color:    'Background Theme',
         settings_selected:    'Selected:',
-        settings_language:    'Interface Language',
+        settings_language:    'Display Language',
         settings_reset:       'Reset to Default',
         bm_panel_title:       'My Verse Bookmarks',
         ayat_word:            'verses',
         bm_search_placeholder:'Search surah or verse text...',
         bm_clear_all:         'Clear All',
         bm_panel_empty:       'No saved verses yet.',
-        bm_panel_empty_hint:  'How to bookmark:\n1. Open a surah\n2. Hover over a verse\n3. Click 🔖 next to the verse number',
+        bm_panel_empty_hint:  'How to bookmark:\n1. Open a surah\n2. Hover over a verse\n3. Click ðŸ”– next to the verse number',
         // JS-rendered strings
         read_btn:             'Read',
         add_favorite:         'Add to favorites',
@@ -722,15 +1413,18 @@ function initI18n() {
     document.addEventListener('ayat-rendered', () => applyI18nDynamic());
 }
 
-/* ──────────────────────────────────────────────
-   SETTINGS — localStorage
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   SETTINGS â€” localStorage
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const SETTINGS_KEY = 'quran_settings';
 
 const SETTINGS_DEFAULT = {
     fontSize: 36,
+    latinFontSize: 13,
+    transFontSize: 13,
     bgColor: '#ffffff',
-    bgName: 'Putih'
+    bgName: 'Putih',
+    arabFont: 'Amiri Quran'
 };
 
 function getSettings() {
@@ -751,7 +1445,20 @@ function applySettings(s) {
     // Ukuran font Arab
     root.style.setProperty('--arabic-font-size', s.fontSize + 'px');
 
-    // Background & warna teks — pakai CSS variable di :root
+    // Ukuran font Latin/Terjemahan
+    if (s.latinFontSize) {
+        root.style.setProperty('--latin-font-size', s.latinFontSize + 'px');
+    }
+    if (s.transFontSize) {
+        root.style.setProperty('--trans-font-size', s.transFontSize + 'px');
+    }
+
+    // Font Arab
+    if (s.arabFont) {
+        root.style.setProperty('--arabic-font-family', "'" + s.arabFont + "', 'Amiri', serif");
+    }
+
+    // Background & warna teks â€” pakai CSS variable di :root
     root.style.setProperty('--ayat-bg', s.bgColor);
 
     if (s.bgColor === '#1a2e45') {
@@ -775,9 +1482,19 @@ function initSettings() {
     const display     = document.getElementById('font-size-display');
     const incBtn      = document.getElementById('font-increase');
     const decBtn      = document.getElementById('font-decrease');
+    const latinSlider = document.getElementById('latin-font-size-slider');
+    const latinDisplay= document.getElementById('latin-font-size-display');
+    const latinIncBtn = document.getElementById('latin-font-increase');
+    const latinDecBtn = document.getElementById('latin-font-decrease');
+    const transSlider = document.getElementById('trans-font-size-slider');
+    const transDisplay= document.getElementById('trans-font-size-display');
+    const transIncBtn = document.getElementById('trans-font-increase');
+    const transDecBtn = document.getElementById('trans-font-decrease');
     const bgOptions   = document.querySelectorAll('.bg-option');
     const selectedLbl = document.getElementById('bg-selected-name');
     const resetBtn    = document.getElementById('settings-reset-btn');
+    const fontSelect  = document.getElementById('arab-font-select');
+    const fontPreview = document.getElementById('arab-font-preview');
 
     if (!overlay) return;
 
@@ -785,6 +1502,14 @@ function initSettings() {
     slider.value = s.fontSize;
     display.textContent = s.fontSize + 'px';
     markBgSelected(s.bgColor, s.bgName, bgOptions, selectedLbl);
+
+    // Font select initial
+    if (fontSelect && s.arabFont) {
+        fontSelect.value = s.arabFont;
+    }
+    if (fontPreview && s.arabFont) {
+        fontPreview.style.fontFamily = "'" + s.arabFont + "', serif";
+    }
 
     // Open / close
     openBtn.addEventListener('click', (e) => {
@@ -796,7 +1521,7 @@ function initSettings() {
         if (e.target === overlay) overlay.classList.remove('open');
     });
 
-    // Font size — slider
+    // Font size â€” slider
     slider.addEventListener('input', () => {
         const val = parseInt(slider.value);
         display.textContent = val + 'px';
@@ -806,7 +1531,7 @@ function initSettings() {
         applySettings(cur);
     });
 
-    // Font size — A+ / A−
+    // Font size â€” A+ / Aâˆ’
     incBtn.addEventListener('click', () => {
         const val = Math.min(64, parseInt(slider.value) + 2);
         slider.value = val;
@@ -817,6 +1542,64 @@ function initSettings() {
         slider.value = val;
         slider.dispatchEvent(new Event('input'));
     });
+
+    // Latin font size â€” slider
+    if (latinSlider) {
+        latinSlider.value = s.latinFontSize || 13;
+        latinDisplay.textContent = (s.latinFontSize || 13) + 'px';
+
+        latinSlider.addEventListener('input', () => {
+            const val = parseInt(latinSlider.value);
+            latinDisplay.textContent = val + 'px';
+            const cur = getSettings();
+            cur.latinFontSize = val;
+            saveSettings(cur);
+            applySettings(cur);
+        });
+    }
+    if (latinIncBtn) {
+        latinIncBtn.addEventListener('click', () => {
+            const val = Math.min(22, parseInt(latinSlider.value) + 1);
+            latinSlider.value = val;
+            latinSlider.dispatchEvent(new Event('input'));
+        });
+    }
+    if (latinDecBtn) {
+        latinDecBtn.addEventListener('click', () => {
+            const val = Math.max(11, parseInt(latinSlider.value) - 1);
+            latinSlider.value = val;
+            latinSlider.dispatchEvent(new Event('input'));
+        });
+    }
+
+    // Translation font size â€” slider
+    if (transSlider) {
+        transSlider.value = s.transFontSize || 13;
+        transDisplay.textContent = (s.transFontSize || 13) + 'px';
+
+        transSlider.addEventListener('input', () => {
+            const val = parseInt(transSlider.value);
+            transDisplay.textContent = val + 'px';
+            const cur = getSettings();
+            cur.transFontSize = val;
+            saveSettings(cur);
+            applySettings(cur);
+        });
+    }
+    if (transIncBtn) {
+        transIncBtn.addEventListener('click', () => {
+            const val = Math.min(20, parseInt(transSlider.value) + 1);
+            transSlider.value = val;
+            transSlider.dispatchEvent(new Event('input'));
+        });
+    }
+    if (transDecBtn) {
+        transDecBtn.addEventListener('click', () => {
+            const val = Math.max(11, parseInt(transSlider.value) - 1);
+            transSlider.value = val;
+            transSlider.dispatchEvent(new Event('input'));
+        });
+    }
 
     // Background color
     bgOptions.forEach(btn => {
@@ -833,14 +1616,30 @@ function initSettings() {
         });
     });
 
+    // Font Arab select
+    if (fontSelect) {
+        fontSelect.addEventListener('change', () => {
+            const font = fontSelect.value;
+            const cur = getSettings();
+            cur.arabFont = font;
+            saveSettings(cur);
+            applySettings(cur);
+            if (fontPreview) fontPreview.style.fontFamily = "'" + font + "', serif";
+        });
+    }
+
     // Reset
     resetBtn.addEventListener('click', () => {
         saveSettings(Object.assign({}, SETTINGS_DEFAULT));
         const s = getSettings();
         slider.value = s.fontSize;
         display.textContent = s.fontSize + 'px';
+        if (latinSlider) { latinSlider.value = s.latinFontSize; latinDisplay.textContent = s.latinFontSize + 'px'; }
+        if (transSlider) { transSlider.value = s.transFontSize; transDisplay.textContent = s.transFontSize + 'px'; }
         applySettings(s);
         markBgSelected(s.bgColor, s.bgName, bgOptions, selectedLbl);
+        if (fontSelect) fontSelect.value = s.arabFont;
+        if (fontPreview) fontPreview.style.fontFamily = "'" + s.arabFont + "', serif";
     });
 }
 
@@ -851,9 +1650,9 @@ function markBgSelected(color, name, bgOptions, selectedLbl) {
     if (selectedLbl) selectedLbl.textContent = name;
 }
 
-/* ──────────────────────────────────────────────
-   LAST READ — localStorage
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   LAST READ â€” localStorage
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const LAST_READ_KEY = 'quran_last_read';
 
 function saveLastRead(nomorSurah, namaLatin, nomorAyat) {
@@ -880,7 +1679,7 @@ function showLastReadToast(namaLatin, nomorAyat) {
         <div class="toast-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
         <div class="toast-body">
             <span class="toast-label">${t('last_read_saved')}</span>
-            <span class="toast-info">${namaLatin} — ${t('ayat_ref')} ${nomorAyat}</span>
+            <span class="toast-info">${namaLatin} â€” ${t('ayat_ref')} ${nomorAyat}</span>
         </div>
         <button class="toast-close" onclick="this.parentElement.remove()">
             <i class="fa-solid fa-xmark"></i>
@@ -940,9 +1739,9 @@ function initLastRead() {
     });
 }
 
-/* ──────────────────────────────────────────────
-   BOOKMARK AYAT — localStorage
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   BOOKMARK AYAT â€” localStorage
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const BOOKMARKS_KEY = 'quran_bookmarks';
 
 function getBookmarks() {
@@ -992,7 +1791,7 @@ function toggleBookmarkAyat(nomorSurah, namaLatin, nomorAyat) {
 }
 
 function renderBookmarks() {
-    // ── Sidebar mini (tab kanan) ──
+    // â”€â”€ Sidebar mini (tab kanan) â”€â”€
     const container = document.getElementById('bookmarks-list');
     const emptyMsg  = document.getElementById('bookmarks-empty');
     if (container) {
@@ -1006,10 +1805,10 @@ function renderBookmarks() {
         }
     }
 
-    // ── Update count badge di nav sidebar kiri ──
+    // â”€â”€ Update count badge di nav sidebar kiri â”€â”€
     renderBookmarkCountBadge();
 
-    // ── Update panel lengkap jika terbuka ──
+    // â”€â”€ Update panel lengkap jika terbuka â”€â”€
     renderBookmarkPanel();
 }
 
@@ -1025,13 +1824,13 @@ function renderBookmarkCountBadge() {
     }
 }
 
-// Buat elemen bookmark item — isPanel=true untuk versi lengkap
+// Buat elemen bookmark item â€” isPanel=true untuk versi lengkap
 function buildBookmarkItem(bm, isPanel) {
     const item = document.createElement('div');
     item.className = isPanel ? 'bm-panel-item' : 'bookmark-item';
 
     if (isPanel) {
-        // Versi lengkap — tampilkan semua field
+        // Versi lengkap â€” tampilkan semua field
         const date = new Date(bm.savedAt);
         const dateStr = date.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
         item.innerHTML = `
@@ -1045,7 +1844,7 @@ function buildBookmarkItem(bm, isPanel) {
             </div>
             <p class="bm-panel-arab" dir="rtl">${bm.teksArab}</p>
             ${bm.teksLatin ? `<p class="bm-panel-latin">${bm.teksLatin}</p>` : ''}
-            <p class="bm-panel-idn">${bm.teksIndonesia || '—'}</p>
+            <p class="bm-panel-idn">${bm.teksIndonesia || 'â€”'}</p>
             <div class="bm-panel-actions">
                 <button class="bookmark-go-btn bm-panel-go-btn">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i> ${t('open_ayat')}
@@ -1057,14 +1856,14 @@ function buildBookmarkItem(bm, isPanel) {
             </div>
         `;
     } else {
-        // Versi mini — sidebar kanan
+        // Versi mini â€” sidebar kanan
         item.innerHTML = `
             <div class="bookmark-header">
                 <span class="bookmark-surah-name">${bm.namaLatin}</span>
                 <span class="bookmark-ayat-num">${t('ayat_ref')} ${bm.nomorAyat}</span>
             </div>
             <p class="bookmark-arab">${bm.teksArab}</p>
-            <p class="bookmark-idn">${bm.teksIndonesia || '—'}</p>
+            <p class="bookmark-idn">${bm.teksIndonesia || 'â€”'}</p>
             <div class="bookmark-actions">
                 <button class="bookmark-go-btn">
                     <i class="fa-solid fa-arrow-right"></i> ${t('open')}
@@ -1142,7 +1941,7 @@ function initBookmarks() {
         });
     });
 
-    // Nav Last Bookmark → buka PANEL LENGKAP
+    // Nav Last Bookmark â†’ buka PANEL LENGKAP
     const navBmBtn = document.getElementById('nav-last-bookmark-btn');
     if (navBmBtn) {
         navBmBtn.addEventListener('click', (e) => {
@@ -1160,7 +1959,7 @@ function initBookmarks() {
         });
     }
 
-    // Klik overlay backdrop → tutup
+    // Klik overlay backdrop â†’ tutup
     const overlay = document.getElementById('bookmark-panel-overlay');
     if (overlay) {
         overlay.addEventListener('click', (e) => {
@@ -1208,9 +2007,9 @@ function syncBookmarkButtons() {
     });
 }
 
-/* ──────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    MOBILE DRAWER
-   ────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function initMobileDrawer() {
     const sidebarLeft  = document.querySelector('.sidebar-left');
     const sidebarRight = document.querySelector('.sidebar-right');
@@ -1247,9 +2046,9 @@ function initMobileDrawer() {
     });
 }
 
-/* ──────────────────────────────────────────────
-   JUZ — mapping & panel
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   JUZ â€” mapping & panel
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const JUZ_MAP = [
     { juz:  1, surah:   1, ayat:   1, namaLatin: 'Al-Fatihah'   },
     { juz:  2, surah:   2, ayat: 142, namaLatin: 'Al-Baqarah'   },
@@ -1340,9 +2139,9 @@ function initJuz() {
     });
 }
 
-/* ──────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    FAVORITES PANEL (from nav-left)
-   ────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function closeAllNavDropdowns() {
     document.querySelectorAll('.nav-dropdown-body').forEach(b => b.classList.remove('open'));
     document.querySelectorAll('.nav-dropdown-arrow').forEach(a => a.classList.remove('rotated'));
@@ -1405,9 +2204,9 @@ function initFavoritesPanel() {
     });
 }
 
-/* ──────────────────────────────────────────────
-   READING CATEGORIES — localStorage
-   ────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   READING CATEGORIES â€” localStorage
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const READING_CATEGORIES_KEY = 'quran_reading_categories';
 
 function getReadingCategories() {
@@ -1453,7 +2252,7 @@ function saveToCategory(categoryId, nomorSurah, namaLatin, nomorAyat) {
         saveReadingCategories(list);
         showLastReadToast(namaLatin, nomorAyat);
     }
-    // Re-render dropdown hanya jika sedang open — hindari layout rusak
+    // Re-render dropdown hanya jika sedang open â€” hindari layout rusak
     const dropBody = document.getElementById('lastread-dropdown-body');
     if (dropBody && dropBody.classList.contains('open')) {
         renderLastReadDropdown();
@@ -1488,7 +2287,7 @@ function renderLastReadPanel() {
         
         const dateStr = cat.savedAt 
             ? new Date(cat.savedAt).toLocaleDateString(getCurrentLang() === 'en' ? 'en-US' : 'id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
-            : '—';
+            : 'â€”';
 
         item.innerHTML = `
             <div class="lr-cat-icon">
@@ -1504,7 +2303,7 @@ function renderLastReadPanel() {
             </button>
         `;
 
-        // Klik item → jump ke posisi
+        // Klik item â†’ jump ke posisi
         item.querySelector('.lr-cat-info').addEventListener('click', () => {
             if (cat.nomorSurah) {
                 document.getElementById('last-read-panel-overlay').classList.remove('open');
@@ -1555,7 +2354,7 @@ function initLastReadPanel() {
         }
     });
 
-    // Tombol tambah kategori — tampilkan input inline
+    // Tombol tambah kategori â€” tampilkan input inline
     const addBtn = document.getElementById('lr-add-category-btn');
     if (addBtn) {
         addBtn.addEventListener('click', (e) => {
@@ -1649,7 +2448,7 @@ function renderLastReadDropdown() {
         const hasPos = cat.nomorSurah !== null;
         const posBadge = hasPos
             ? `<span class="lr-cat-badge">${cat.nomorSurah}:${cat.nomorAyat}</span>`
-            : `<span class="lr-cat-badge lr-cat-badge-empty">—</span>`;
+            : `<span class="lr-cat-badge lr-cat-badge-empty">â€”</span>`;
 
         item.innerHTML = `
             <div class="lr-cat-main" ${hasPos ? 'style="cursor:pointer"' : ''}>
@@ -1698,9 +2497,9 @@ function renderLastReadDropdown() {
     });
 }
 
-/* ──────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    SAVE LAST-READ POPUP
-   ────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function showSaveLastReadSlide(nomorSurah, namaLatin, nomorAyat) {
     // Hapus popup lama jika ada
     const existing = document.getElementById('lr-popup-overlay');
@@ -1723,7 +2522,7 @@ function showSaveLastReadSlide(nomorSurah, namaLatin, nomorAyat) {
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 <span>${t('lr_slide_title')}</span>
             </div>
-            <div class="lr-popup-meta">${namaLatin} · ${t('ayat_ref')} ${nomorAyat}</div>
+            <div class="lr-popup-meta">${namaLatin} Â· ${t('ayat_ref')} ${nomorAyat}</div>
             <button class="lr-popup-close" id="lr-popup-close-btn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -1756,7 +2555,7 @@ function showSaveLastReadSlide(nomorSurah, namaLatin, nomorAyat) {
         btn.className = 'lr-popup-item';
         const posText = cat.nomorSurah
             ? `<span class="lr-popup-item-pos">${cat.nomorSurah}:${cat.nomorAyat}</span>`
-            : `<span class="lr-popup-item-empty">—</span>`;
+            : `<span class="lr-popup-item-empty">â€”</span>`;
         btn.innerHTML = `
             <i class="fa-solid fa-clock-rotate-left"></i>
             <span class="lr-popup-item-name">${cat.name}</span>
@@ -1826,13 +2625,13 @@ function hideSaveLastReadSlide() {
 }
 
 function initSaveLastReadSlide() {
-    // Slide digantikan popup JS — tidak perlu init dari HTML
+    // Slide digantikan popup JS â€” tidak perlu init dari HTML
     // Backdrop lama di layout juga tidak dipakai, tapi tidak masalah
 }
 
-/* ──────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    AUTOCOMPLETE (jQuery UI)
-   ────────────────────────────────────────────── */
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 $(function () {
     var listSurah = [];
     loadAllSurah().then(function (data) {
@@ -1851,3 +2650,4 @@ $(function () {
     });
 });
 </script>
+
