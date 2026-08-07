@@ -3,6 +3,67 @@
    Palet: biru dongker (#0d2137) + biru muda (#e8f4fd) + emas (#c9a84c)
    ============================================================ */
 
+/* ── 0. ARABIC FONT FACES (CDN) ── */
+@font-face {
+    font-family: "Amiri Quran";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/amiri-quran.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/amiri-quran.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Scheherazade";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/scheherazade-regular.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/scheherazade-regular.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Noorehuda";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehuda.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehuda.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "KFGQPC Hafs";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/uthmanic-hafs1-ver14.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/uthmanic-hafs1-ver14.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Noto Naskh Arabic";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-naskh-arabic-regular.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-naskh-arabic-regular.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* ── 1. CSS VARIABLES ── */
 :root {
     --navy: #0d2137;
@@ -1010,8 +1071,8 @@ input {
 .info-ornament {
     font-family: "Amiri", serif;
     font-size: 46px;
-    color: var(--gold);
-    opacity: 0.85;
+    color: var(--navy);
+    opacity: 1;
     letter-spacing: 3px;
     line-height: 1.4;
     display: block;
@@ -1020,7 +1081,7 @@ input {
 
 .info-subtitle {
     font-size: 12px;
-    color: var(--text-mid);
+    color: var(--text-dark);
     font-style: italic;
     margin-top: 6px;
     letter-spacing: 0.3px;
@@ -1532,29 +1593,32 @@ input {
     width: 100%;
 }
 
-/* tombol bookmark + lastread — muncul saat hover, rata kiri */
+/* tombol bookmark + lastread + asbab — bookmark selalu tampil, sisanya hover */
 .nomor-ayat .ayat-btns {
-    display: none;
+    display: flex;
     flex-direction: row;
     align-items: center;
     gap: 3px;
 }
 
-.barisSurah:hover .nomor-ayat .ayat-btns {
-    display: flex;
-}
-
 .ayat-btns {
-    display: none;
+    display: flex;
     flex-direction: row;
     align-items: center;
     gap: 4px;
-    padding-top: 6px;
+    padding-top: 4px;
     direction: ltr;
 }
 
-.barisSurah:hover .ayat-btns {
-    display: flex;
+/* Hover-only buttons: hidden by default, show on row hover */
+.btn-hover-only {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.barisSurah:hover .btn-hover-only {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* Tetap tampil jika sudah dibookmark */
@@ -1562,8 +1626,29 @@ input {
     display: flex;
 }
 
+/* Asbabun Nuzul & Tafsir button */
+.btn-asbab-ayat,
+.btn-tafsir-ayat {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 13px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color var(--transition), background var(--transition);
+}
+.btn-asbab-ayat:hover {
+    color: var(--gold);
+    background: rgba(201, 168, 76, 0.1);
+}
+.btn-tafsir-ayat:hover {
+    color: var(--navy-light);
+    background: rgba(30, 73, 118, 0.1);
+}
+
 .arabic {
-    font-family: "Amiri", serif;
+    font-family: var(--arabic-font-family, "Amiri", serif);
     font-size: var(--arabic-font-size, 36px);
     font-weight: 700;
     color: var(--navy);
@@ -1582,24 +1667,24 @@ input {
 }
 .theme-dark .ayat .urutan-ayat {
     border-color: #e8c97a;
-    background: rgba(232, 201, 122, 0.1);
+    background: #e8c97a;
 }
 .theme-dark .ayat .urutan-ayat span {
-    color: #e8c97a;
+    color: #0d2137;
 }
 .theme-dark .ayat .isi-ayat {
     border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 .theme-dark .ayat .show-hide-terjemahan {
-    color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
 }
 .theme-dark .ayat .tulisan-latin {
-    color: rgba(255, 255, 255, 0.65);
+    color: #ffffff;
 }
 .theme-dark .ayat .terjemahan {
-    background: rgba(232, 201, 122, 0.12);
+    background: rgba(232, 201, 122, 0.1);
     border-left-color: #e8c97a;
-    color: rgba(255, 255, 255, 0.85);
+    color: #ffffff;
 }
 .theme-dark .ayat .btn-bookmark-ayat {
     background: rgba(255, 255, 255, 0.08);
@@ -1638,7 +1723,7 @@ input {
 
 .tulisan-latin {
     font-style: italic;
-    font-size: 13px;
+    font-size: var(--latin-font-size, 13px);
     color: var(--text-mid);
     text-align: left;
     direction: ltr;
@@ -1647,7 +1732,7 @@ input {
 }
 
 .terjemahan {
-    font-size: 13px;
+    font-size: var(--trans-font-size, 13px);
     color: var(--text-dark);
     text-align: justify;
     direction: ltr;
@@ -2091,9 +2176,18 @@ input {
     border-radius: var(--radius-lg);
     width: 400px;
     max-width: 95vw;
+    max-height: 85vh;
     box-shadow: var(--shadow-lg);
     overflow: hidden;
     animation: slideUp 0.25s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
 }
 
 @keyframes slideUp {
@@ -2244,6 +2338,61 @@ input {
     background: var(--gold);
     border: 2px solid var(--white);
     cursor: pointer;
+}
+
+/* Arab font select & preview */
+.settings-select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: var(--white);
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: border-color var(--transition);
+}
+.settings-select:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+.settings-font-preview {
+    font-size: 24px;
+    line-height: 1.8;
+    padding: 12px;
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    color: var(--text-dark);
+}
+
+.settings-preview {
+    padding: 10px 12px;
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    color: var(--text-dark);
+    margin-top: 8px;
+    line-height: 1.6;
+    transition: font-size 0.2s ease;
+}
+.settings-preview-arab {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    font-size: var(--arabic-font-size, 36px);
+}
+.settings-preview-latin {
+    font-style: italic;
+    font-size: var(--latin-font-size, 13px);
+    color: var(--text-mid);
+}
+.settings-preview-trans {
+    font-size: var(--trans-font-size, 13px);
+    color: var(--text-dark);
 }
 
 /* Background color options */
@@ -4295,30 +4444,83 @@ input {
 
 .tajweed-legend {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px 12px;
-    padding: 10px;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px;
     background: var(--blue-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    margin-top: 4px;
+    margin-top: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.tajweed-legend-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+.tajweed-legend-title i {
+    color: var(--gold);
+    font-size: 13px;
+}
+
+.tajweed-legend-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tajweed-group-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-mid);
+    padding: 4px 0 2px;
 }
 
 .tajweed-legend-item {
     display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 10.5px;
-    color: var(--text-dark);
-    white-space: nowrap;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: var(--white);
+    border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .tj-swatch {
     display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
     flex-shrink: 0;
+    margin-top: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tj-legend-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+.tj-legend-text strong {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+.tj-legend-text small {
+    font-size: 10px;
+    color: var(--text-mid);
+    line-height: 1.35;
 }
 
 /* ── TAJWEED COLORS (applied to Arabic text) ── */
@@ -4371,5 +4573,617 @@ input {
     color: #ff7e1e;
 }
 [class^="tj-"] {
-    font-family: "Amiri", serif;
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    position: relative;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.15s ease;
+}
+[class^="tj-"]:hover {
+    cursor: pointer;
+}
+
+/* Tajweed tooltip — handled by JS (appended to body) */
+[class^="tj-"]::after,
+[class^="tj-"]::before {
+    display: none;
+}
+
+/* Tajweed tooltip element (JS-created, appended to body) */
+.tj-tooltip {
+    position: fixed;
+    background: #0d2137;
+    color: #fff;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    padding: 6px 12px;
+    border-radius: 6px;
+    width: max-content;
+    max-width: 200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 99999;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    text-align: center;
+    direction: ltr;
+}
+.tj-tooltip.visible {
+    opacity: 1 !important;
+    transform: translateY(0);
+}
+.tj-tooltip-name {
+    color: #e8c97a;
+}
+.tj-tooltip-arrow {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: #0d2137;
+}
+
+/* Tajweed detail modal */
+.tj-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 33, 55, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.tj-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+.tj-modal {
+    background: #fff;
+    border-radius: 16px;
+    width: 420px;
+    max-width: 90vw;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    overflow: hidden;
+    transform: scale(0.92) translateY(10px);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tj-modal-overlay.open .tj-modal {
+    transform: scale(1) translateY(0);
+}
+.tj-modal-header {
+    background: linear-gradient(135deg, #0d2137 0%, #1e4976 100%);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #c9a84c;
+}
+.tj-modal-title {
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #e8c97a;
+}
+.tj-modal-close {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+.tj-modal-close:hover {
+    background: rgba(255,255,255,0.25);
+}
+.tj-modal-body {
+    padding: 20px;
+}
+.tj-modal-letter {
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #f0f8ff;
+    border-radius: 12px;
+    border: 1px solid #cde4f5;
+}
+.tj-modal-letter-text {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    font-size: 38px;
+    direction: rtl;
+    line-height: 1.6;
+}
+.tj-modal-section {
+    margin-bottom: 12px;
+}
+.tj-modal-section-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #4a6580;
+    margin-bottom: 4px;
+}
+.tj-modal-section-text {
+    font-size: 15px;
+    color: #1a2e45;
+    line-height: 1.75;
+    direction: ltr;
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+    letter-spacing: 0.2px;
+}
+.tj-modal-color-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 6px 12px;
+    background: #f8f9fa;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+}
+.tj-modal-color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.tj-modal-color-label {
+    font-size: 11px;
+    color: #4a6580;
+    font-weight: 500;
+}
+
+
+/* ── ASBABUN NUZUL MODAL ── */
+.asbab-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 33, 55, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.asbab-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+.asbab-modal {
+    background: #fff;
+    border-radius: 16px;
+    width: 500px;
+    max-width: 92vw;
+    max-height: 80vh;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.92) translateY(10px);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.asbab-modal-overlay.open .asbab-modal {
+    transform: scale(1) translateY(0);
+}
+.asbab-modal-header {
+    background: linear-gradient(135deg, #0d2137 0%, #1e4976 100%);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #c9a84c;
+    flex-shrink: 0;
+}
+.asbab-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #e8c97a;
+}
+.asbab-modal-title i {
+    font-size: 16px;
+}
+.asbab-modal-close {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+.asbab-modal-close:hover {
+    background: rgba(255,255,255,0.25);
+}
+.asbab-modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+.asbab-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+    font-size: 14px;
+}
+.asbab-loading i {
+    margin-right: 8px;
+    color: var(--gold);
+}
+.asbab-empty {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-light);
+}
+.asbab-empty i {
+    font-size: 32px;
+    color: var(--gold-light);
+    margin-bottom: 12px;
+    display: block;
+}
+.asbab-empty p {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-mid);
+}
+.asbab-empty small {
+    font-size: 12px;
+    color: var(--text-light);
+}
+.asbab-ayat-info {
+    margin-bottom: 14px;
+}
+.asbab-ayat-badge {
+    display: inline-block;
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+}
+.asbab-content {
+    font-size: 14.5px;
+    line-height: 1.8;
+    color: var(--text-dark);
+    text-align: justify;
+}
+.asbab-content p {
+    margin: 0;
+}
+
+/* ── DATA SOURCE BUTTON & MODAL LIST ── */
+.data-source-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-sm);
+    color: #a8c4d8;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background var(--transition), color var(--transition);
+}
+.data-source-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+.data-source-btn i {
+    color: var(--gold);
+    font-size: 13px;
+}
+
+.datasource-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.datasource-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px;
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+.datasource-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.datasource-info {
+    flex: 1;
+    min-width: 0;
+}
+.datasource-info h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+}
+.datasource-info p {
+    font-size: 12.5px;
+    color: var(--text-mid);
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+.datasource-info a {
+    font-size: 11.5px;
+    color: var(--navy-light);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color var(--transition);
+}
+.datasource-info a:hover {
+    color: var(--gold);
+}
+.datasource-info a i {
+    font-size: 9px;
+}
+
+/* ── PANDUAN TAJWID MODAL (besar) ── */
+.tajwid-guide-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 33, 55, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.tajwid-guide-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+.tajwid-guide-modal {
+    background: #fff;
+    border-radius: 18px;
+    width: 700px;
+    max-width: 95vw;
+    max-height: 88vh;
+    box-shadow: 0 16px 50px rgba(0,0,0,0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.92) translateY(10px);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tajwid-guide-overlay.open .tajwid-guide-modal {
+    transform: scale(1) translateY(0);
+}
+.tajwid-guide-header {
+    background: linear-gradient(135deg, #0d2137 0%, #1e4976 100%);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #c9a84c;
+    flex-shrink: 0;
+}
+.tajwid-guide-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Inter", sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #e8c97a;
+}
+.tajwid-guide-title i {
+    font-size: 18px;
+}
+.tajwid-guide-body {
+    overflow-y: auto;
+    padding: 24px 28px;
+    flex: 1;
+}
+
+/* Sections */
+.tg-section {
+    margin-bottom: 28px;
+}
+.tg-section:last-child {
+    margin-bottom: 0;
+}
+.tg-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gold-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tg-section-title i {
+    color: var(--gold);
+    font-size: 14px;
+}
+
+/* Rule cards */
+.tg-rule {
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+}
+.tg-rule:last-child {
+    margin-bottom: 0;
+}
+.tg-rule-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+.tg-rule-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+}
+.tg-rule-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: #eee;
+    color: #555;
+}
+.tg-badge-green { background: #e6f7ed; color: #169777; }
+.tg-badge-blue { background: #e8f0ff; color: #2144C1; }
+.tg-badge-purple { background: #f3e8ff; color: #9400A8; }
+.tg-badge-cyan { background: #e6faff; color: #0891b2; }
+.tg-badge-red { background: #fee8e8; color: #DD0008; }
+.tg-badge-orange { background: #fff3e6; color: #d97706; }
+
+.tg-rule-desc {
+    font-size: 13px;
+    color: var(--text-dark);
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+.tg-letters {
+    font-size: 12.5px;
+    color: var(--text-mid);
+    margin-bottom: 5px;
+}
+.tg-arab {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    font-size: 18px;
+    color: var(--navy);
+    direction: rtl;
+    display: inline;
+}
+.tg-example {
+    font-size: 12px;
+    color: var(--text-mid);
+    margin-top: 8px;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 12px;
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+.tg-example.open {
+    max-height: 200px;
+    padding: 12px;
+    margin-top: 8px;
+}
+.tg-example .tg-arab {
+    font-size: 20px;
+    color: var(--navy);
+    display: block;
+    text-align: center;
+    margin-top: 6px;
+    line-height: 1.8;
+}
+.tg-example-toggle {
+    font-size: 11px;
+    color: var(--navy-light);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 4px 0;
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+    transition: color var(--transition);
+}
+.tg-example-toggle:hover {
+    color: var(--gold);
+}
+.tg-example-toggle i {
+    font-size: 9px;
+    transition: transform 0.2s ease;
+}
+.tg-example-toggle.open i {
+    transform: rotate(180deg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tajwid-guide-modal {
+        max-width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+        width: 100%;
+    }
+    .tajwid-guide-body {
+        padding: 16px 14px;
+    }
+    .tg-rule {
+        padding: 12px 14px;
+    }
+}
+
+/* Tajwid guide source section */
+.tg-source-section .tg-sources {
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+}
+.tg-source-section .tg-sources p {
+    font-size: 12.5px;
+    color: var(--text-mid);
+    line-height: 1.8;
+    margin: 0;
 }

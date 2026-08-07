@@ -173,7 +173,12 @@ function surahCard(surah) {
     card.classList.add("surah-card");
 
     const favClass =
-        typeof isFavorite === "function" && isFavorite(surah.nomor)
+        (function() {
+            try {
+                const favs = JSON.parse(localStorage.getItem('quran_favorites')) || [];
+                return favs.some(f => f.nomor === surah.nomor);
+            } catch(e) { return false; }
+        })()
             ? "favorited"
             : "";
     const favTitle = favClass
@@ -187,15 +192,16 @@ function surahCard(surah) {
     <p class="card-arti">${surah.arti}</p>
   </div>
   <div class="card-actions">
-    <button id="button${surah.nomor}" class="btn-read">
-      <i class="fa-solid fa-book-open"></i> ${__("read_btn", "Baca")}
-    </button>
     <button id="star-${surah.nomor}" class="btn-star ${favClass}" title="${favTitle}"
-      onclick="toggleFavorite(${surah.nomor}, '${surah.nama_latin.replace(/'/g, "\\'")}', '${surah.arti.replace(/'/g, "\\'")}')">
+      onclick="event.stopPropagation(); toggleFavorite(${surah.nomor}, '${surah.nama_latin.replace(/'/g, "\\'")}', '${surah.arti.replace(/'/g, "\\'")}')">
       <i class="fa-solid fa-star"></i>
     </button>
   </div>
   `;
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => {
+        loadSurahDetails(surah.nomor);
+    });
     return card;
 }
 
@@ -250,16 +256,6 @@ function loadPagingSurah(currentIndex, totalData) {
                         break;
                     }
                     mainBody.appendChild(surahCard(data[currentIndex]));
-
-                    const buttonDetail = document.getElementById(
-                        `button${data[currentIndex].nomor}`,
-                    );
-
-                    (function (index) {
-                        buttonDetail.addEventListener("click", () => {
-                            loadSurahDetails(index);
-                        });
-                    })(data[currentIndex].nomor);
                 }
 
                 if (typeof isFavorite === "function") {
@@ -370,8 +366,9 @@ function loadSurahDetails(nomorSurah) {
                     const el = document.getElementById(`isi-ayat${nomorAyat}`);
                     if (!el) return;
                     el.addEventListener("dblclick", () => {
-                        if (typeof saveLastRead === "function") {
-                            saveLastRead(
+                        if (typeof saveToCategory === "function") {
+                            saveToCategory(
+                                "default",
                                 nomorSurah,
                                 data.namaLatin ?? data.nama_latin,
                                 nomorAyat,
@@ -553,33 +550,45 @@ function componentDetailSurah(surah) {
             const teksArab = ayat.teksArab ?? ayat.ar;
             isiAyat += `
         <div class="barisSurah">
-        <div id="isi-ayat${nomorAyat}" class="isi-ayat">
+        <div id="isi-ayat${nomorAyat}" class="isi-ayat" data-surah="${surah.nomor}" data-ayat="${nomorAyat}">
             <div class="ayat-nav">
                 <span class="arabic">${teksArab}</span>
                 <span class="ayat-nomor-inline">
                     <div class="urutan-ayat"><span>${numberToArabic(nomorAyat)}</span></div>
                 </span>
             </div>
-            <div class="ayat-action">
-                <a id="toggleTerjemahan${nomorAyat}" class="show-hide-terjemahan">
-                    ${__("see_translation", "Lihat terjemahan")}
-                </a>
-            </div>
             <div class="ayat-btns">
                 <button class="btn-bookmark-ayat"
                     id="bookmark-btn-${nomorAyat}"
-                    data-tooltip="${__("save_bookmark", "Simpan bookmark")}"
                     title="${__("save_bookmark", "Simpan bookmark ayat ini")}"
                     onclick="toggleBookmarkAyat(${surah.nomor}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', ${nomorAyat})">
                     <i class="fa-solid fa-bookmark"></i>
                 </button>
-                <button class="btn-lastread-ayat"
+                <button class="btn-lastread-ayat btn-hover-only"
                     id="lastread-btn-${nomorAyat}"
-                    data-tooltip="${__("save_lastread", "Terakhir dibaca")}"
                     title="${__("save_lastread", "Simpan terakhir dibaca")}"
                     onclick="showSaveLastReadSlide(${surah.nomor}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', ${nomorAyat})">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                 </button>
+                <button class="btn-asbab-ayat btn-hover-only"
+                    id="asbab-btn-${nomorAyat}"
+                    title="Asbabun Nuzul"
+                    data-surah="${surah.nomor}"
+                    data-ayat="${nomorAyat}"
+                    onclick="openAsbabunNuzul(${surah.nomor}, ${nomorAyat})">
+                    <i class="fa-solid fa-scroll"></i>
+                </button>
+                <button class="btn-tafsir-ayat btn-hover-only"
+                    id="tafsir-btn-${nomorAyat}"
+                    title="Tafsir"
+                    onclick="openTafsir(${surah.nomor}, ${nomorAyat})">
+                    <i class="fa-solid fa-book"></i>
+                </button>
+            </div>
+            <div class="ayat-action">
+                <a id="toggleTerjemahan${nomorAyat}" class="show-hide-terjemahan">
+                    ${__("see_translation", "Lihat terjemahan")}
+                </a>
             </div>
         </div>
         </div>
