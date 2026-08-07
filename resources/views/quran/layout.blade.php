@@ -17,7 +17,7 @@
       defer
     ></script>
 
-    <title>Al-Qur'an Digital</title>
+    <title>Al Quran Digital</title>
   </head>
   <body>
 
@@ -28,7 +28,7 @@
       <aside class="sidebar-left">
         <div class="sidebar-logo">
           <div class="logo-ornament">☽</div>
-          <span class="logo-text">Al-Qur'an</span>
+          <span class="logo-text">Al Quran</span>
         </div>
 
         <nav class="sidebar-nav">
@@ -40,11 +40,32 @@
             <i class="fa-solid fa-book-open nav-icon"></i>
             <span data-i18n="nav_juz">Juz</span>
           </a>
-          <a href="#" class="nav-item" id="nav-last-read-btn">
-            <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
-            <span data-i18n="nav_last_read">Terakhir Dibaca</span>
-            <span id="last-read-badge" class="last-read-badge" style="display:none;"></span>
+
+          {{-- Terakhir Dibaca: expandable dropdown --}}
+          <div class="nav-dropdown" id="nav-lastread-dropdown">
+            <button class="nav-item nav-dropdown-trigger" id="nav-last-read-btn">
+              <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
+              <span data-i18n="nav_last_read">Terakhir Dibaca</span>
+              <span id="last-read-badge" class="last-read-badge" style="display:none;"></span>
+              <i class="fa-solid fa-chevron-down nav-dropdown-arrow" id="lastread-arrow"></i>
+            </button>
+            <div class="nav-dropdown-body" id="lastread-dropdown-body">
+              <div id="lr-category-list" class="lr-category-list">
+                {{-- Populated by JS --}}
+              </div>
+              <button class="lr-add-btn" id="lr-add-category-btn">
+                <i class="fa-solid fa-plus"></i>
+                <span data-i18n="lr_add_category">Tambah Kategori</span>
+              </button>
+            </div>
+          </div>
+
+          <a href="#" class="nav-item" id="nav-favorites-btn">
+            <i class="fa-solid fa-star nav-icon"></i>
+            <span data-i18n="nav_favorites">Favorit</span>
+            <span id="favorites-count-badge" class="last-read-badge" style="display:none;"></span>
           </a>
+
           <a href="#" class="nav-item" id="nav-last-bookmark-btn">
             <i class="fa-solid fa-bookmark nav-icon"></i>
             <span data-i18n="nav_bookmark">Bookmark</span>
@@ -71,7 +92,7 @@
           <button class="burger-btn" id="burger-left-btn" data-i18n-title="menu" title="Menu">
             <i class="fa-solid fa-bars"></i>
           </button>
-          <span class="mobile-logo">☽ Al-Qur'an</span>
+          <span class="mobile-logo">☽ Al Quran</span>
           <button class="burger-btn" id="burger-right-btn" data-i18n-title="favorites_bookmark" title="Favorit & Bookmark">
             <i class="fa-solid fa-star"></i>
           </button>
@@ -91,7 +112,12 @@
       </main>
 
       {{-- RIGHT SIDEBAR: Favorites + Last Bookmark (tabbed) --}}
-      <aside class="sidebar-right">
+      <aside class="sidebar-right" id="sidebar-right">
+
+        {{-- Toggle collapse button --}}
+        <button class="sidebar-right-toggle" id="sidebar-right-toggle" title="Sembunyikan sidebar">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
 
         {{-- Tab buttons --}}
         <div class="sidebar-tabs">
@@ -127,11 +153,16 @@
 
       </aside>
 
+      {{-- Tombol expand sidebar kanan (muncul saat collapsed) --}}
+      <button class="sidebar-right-expand" id="sidebar-right-expand" title="Tampilkan sidebar">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+
     </div>{{-- .app-wrapper --}}
 
     <footer class="footer">
       <span class="footer-ornament">❋</span>
-      <h3>Copyright © Al-Qur'an Digital 2024</h3>
+      <h3>Copyright © Al Quran Digital 2024</h3>
       <span class="footer-ornament">❋</span>
     </footer>
 
@@ -149,7 +180,7 @@
           <div class="juz-panel-title">
             <i class="fa-solid fa-book-open"></i>
             <h3 data-i18n="juz_title">Daftar Juz</h3>
-            <span class="juz-panel-subtitle" data-i18n="juz_subtitle">Al-Qur'an 30 Juz</span>
+            <span class="juz-panel-subtitle" data-i18n="juz_subtitle">Al Quran 30 Juz</span>
           </div>
           <button id="close-juz-panel-btn" class="settings-close-btn" data-i18n-title="close" title="Tutup">
             <i class="fa-solid fa-xmark"></i>
@@ -238,6 +269,34 @@
           </div>
         </div>
 
+        {{-- Tajwid Berwarna --}}
+        <div class="settings-section">
+          <label class="settings-label">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span data-i18n="settings_tajweed">Tajwid Berwarna</span>
+          </label>
+          <div class="tajweed-toggle-wrap">
+            <label class="toggle-switch">
+              <input type="checkbox" id="tajweed-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="tajweed-toggle-label" id="tajweed-toggle-label" data-i18n="tajweed_off">Nonaktif</span>
+          </div>
+          <p class="settings-hint" data-i18n="settings_tajweed_hint">Menampilkan warna pada huruf Arab sesuai hukum tajwid.</p>
+          <div class="tajweed-legend" id="tajweed-legend" style="display:none;">
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#AAAAAA"></span> <span data-i18n="tj_hamzat_wasl">Hamzat Wasl / Lam Syamsiyyah</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#537FFF"></span> <span data-i18n="tj_madd_normal">Mad Normal</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#4050FF"></span> <span data-i18n="tj_madd_permissible">Mad Jaiz</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#000EBC"></span> <span data-i18n="tj_madd_necessary">Mad Wajib/Lazim</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#DD0008"></span> <span data-i18n="tj_qalqalah">Qalqalah</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#9400A8"></span> <span data-i18n="tj_ikhfa">Ikhfa</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#26BFFD"></span> <span data-i18n="tj_iqlab">Iqlab</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#169777"></span> <span data-i18n="tj_idgham_ghunnah">Idgham dengan Ghunnah</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#169200"></span> <span data-i18n="tj_idgham_no_ghunnah">Idgham tanpa Ghunnah</span></div>
+            <div class="tajweed-legend-item"><span class="tj-swatch" style="background:#FF7E1E"></span> <span data-i18n="tj_ghunnah">Ghunnah</span></div>
+          </div>
+        </div>
+
         {{-- Reset --}}
         <div class="settings-section settings-footer-row">
           <button id="settings-reset-btn" class="settings-reset-btn">
@@ -285,6 +344,34 @@
             3. Klik tombol 🔖 yang muncul di samping nomor ayat<br><br>
             Ayat tersimpan bisa dibuka kembali kapan saja dari menu ini.
           </small>
+        </div>
+
+      </div>
+    </div>
+
+    {{-- FAVORITES PANEL --}}
+    <div id="favorites-panel-overlay" class="favorites-panel-overlay">
+      <div class="favorites-panel">
+
+        <div class="favorites-panel-header">
+          <div class="favorites-panel-title">
+            <i class="fa-solid fa-star"></i>
+            <h3 data-i18n="nav_favorites">Favorit</h3>
+            <span id="favorites-panel-count" class="bookmark-panel-count">0</span>
+          </div>
+          <button id="close-favorites-panel-btn" class="settings-close-btn" title="Tutup">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div id="favorites-panel-list" class="favorites-panel-list">
+          {{-- Populated by JS --}}
+        </div>
+
+        <div id="favorites-panel-empty" class="bookmark-panel-empty" style="display:none;">
+          <i class="fa-regular fa-star"></i>
+          <p data-i18n="fav_empty">Belum ada favorit.</p>
+          <small data-i18n="fav_empty_hint">Klik ★ pada kartu surah untuk menambahkan.</small>
         </div>
 
       </div>

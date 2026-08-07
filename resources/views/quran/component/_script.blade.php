@@ -84,6 +84,8 @@ function renderFavorites() {
         });
         container.appendChild(item);
     });
+    // Sync badge di nav kiri
+    if (typeof renderFavoritesBadge === 'function') renderFavoritesBadge();
 }
 
 // Toggle favorit dari kartu surah
@@ -101,16 +103,330 @@ function toggleFavorite(nomor, namaLatin, arti) {
     }
 }
 
+/* ──────────────────────────────────────────────
+   FAVORITES NAV PANEL (sidebar kiri)
+   ────────────────────────────────────────────── */
+function renderFavoritesPanel() {
+    const list      = getFavorites();
+    const container = document.getElementById('favorites-panel-list');
+    const emptyMsg  = document.getElementById('favorites-panel-empty');
+    const countEl   = document.getElementById('favorites-panel-count');
+    if (!container) return;
+
+    container.querySelectorAll('.fav-panel-item').forEach(el => el.remove());
+    if (countEl) countEl.textContent = list.length;
+
+    if (list.length === 0) {
+        if (emptyMsg) emptyMsg.style.display = 'flex';
+        return;
+    }
+    if (emptyMsg) emptyMsg.style.display = 'none';
+
+    list.forEach(fav => {
+        const item = document.createElement('div');
+        item.className = 'fav-panel-item';
+        item.innerHTML = `
+            <div class="fav-panel-main">
+                <span class="fav-panel-nomor">${fav.nomor}</span>
+                <div class="fav-panel-info">
+                    <span class="fav-panel-name">${fav.namaLatin}</span>
+                    <span class="fav-panel-arti">${fav.arti}</span>
+                </div>
+            </div>
+            <button class="fav-panel-del" title="${t('remove_favorite')}" data-nomor="${fav.nomor}">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        `;
+        item.querySelector('.fav-panel-main').addEventListener('click', () => {
+            document.getElementById('favorites-panel-overlay').classList.remove('open');
+            loadSurahDetails(fav.nomor);
+        });
+        item.querySelector('.fav-panel-del').addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeFavorite(fav.nomor);
+            renderFavoritesPanel();
+            renderFavoritesBadge();
+        });
+        container.appendChild(item);
+    });
+}
+
+function renderFavoritesBadge() {
+    const badge = document.getElementById('favorites-count-badge');
+    if (!badge) return;
+    const count = getFavorites().length;
+    if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function initFavoritesNav() {
+    renderFavoritesBadge();
+
+    const overlay  = document.getElementById('favorites-panel-overlay');
+    const openBtn  = document.getElementById('nav-favorites-btn');
+    const closeBtn = document.getElementById('close-favorites-panel-btn');
+    if (!overlay) return;
+
+    openBtn && openBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        renderFavoritesPanel();
+        overlay.classList.add('open');
+        document.querySelector('.sidebar-left')?.classList.remove('drawer-open');
+        document.getElementById('drawer-backdrop')?.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    closeBtn && closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('open');
+    });
+}
+
 // Init saat halaman load
 document.addEventListener('DOMContentLoaded', function () {
-    initI18n();
-    renderFavorites();
-    initSettings();
-    initLastRead();
-    initBookmarks();
-    initMobileDrawer();
-    initJuz();
+    try { renderFavorites(); } catch(e) { console.error('renderFavorites error:', e); }
+    try { initSettings(); } catch(e) { console.error('initSettings error:', e); }
+    try { initLastReadPanel(); } catch(e) { console.error('initLastReadPanel error:', e); }
+    try { initSaveLastReadSlide(); } catch(e) { console.error('initSaveLastReadSlide error:', e); }
+    try { initBookmarks(); } catch(e) { console.error('initBookmarks error:', e); }
+    try { initFavoritesNav(); } catch(e) { console.error('initFavoritesNav error:', e); }
+    try { initMobileDrawer(); } catch(e) { console.error('initMobileDrawer error:', e); }
+    try { initJuz(); } catch(e) { console.error('initJuz error:', e); }
+    try { initSidebarRightCollapse(); } catch(e) { console.error('initSidebarRightCollapse error:', e); }
+    try { initTajweedToggle(); } catch(e) { console.error('initTajweedToggle error:', e); }
 });
+
+/* ──────────────────────────────────────────────
+   TAJWEED — Colored Tajwid from alquran.cloud API
+   ────────────────────────────────────────────── */
+const TAJWEED_KEY = 'quran_tajweed_enabled';
+const tajweedCache = new Map();
+let lastRenderedSurah = null;
+
+function isTajweedEnabled() {
+    return localStorage.getItem(TAJWEED_KEY) === 'true';
+}
+
+function setTajweedEnabled(val) {
+    localStorage.setItem(TAJWEED_KEY, val ? 'true' : 'false');
+}
+
+// Mapping dari identifier tag ke CSS class
+const TAJWEED_MAP = {
+    'h': 'ham_wasl',
+    's': 'slnt',
+    'l': 'slnt',
+    'n': 'madda_normal',
+    'p': 'madda_permissible',
+    'm': 'madda_necessary',
+    'q': 'qlq',
+    'o': 'madda_obligatory',
+    'c': 'ikhf_shfw',
+    'f': 'ikhf',
+    'w': 'idghm_shfw',
+    'i': 'iqlb',
+    'a': 'idgh_ghn',
+    'u': 'idgh_w_ghn',
+    'd': 'idgh_mus',
+    'b': 'idgh_mut',
+    'g': 'ghn'
+};
+
+/**
+ * Parse raw tajweed text from API ke HTML berwarna.
+ * Format tag: [X:NUM[TEXT] atau [X[TEXT]
+ * Contoh: [h:1[ٱ] atau [n[مَٰ]
+ */
+function parseTajweedText(rawText) {
+    if (!rawText) return '';
+    let result = '';
+    let i = 0;
+    while (i < rawText.length) {
+        if (rawText[i] === '[') {
+            // Ambil identifier (1 huruf setelah '[')
+            const identifier = rawText[i + 1];
+            if (identifier && TAJWEED_MAP[identifier]) {
+                const cssClass = TAJWEED_MAP[identifier];
+                // Cari posisi '[' kedua (pembuka teks)
+                let j = i + 2;
+                // Skip optional :NUM
+                if (rawText[j] === ':') {
+                    while (j < rawText.length && rawText[j] !== '[') {
+                        j++;
+                    }
+                }
+                // Sekarang j menunjuk ke '[' pembuka teks
+                if (rawText[j] === '[') {
+                    j++; // Masuk ke isi teks
+                    // Cari ']' penutup
+                    let textContent = '';
+                    let depth = 1;
+                    while (j < rawText.length && depth > 0) {
+                        if (rawText[j] === '[') depth++;
+                        else if (rawText[j] === ']') {
+                            depth--;
+                            if (depth === 0) break;
+                        }
+                        textContent += rawText[j];
+                        j++;
+                    }
+                    result += `<span class="tj-${cssClass}">${textContent}</span>`;
+                    i = j + 1; // Skip ']' penutup
+                } else {
+                    result += rawText[i];
+                    i++;
+                }
+            } else {
+                result += rawText[i];
+                i++;
+            }
+        } else {
+            result += rawText[i];
+            i++;
+        }
+    }
+    return result;
+}
+
+/**
+ * Fetch data tajwid untuk satu surah dari alquran.cloud API.
+ * Returns: Map<numberInSurah, parsedHTML>
+ */
+function fetchTajweedSurah(nomorSurah) {
+    if (tajweedCache.has(nomorSurah)) {
+        return Promise.resolve(tajweedCache.get(nomorSurah));
+    }
+    return fetch(`https://api.alquran.cloud/v1/surah/${nomorSurah}/quran-tajweed`)
+        .then(res => res.json())
+        .then(json => {
+            const ayahs = json.data && json.data.ayahs ? json.data.ayahs : [];
+            const map = new Map();
+            ayahs.forEach(ayah => {
+                map.set(ayah.numberInSurah, parseTajweedText(ayah.text));
+            });
+            tajweedCache.set(nomorSurah, map);
+            return map;
+        })
+        .catch(err => {
+            console.error('Tajweed fetch error:', err);
+            return new Map();
+        });
+}
+
+/**
+ * Apply tajwid berwarna ke ayat-ayat yang sudah dirender di DOM.
+ */
+function applyTajweedToRendered(nomorSurah) {
+    if (!isTajweedEnabled()) return;
+    fetchTajweedSurah(nomorSurah).then(tajweedMap => {
+        tajweedMap.forEach((html, nomorAyat) => {
+            const el = document.querySelector(`#isi-ayat${nomorAyat} .arabic`);
+            if (el && html) {
+                // Simpan teks asli jika belum
+                if (!el.dataset.originalText) {
+                    el.dataset.originalText = el.textContent;
+                }
+                el.innerHTML = html;
+                el.classList.add('tajweed-active');
+            }
+        });
+    });
+}
+
+/**
+ * Kembalikan teks Arab ke versi non-tajwid.
+ */
+function removeTajweedFromRendered() {
+    document.querySelectorAll('.arabic.tajweed-active').forEach(el => {
+        if (el.dataset.originalText) {
+            el.textContent = el.dataset.originalText;
+            el.classList.remove('tajweed-active');
+        }
+    });
+}
+
+/**
+ * Init toggle di settings dan event listener.
+ */
+function initTajweedToggle() {
+    const toggle = document.getElementById('tajweed-toggle');
+    const label  = document.getElementById('tajweed-toggle-label');
+    const legend = document.getElementById('tajweed-legend');
+    if (!toggle) return;
+
+    // Restore state
+    const enabled = isTajweedEnabled();
+    toggle.checked = enabled;
+    if (label) label.textContent = enabled ? (typeof t === 'function' ? t('tajweed_on') : 'Aktif') : (typeof t === 'function' ? t('tajweed_off') : 'Nonaktif');
+    if (legend) legend.style.display = enabled ? 'flex' : 'none';
+
+    toggle.addEventListener('change', () => {
+        const isOn = toggle.checked;
+        setTajweedEnabled(isOn);
+        if (label) label.textContent = isOn ? (typeof t === 'function' ? t('tajweed_on') : 'Aktif') : (typeof t === 'function' ? t('tajweed_off') : 'Nonaktif');
+        if (legend) legend.style.display = isOn ? 'flex' : 'none';
+
+        if (isOn) {
+            // Apply ke ayat yang sedang ditampilkan
+            if (lastRenderedSurah) {
+                applyTajweedToRendered(lastRenderedSurah);
+            }
+        } else {
+            removeTajweedFromRendered();
+        }
+    });
+
+    // Listen event saat ayat baru dirender
+    document.addEventListener('ayat-rendered', (e) => {
+        const ns = e.detail && e.detail.nomorSurah ? e.detail.nomorSurah : (typeof nomorSurah !== 'undefined' ? nomorSurah : null);
+        if (ns) lastRenderedSurah = ns;
+        if (isTajweedEnabled() && ns) {
+            setTimeout(() => applyTajweedToRendered(ns), 150);
+        }
+    });
+}
+
+/* ──────────────────────────────────────────────
+   SIDEBAR RIGHT — Collapse / Expand
+   ────────────────────────────────────────────── */
+const SIDEBAR_RIGHT_KEY = 'quran_sidebar_right_collapsed';
+
+function initSidebarRightCollapse() {
+    const sidebar   = document.getElementById('sidebar-right');
+    const wrapper   = document.querySelector('.app-wrapper');
+    const toggleBtn = document.getElementById('sidebar-right-toggle');
+    const expandBtn = document.getElementById('sidebar-right-expand');
+    if (!sidebar || !wrapper) return;
+
+    // Restore state dari localStorage
+    const isCollapsed = localStorage.getItem(SIDEBAR_RIGHT_KEY) === 'true';
+    if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        wrapper.classList.add('sidebar-collapsed');
+    }
+
+    // Klik toggle (tutup)
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.add('collapsed');
+            wrapper.classList.add('sidebar-collapsed');
+            localStorage.setItem(SIDEBAR_RIGHT_KEY, 'true');
+        });
+    }
+
+    // Klik expand (buka kembali)
+    if (expandBtn) {
+        expandBtn.addEventListener('click', () => {
+            sidebar.classList.remove('collapsed');
+            wrapper.classList.remove('sidebar-collapsed');
+            localStorage.setItem(SIDEBAR_RIGHT_KEY, 'false');
+        });
+    }
+}
 
 /* ──────────────────────────────────────────────
    I18N — Sistem terjemahan antarmuka
@@ -137,7 +453,7 @@ const I18N = {
         bm_empty_hint:        'Buka surah, lalu arahkan kursor ke ayat — tombol 🔖 akan muncul di samping nomor ayat.',
         loading:              'Memuat data...',
         juz_title:            'Daftar Juz',
-        juz_subtitle:         'Al-Qur\'an 30 Juz',
+        juz_subtitle:         'Al Quran 30 Juz',
         close:                'Tutup',
         menu:                 'Menu',
         favorites_bookmark:   'Favorit & Bookmark',
@@ -182,6 +498,25 @@ const I18N = {
         prev_page:            'Sebelumnya',
         next_page:            'Berikutnya',
         translation_suffix:   'artinya:',
+        // Favorites panel
+        fav_panel_title:      'Surah Favorit Saya',
+        nav_favorites:        'Favorit',
+        // Last read categories
+        lr_panel_title:       'Terakhir Dibaca',
+        lr_add_category:      'Tambah Kategori',
+        lr_empty:             'Belum ada kategori. Tambahkan kategori untuk menyimpan posisi bacaan.',
+        lr_new_category_prompt:'Nama kategori baru:',
+        lr_category_default:  'Bacaan Utama',
+        lr_saved_toast:       'Posisi disimpan ke kategori',
+        lr_no_position:       'Belum ada posisi',
+        lr_slide_title:       'Simpan ke Kategori',
+        lr_new_category_slide:'+ Kategori Baru',
+        save_lastread:        'Simpan terakhir dibaca',
+        // Tajweed
+        settings_tajweed:     'Tajwid Berwarna',
+        settings_tajweed_hint:'Menampilkan warna pada huruf Arab sesuai hukum tajwid.',
+        tajweed_on:           'Aktif',
+        tajweed_off:          'Nonaktif',
     },
     en: {
         nav_home:             'Home',
@@ -247,6 +582,25 @@ const I18N = {
         prev_page:            'Previous',
         next_page:            'Next',
         translation_suffix:   'meaning:',
+        // Favorites panel
+        fav_panel_title:      'My Favorite Surahs',
+        nav_favorites:        'Favorites',
+        // Last read categories
+        lr_panel_title:       'Last Read',
+        lr_add_category:      'Add Category',
+        lr_empty:             'No categories yet. Add a category to save your reading position.',
+        lr_new_category_prompt:'New category name:',
+        lr_category_default:  'Main Reading',
+        lr_saved_toast:       'Position saved to category',
+        lr_no_position:       'No position saved',
+        lr_slide_title:       'Save to Category',
+        lr_new_category_slide:'+ New Category',
+        save_lastread:        'Save last read',
+        // Tajweed
+        settings_tajweed:     'Colored Tajweed',
+        settings_tajweed_hint:'Display color-coded Arabic letters based on tajweed rules.',
+        tajweed_on:           'Active',
+        tajweed_off:          'Inactive',
     }
 };
 
@@ -305,6 +659,52 @@ function applyI18n() {
     const nextBtn = document.getElementById('next');
     if (prevBtn) prevBtn.innerHTML = `<i class="fa-solid fa-chevron-left"></i> ${t('prev_page')}`;
     if (nextBtn) nextBtn.innerHTML = `${t('next_page')} <i class="fa-solid fa-chevron-right"></i>`;
+
+    // Update elemen dinamis di detail surah (jika sedang terbuka)
+    applyI18nDynamic();
+}
+
+// Update teks elemen yang di-render JS secara dinamis (detail surah)
+function applyI18nDynamic() {
+    // Navigasi surah
+    const prevSurah = document.getElementById('surah-prev');
+    const nextSurah = document.getElementById('surah-next');
+    if (prevSurah) prevSurah.textContent = t('prev_surah');
+    if (nextSurah) nextSurah.textContent = t('next_surah');
+
+    // Label "Lompat ke ayat"
+    const jumpLabel = document.querySelector('label[for="scroll-input"]');
+    if (jumpLabel) jumpLabel.textContent = t('jump_to_ayat');
+
+    // Tombol tampilkan/sembunyikan terjemahan
+    const toggleBtn = document.getElementById('toggle-translation-btn');
+    if (toggleBtn) {
+        const isActive = toggleBtn.classList.contains('active');
+        const icon = isActive ? 'fa-eye' : 'fa-eye-slash';
+        const label = isActive ? t('show_translation') : t('hide_translation');
+        toggleBtn.innerHTML = `<i class="fa-solid ${icon}"></i><span>${label}</span>`;
+        toggleBtn.title = label;
+    }
+
+    // Semua link "Lihat/Sembunyikan terjemahan" per ayat
+    document.querySelectorAll('.show-hide-terjemahan').forEach(el => {
+        const id = el.id; // toggleTerjemahanX
+        if (!id) return;
+        const nomorAyat = id.replace('toggleTerjemahan', '');
+        const terjDiv = document.getElementById(`terjemahan${nomorAyat}`);
+        const isShowing = terjDiv && terjDiv.style.display === 'block';
+        el.innerHTML = isShowing ? t('hide_translation_s') : t('see_translation');
+    });
+
+    // Semua tombol bookmark per ayat
+    document.querySelectorAll('.btn-bookmark-ayat').forEach(btn => {
+        btn.title = t('save_bookmark');
+    });
+
+    // Semua tombol lastread per ayat
+    document.querySelectorAll('.btn-lastread-ayat').forEach(btn => {
+        btn.title = t('save_lastread');
+    });
 }
 
 function initI18n() {
@@ -317,6 +717,9 @@ function initI18n() {
             applyI18n();
         });
     });
+
+    // Re-apply teks dinamis setiap kali detail surah selesai di-render
+    document.addEventListener('ayat-rendered', () => applyI18nDynamic());
 }
 
 /* ──────────────────────────────────────────────
@@ -493,13 +896,12 @@ function showLastReadToast(namaLatin, nomorAyat) {
 }
 
 function renderLastReadBadge() {
-    const lr = getLastRead();
     const badge = document.getElementById('last-read-badge');
     if (!badge) return;
-    if (lr) {
-        badge.textContent = `${lr.nomorSurah}:${lr.nomorAyat}`;
+    const filled = getReadingCategories().filter(c => c.nomorSurah !== null).length;
+    if (filled > 0) {
+        badge.textContent = filled;
         badge.style.display = 'inline-flex';
-        badge.title = `${lr.namaLatin} : ${t('ayat_ref')} ${lr.nomorAyat}`;
     } else {
         badge.style.display = 'none';
     }
@@ -936,6 +1338,496 @@ function initJuz() {
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) overlay.classList.remove('open');
     });
+}
+
+/* ──────────────────────────────────────────────
+   FAVORITES PANEL (from nav-left)
+   ────────────────────────────────────────────── */
+function closeAllNavDropdowns() {
+    document.querySelectorAll('.nav-dropdown-body').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.nav-dropdown-arrow').forEach(a => a.classList.remove('rotated'));
+}
+
+function renderFavoritesDropdown() {
+    const container = document.getElementById('favorites-dropdown-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const list = getFavorites();
+    if (list.length === 0) {
+        container.innerHTML = `<div class="lr-empty-hint"><i class="fa-regular fa-star"></i> ${t('fav_empty')}</div>`;
+        return;
+    }
+
+    list.forEach(fav => {
+        const item = document.createElement('div');
+        item.className = 'fav-dd-item';
+        item.innerHTML = `
+            <div class="fav-dd-main">
+                <span class="fav-dd-nomor">${fav.nomor}</span>
+                <div class="fav-dd-info">
+                    <span class="fav-dd-name">${fav.namaLatin}</span>
+                    <span class="fav-dd-arti">${fav.arti}</span>
+                </div>
+            </div>
+            <button class="fav-dd-del" title="${t('remove_favorite')}" data-nomor="${fav.nomor}">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        `;
+        item.querySelector('.fav-dd-main').addEventListener('click', () => {
+            closeAllNavDropdowns();
+            loadSurahDetails(fav.nomor);
+        });
+        item.querySelector('.fav-dd-del').addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeFavorite(fav.nomor);
+            renderFavoritesDropdown();
+        });
+        container.appendChild(item);
+    });
+}
+
+function initFavoritesPanel() {
+    const trigger = document.getElementById('nav-favorites-btn');
+    const body    = document.getElementById('favorites-dropdown-body');
+    const arrow   = document.getElementById('favorites-arrow');
+    if (!trigger || !body) return;
+
+    trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isOpen = body.classList.contains('open');
+        closeAllNavDropdowns();
+        if (!isOpen) {
+            body.classList.add('open');
+            if (arrow) arrow.classList.add('rotated');
+            renderFavoritesDropdown();
+        }
+    });
+}
+
+/* ──────────────────────────────────────────────
+   READING CATEGORIES — localStorage
+   ────────────────────────────────────────────── */
+const READING_CATEGORIES_KEY = 'quran_reading_categories';
+
+function getReadingCategories() {
+    try {
+        return JSON.parse(localStorage.getItem(READING_CATEGORIES_KEY)) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveReadingCategories(list) {
+    localStorage.setItem(READING_CATEGORIES_KEY, JSON.stringify(list));
+}
+
+function addReadingCategory(name) {
+    const list = getReadingCategories();
+    const newCat = {
+        id: Date.now().toString(),
+        name: name,
+        nomorSurah: null,
+        namaLatin: null,
+        nomorAyat: null,
+        savedAt: null
+    };
+    list.push(newCat);
+    saveReadingCategories(list);
+    return newCat;
+}
+
+function removeReadingCategory(categoryId) {
+    const list = getReadingCategories().filter(c => c.id !== categoryId);
+    saveReadingCategories(list);
+}
+
+function saveToCategory(categoryId, nomorSurah, namaLatin, nomorAyat) {
+    const list = getReadingCategories();
+    const cat = list.find(c => c.id === categoryId);
+    if (cat) {
+        cat.nomorSurah = nomorSurah;
+        cat.namaLatin = namaLatin;
+        cat.nomorAyat = nomorAyat;
+        cat.savedAt = Date.now();
+        saveReadingCategories(list);
+        showLastReadToast(namaLatin, nomorAyat);
+    }
+    // Re-render dropdown hanya jika sedang open — hindari layout rusak
+    const dropBody = document.getElementById('lastread-dropdown-body');
+    if (dropBody && dropBody.classList.contains('open')) {
+        renderLastReadDropdown();
+    }
+    renderLastReadBadge();
+}
+
+function renderLastReadPanel() {
+    const container = document.getElementById('lr-category-list');
+    if (!container) return;
+
+    container.innerHTML = '';
+    const list = getReadingCategories();
+
+    if (list.length === 0) {
+        container.innerHTML = `
+            <div class="lr-category-empty">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <p>${t('lr_empty')}</p>
+            </div>
+        `;
+        return;
+    }
+
+    list.forEach(cat => {
+        const item = document.createElement('div');
+        item.className = 'lr-category-item';
+
+        const positionText = cat.nomorSurah 
+            ? `${cat.namaLatin} : ${t('ayat_ref')} ${cat.nomorAyat}`
+            : t('lr_no_position');
+        
+        const dateStr = cat.savedAt 
+            ? new Date(cat.savedAt).toLocaleDateString(getCurrentLang() === 'en' ? 'en-US' : 'id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+            : '—';
+
+        item.innerHTML = `
+            <div class="lr-cat-icon">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+            <div class="lr-cat-info">
+                <span class="lr-cat-name">${cat.name}</span>
+                <span class="lr-cat-position">${positionText}</span>
+                <span class="lr-cat-date">${dateStr}</span>
+            </div>
+            <button class="lr-cat-remove" title="${t('delete')}" data-id="${cat.id}">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        `;
+
+        // Klik item → jump ke posisi
+        item.querySelector('.lr-cat-info').addEventListener('click', () => {
+            if (cat.nomorSurah) {
+                document.getElementById('last-read-panel-overlay').classList.remove('open');
+                loadSurahDetails(cat.nomorSurah);
+                setTimeout(() => jumpToLastRead({ nomorAyat: cat.nomorAyat }), 950);
+            }
+        });
+        item.querySelector('.lr-cat-icon').addEventListener('click', () => {
+            if (cat.nomorSurah) {
+                document.getElementById('last-read-panel-overlay').classList.remove('open');
+                loadSurahDetails(cat.nomorSurah);
+                setTimeout(() => jumpToLastRead({ nomorAyat: cat.nomorAyat }), 950);
+            }
+        });
+
+        // Hapus kategori
+        item.querySelector('.lr-cat-remove').addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeReadingCategory(cat.id);
+            renderLastReadPanel();
+            renderLastReadBadge();
+        });
+
+        container.appendChild(item);
+    });
+}
+
+function initLastReadPanel() {
+    // Pastikan kategori default ada
+    ensureDefaultCategory();
+    renderLastReadBadge();
+    renderLastReadDropdown();
+
+    const trigger = document.getElementById('nav-last-read-btn');
+    const body    = document.getElementById('lastread-dropdown-body');
+    const arrow   = document.getElementById('lastread-arrow');
+    if (!trigger || !body) return;
+
+    trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isOpen = body.classList.contains('open');
+        // Tutup semua dropdown lain dulu
+        closeAllNavDropdowns();
+        if (!isOpen) {
+            body.classList.add('open');
+            if (arrow) arrow.classList.add('rotated');
+            renderLastReadDropdown();
+        }
+    });
+
+    // Tombol tambah kategori — tampilkan input inline
+    const addBtn = document.getElementById('lr-add-category-btn');
+    if (addBtn) {
+        addBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showAddCategoryInput();
+        });
+    }
+}
+
+function showAddCategoryInput() {
+    // Jangan tampilkan dobel
+    if (document.getElementById('lr-add-input-row')) return;
+
+    const container = document.getElementById('lr-category-list');
+    if (!container) return;
+
+    const row = document.createElement('div');
+    row.id = 'lr-add-input-row';
+    row.className = 'lr-add-input-row';
+    row.innerHTML = `
+        <input id="lr-new-cat-input" class="lr-new-cat-input" type="text"
+            placeholder="${t('lr_new_category_prompt')}" maxlength="30" autofocus>
+        <button class="lr-new-cat-confirm" id="lr-new-cat-confirm" title="Simpan">
+            <i class="fa-solid fa-check"></i>
+        </button>
+        <button class="lr-new-cat-cancel" id="lr-new-cat-cancel" title="Batal">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    `;
+
+    container.appendChild(row);
+
+    const input   = row.querySelector('#lr-new-cat-input');
+    const confirm = row.querySelector('#lr-new-cat-confirm');
+    const cancel  = row.querySelector('#lr-new-cat-cancel');
+
+    // Fokus langsung ke input
+    setTimeout(() => input.focus(), 50);
+
+    function doAdd() {
+        const name = input.value.trim();
+        if (name) {
+            addReadingCategory(name);
+            renderLastReadDropdown();
+            renderLastReadBadge();
+        } else {
+            row.remove();
+        }
+    }
+
+    confirm.addEventListener('click', (e) => { e.stopPropagation(); doAdd(); });
+    cancel.addEventListener('click',  (e) => { e.stopPropagation(); row.remove(); });
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter')  { e.preventDefault(); doAdd(); }
+        if (e.key === 'Escape') { e.preventDefault(); row.remove(); }
+    });
+    // Cegah klik di dalam input menutup dropdown
+    input.addEventListener('click', (e) => e.stopPropagation());
+}
+
+function ensureDefaultCategory() {
+    const list = getReadingCategories();
+    if (list.length === 0) {
+        const def = {
+            id: 'default',
+            name: 'Baca Quran',
+            nomorSurah: null,
+            namaLatin: null,
+            nomorAyat: null,
+            savedAt: null
+        };
+        saveReadingCategories([def]);
+    }
+}
+
+function renderLastReadDropdown() {
+    const container = document.getElementById('lr-category-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const list = getReadingCategories();
+    if (list.length === 0) {
+        container.innerHTML = `<div class="lr-empty-hint"><i class="fa-solid fa-circle-info"></i> ${t('lr_empty')}</div>`;
+        return;
+    }
+
+    list.forEach(cat => {
+        const item = document.createElement('div');
+        item.className = 'lr-cat-item';
+
+        const hasPos = cat.nomorSurah !== null;
+        const posBadge = hasPos
+            ? `<span class="lr-cat-badge">${cat.nomorSurah}:${cat.nomorAyat}</span>`
+            : `<span class="lr-cat-badge lr-cat-badge-empty">—</span>`;
+
+        item.innerHTML = `
+            <div class="lr-cat-main" ${hasPos ? 'style="cursor:pointer"' : ''}>
+                <span class="lr-cat-name"><span>${cat.name}</span></span>
+                ${posBadge}
+            </div>
+            ${cat.id !== 'default' ? `<button class="lr-cat-del" title="${t('delete')}" data-id="${cat.id}"><i class="fa-solid fa-xmark"></i></button>` : ''}
+            <div class="lr-cat-tooltip">${cat.name}</div>
+        `;
+
+        // Hitung offset marquee setelah elemen masuk DOM
+        requestAnimationFrame(() => {
+            const nameEl    = item.querySelector('.lr-cat-name');
+            const innerSpan = item.querySelector('.lr-cat-name span');
+            if (nameEl && innerSpan) {
+                const overflow = innerSpan.scrollWidth - nameEl.clientWidth;
+                if (overflow > 4) {
+                    // Set offset sebagai px negatif agar terbaca penuh
+                    nameEl.style.setProperty('--marquee-offset', `-${overflow}px`);
+                } else {
+                    // Teks muat, tidak perlu animasi
+                    nameEl.dataset.noScroll = '1';
+                }
+            }
+        });
+
+        if (hasPos) {
+            item.querySelector('.lr-cat-main').addEventListener('click', () => {
+                closeAllNavDropdowns();
+                loadSurahDetails(cat.nomorSurah);
+                setTimeout(() => jumpToLastRead({ nomorAyat: cat.nomorAyat }), 950);
+            });
+        }
+
+        const delBtn = item.querySelector('.lr-cat-del');
+        if (delBtn) {
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeReadingCategory(cat.id);
+                renderLastReadDropdown();
+                renderLastReadBadge();
+            });
+        }
+
+        container.appendChild(item);
+    });
+}
+
+/* ──────────────────────────────────────────────
+   SAVE LAST-READ POPUP
+   ────────────────────────────────────────────── */
+function showSaveLastReadSlide(nomorSurah, namaLatin, nomorAyat) {
+    // Hapus popup lama jika ada
+    const existing = document.getElementById('lr-popup-overlay');
+    if (existing) existing.remove();
+
+    const list = getReadingCategories();
+
+    // Buat overlay + popup
+    const overlay = document.createElement('div');
+    overlay.id = 'lr-popup-overlay';
+    overlay.className = 'lr-popup-overlay';
+
+    const popup = document.createElement('div');
+    popup.className = 'lr-popup';
+
+    // Header
+    popup.innerHTML = `
+        <div class="lr-popup-header">
+            <div class="lr-popup-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>${t('lr_slide_title')}</span>
+            </div>
+            <div class="lr-popup-meta">${namaLatin} · ${t('ayat_ref')} ${nomorAyat}</div>
+            <button class="lr-popup-close" id="lr-popup-close-btn">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="lr-popup-list" id="lr-popup-list"></div>
+        <div class="lr-popup-footer">
+            <div class="lr-popup-add-row" id="lr-popup-add-row">
+                <input class="lr-popup-add-input" id="lr-popup-add-input"
+                    type="text" placeholder="${t('lr_new_category_prompt')}" maxlength="30">
+                <button class="lr-popup-add-confirm" id="lr-popup-add-confirm">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+                <button class="lr-popup-add-cancel" id="lr-popup-add-cancel">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <button class="lr-popup-add-btn" id="lr-popup-add-btn">
+                <i class="fa-solid fa-plus"></i> ${t('lr_add_category')}
+            </button>
+        </div>
+    `;
+
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+
+    // Render daftar kategori
+    const listEl = popup.querySelector('#lr-popup-list');
+    list.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'lr-popup-item';
+        const posText = cat.nomorSurah
+            ? `<span class="lr-popup-item-pos">${cat.nomorSurah}:${cat.nomorAyat}</span>`
+            : `<span class="lr-popup-item-empty">—</span>`;
+        btn.innerHTML = `
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span class="lr-popup-item-name">${cat.name}</span>
+            ${posText}
+        `;
+        btn.addEventListener('click', () => {
+            saveToCategory(cat.id, nomorSurah, namaLatin, nomorAyat);
+            overlay.remove();
+            // Tampilkan konfirmasi visual di tombol baris ayat
+            const lrBtn = document.getElementById(`lastread-btn-${nomorAyat}`);
+            if (lrBtn) {
+                lrBtn.classList.add('saved');
+                setTimeout(() => lrBtn.classList.remove('saved'), 1500);
+            }
+        });
+        listEl.appendChild(btn);
+    });
+
+    // Inline tambah kategori baru
+    const addRow   = popup.querySelector('#lr-popup-add-row');
+    const addInput = popup.querySelector('#lr-popup-add-input');
+    const addBtn   = popup.querySelector('#lr-popup-add-btn');
+    const confirm  = popup.querySelector('#lr-popup-add-confirm');
+    const cancelAdd = popup.querySelector('#lr-popup-add-cancel');
+
+    addRow.style.display = 'none';
+
+    addBtn.addEventListener('click', () => {
+        addRow.style.display = 'flex';
+        addBtn.style.display = 'none';
+        setTimeout(() => addInput.focus(), 50);
+    });
+
+    function doAddCat() {
+        const name = addInput.value.trim();
+        if (name) {
+            const newCat = addReadingCategory(name);
+            saveToCategory(newCat.id, nomorSurah, namaLatin, nomorAyat);
+            overlay.remove();
+        } else {
+            addRow.style.display = 'none';
+            addBtn.style.display = 'flex';
+        }
+    }
+
+    confirm.addEventListener('click', doAddCat);
+    cancelAdd.addEventListener('click', () => {
+        addRow.style.display = 'none';
+        addBtn.style.display = 'flex';
+    });
+    addInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter')  { e.preventDefault(); doAddCat(); }
+        if (e.key === 'Escape') { e.preventDefault(); addRow.style.display = 'none'; addBtn.style.display = 'flex'; }
+    });
+
+    // Tutup
+    popup.querySelector('#lr-popup-close-btn').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+    // Animasi masuk
+    requestAnimationFrame(() => overlay.classList.add('open'));
+}
+
+function hideSaveLastReadSlide() {
+    const overlay = document.getElementById('lr-popup-overlay');
+    if (overlay) overlay.remove();
+}
+
+function initSaveLastReadSlide() {
+    // Slide digantikan popup JS — tidak perlu init dari HTML
+    // Backdrop lama di layout juga tidak dipakai, tapi tidak masalah
 }
 
 /* ──────────────────────────────────────────────

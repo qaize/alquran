@@ -359,7 +359,11 @@ function loadSurahDetails(nomorSurah) {
             componentDetailSurah(data).then((surah) => {
                 mainBody.appendChild(surah);
 
-                document.dispatchEvent(new Event("ayat-rendered"));
+                document.dispatchEvent(
+                    new CustomEvent("ayat-rendered", {
+                        detail: { nomorSurah: data.nomor },
+                    }),
+                );
 
                 data.ayat.forEach((ayat) => {
                     const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
@@ -442,16 +446,9 @@ function loadSurahDetails(nomorSurah) {
 
                         data.ayat.forEach((ayat) => {
                             const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
-                            const actionRow = document.querySelector(
-                                `#isi-ayat${nomorAyat} .ayat-action`,
-                            );
                             const terjemahanBlock = document.getElementById(
                                 `terjemahan${nomorAyat}`,
                             );
-                            if (actionRow)
-                                actionRow.style.display = translationVisible
-                                    ? "block"
-                                    : "none";
                             if (terjemahanBlock)
                                 terjemahanBlock.style.display =
                                     translationVisible ? "block" : "none";
@@ -559,23 +556,31 @@ function componentDetailSurah(surah) {
         <div id="isi-ayat${nomorAyat}" class="isi-ayat">
             <div class="ayat-nav">
                 <span class="arabic">${teksArab}</span>
+                <span class="ayat-nomor-inline">
+                    <div class="urutan-ayat"><span>${numberToArabic(nomorAyat)}</span></div>
+                </span>
             </div>
-            <div class="ayat-action" style="display:none;">
+            <div class="ayat-action">
                 <a id="toggleTerjemahan${nomorAyat}" class="show-hide-terjemahan">
                     ${__("see_translation", "Lihat terjemahan")}
                 </a>
             </div>
-        </div>
-        <div class="nomor-ayat">
-            <div class="urutan-ayat">
-                <span>${numberToArabic(nomorAyat)}</span>
+            <div class="ayat-btns">
+                <button class="btn-bookmark-ayat"
+                    id="bookmark-btn-${nomorAyat}"
+                    data-tooltip="${__("save_bookmark", "Simpan bookmark")}"
+                    title="${__("save_bookmark", "Simpan bookmark ayat ini")}"
+                    onclick="toggleBookmarkAyat(${surah.nomor}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', ${nomorAyat})">
+                    <i class="fa-solid fa-bookmark"></i>
+                </button>
+                <button class="btn-lastread-ayat"
+                    id="lastread-btn-${nomorAyat}"
+                    data-tooltip="${__("save_lastread", "Terakhir dibaca")}"
+                    title="${__("save_lastread", "Simpan terakhir dibaca")}"
+                    onclick="showSaveLastReadSlide(${surah.nomor}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', ${nomorAyat})">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
             </div>
-            <button class="btn-bookmark-ayat"
-                id="bookmark-btn-${nomorAyat}"
-                title="${__("save_bookmark", "Simpan bookmark ayat ini")}"
-                onclick="toggleBookmarkAyat(${surah.nomor}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', ${nomorAyat})">
-                <i class="fa-solid fa-bookmark"></i>
-            </button>
         </div>
         </div>
         `;
