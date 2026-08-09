@@ -1,3 +1,17 @@
+﻿// ── NProgress config ──
+if (typeof NProgress !== 'undefined') {
+    NProgress.configure({
+        minimum: 0.15,
+        speed: 300,
+        trickleSpeed: 200,
+        showSpinner: false,
+    });
+}
+
+// Helper wrapper: start + done NProgress
+function npStart() { if (typeof NProgress !== 'undefined') NProgress.start(); }
+function npDone()  { if (typeof NProgress !== 'undefined') NProgress.done();  }
+
 const mainBody = document.getElementById("main-body");
 const surahDetail = document.getElementById("surah_detail");
 const prevButton = document.getElementById("prev");
@@ -167,10 +181,20 @@ function loadAllSurah() {
     return allDataSurahPromise;
 }
 
+// counter untuk stagger animasi kartu
+let _cardAnimIndex = 0;
+
 // kartu surah
 function surahCard(surah) {
     const card = document.createElement("div");
     card.classList.add("surah-card");
+
+    // Animate.css — fadeInUp dengan stagger delay
+    card.classList.add("animate__animated", "animate__fadeInUp");
+    const delay = Math.min(_cardAnimIndex * 50, 400); // max 400ms agar tidak terlalu lama
+    card.style.animationDelay = delay + "ms";
+    card.style.animationDuration = "0.4s";
+    _cardAnimIndex++;
 
     const favClass =
         (function() {
@@ -207,9 +231,12 @@ function surahCard(surah) {
 
 // muat daftar surah dengan paginasi
 function loadPagingSurah(currentIndex, totalData) {
+    _cardAnimIndex = 0; // reset stagger setiap load halaman baru
+    npStart();
     showLoadingScreen();
     loadAllSurah()
         .then((allData) => {
+            npDone();
             hideLoadingScreen();
             titleSurah.innerHTML = "";
             mainBody.innerHTML = "";
@@ -277,6 +304,7 @@ function loadPagingSurah(currentIndex, totalData) {
             }
         })
         .catch((error) => {
+            npDone();
             console.error(error);
         });
 }
@@ -313,13 +341,13 @@ function fetchDetailInformasiSurah(nomor) {
 
 // tampilkan detail surah
 function loadSurahDetails(nomorSurah) {
+    npStart();
     fetchDetailInformasiSurah(nomorSurah)
         .then((data) => {
             titleSurah.innerHTML = "";
             info.style.display = "none";
 
             titleSurah.appendChild(componentTitleSurah(data));
-            const jumpTo = document.getElementById("scroll-input");
             const nextSurah = document.getElementById("surah-next");
             const prevSurah = document.getElementById("surah-prev");
 
@@ -355,6 +383,11 @@ function loadSurahDetails(nomorSurah) {
             componentDetailSurah(data).then((surah) => {
                 mainBody.appendChild(surah);
 
+                // Expose ayat data (dengan field .audio) ke audio module
+                if (typeof setActiveAyatData === 'function') {
+                    setActiveAyatData(data.ayat);
+                }
+
                 document.dispatchEvent(
                     new CustomEvent("ayat-rendered", {
                         detail: { nomorSurah: data.nomor },
@@ -365,6 +398,8 @@ function loadSurahDetails(nomorSurah) {
                     const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
                     const el = document.getElementById(`isi-ayat${nomorAyat}`);
                     if (!el) return;
+
+                    // Desktop: double click
                     el.addEventListener("dblclick", () => {
                         if (typeof saveToCategory === "function") {
                             saveToCategory(
@@ -374,9 +409,40 @@ function loadSurahDetails(nomorSurah) {
                                 nomorAyat,
                             );
                         }
-                        el.style.outline = "2px solid var(--gold)";
-                        setTimeout(() => (el.style.outline = ""), 800);
+                        el.classList.add('ayat-jump-highlight');
+                        setTimeout(() => el.classList.remove('ayat-jump-highlight'), 2000);
                     });
+
+                    // Mobile: long press 2 detik
+                    let _pressTimer = null;
+                    let _pressStarted = false;
+
+                    el.addEventListener("touchstart", (e) => {
+                        _pressStarted = true;
+                        el.classList.add('ayat-longpress-pending');
+                        _pressTimer = setTimeout(() => {
+                            if (!_pressStarted) return;
+                            el.classList.remove('ayat-longpress-pending');
+                            el.classList.add('ayat-jump-highlight');
+                            setTimeout(() => el.classList.remove('ayat-jump-highlight'), 2000);
+                            if (typeof showSaveLastReadSlide === "function") {
+                                showSaveLastReadSlide(
+                                    nomorSurah,
+                                    data.namaLatin ?? data.nama_latin,
+                                    nomorAyat,
+                                );
+                            }
+                        }, 2000);
+                    }, { passive: true });
+
+                    const cancelPress = () => {
+                        _pressStarted = false;
+                        clearTimeout(_pressTimer);
+                        el.classList.remove('ayat-longpress-pending');
+                    };
+                    el.addEventListener("touchend",    cancelPress, { passive: true });
+                    el.addEventListener("touchmove",   cancelPress, { passive: true });
+                    el.addEventListener("touchcancel", cancelPress, { passive: true });
                 });
 
                 const hideDetailButton =
@@ -417,80 +483,108 @@ function loadSurahDetails(nomorSurah) {
 
                 initiateTerjemah(data.ayat);
 
-                // Tombol tampilkan/sembunyikan terjemahan
-                let translationVisible = false;
+                // Query scroll-input fresh setelah DOM siap
+                const jumpInput = document.getElementById("scroll-input");
+                if (jumpInput) {
+                    const totalAyat = data.ayat.length;
+                    jumpInput.max   = totalAyat;
+                    jumpInput.value = "";
 
-                const toggleTranslationBtn = document.getElementById(
-                    "toggle-translation-btn",
-                );
-                if (toggleTranslationBtn) {
-                    toggleTranslationBtn.addEventListener("click", () => {
-                        translationVisible = !translationVisible;
+                    // Clone → hapus listener lama yang menumpuk tiap buka surah
+                    const freshInput = jumpInput.cloneNode(true);
+                    jumpInput.parentNode.replaceChild(freshInput, jumpInput);
 
-                        if (translationVisible) {
-                            toggleTranslationBtn.innerHTML = `
-                                <i class="fa-solid fa-eye"></i>
-                                <span>${__("show_translation", "Tampilkan Terjemahan")}</span>
-                            `;
-                            toggleTranslationBtn.classList.add("active");
-                        } else {
-                            toggleTranslationBtn.innerHTML = `
-                                <i class="fa-solid fa-eye-slash"></i>
-                                <span>${__("hide_translation", "Sembunyikan Terjemahan")}</span>
-                            `;
-                            toggleTranslationBtn.classList.remove("active");
+                    freshInput.addEventListener("keydown", (e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        const nomorAyat = parseInt(freshInput.value);
+                        if (!nomorAyat || nomorAyat < 1 || nomorAyat > totalAyat) {
+                            if (typeof showToast === 'function') {
+                                showToast({ type: 'warning', message: __('ayat_not_found', 'Nomor ayat tidak tersedia!'), duration: 2500 });
+                            }
+                            return;
                         }
-
-                        data.ayat.forEach((ayat) => {
-                            const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
-                            const terjemahanBlock = document.getElementById(
-                                `terjemahan${nomorAyat}`,
-                            );
-                            if (terjemahanBlock)
-                                terjemahanBlock.style.display =
-                                    translationVisible ? "block" : "none";
-                        });
+                        const el = document.getElementById(`isi-ayat${nomorAyat}`);
+                        if (!el) return;
+                        // Langsung scroll
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Smooth pulse highlight
+                        el.classList.add('ayat-jump-highlight');
+                        setTimeout(() => el.classList.remove('ayat-jump-highlight'), 2000);
+                        // Toast kecil
+                        if (typeof showToast === 'function') {
+                            showToast({
+                                type: 'info',
+                                icon: 'fa-arrow-down',
+                                label: null,
+                                message: `${__('ayat_ref','Ayat')} ${nomorAyat}`,
+                                duration: 1800,
+                            });
+                        }
                     });
                 }
 
-                let condition = true;
-                if (showAllTerjemah) {
-                    showAllTerjemah.addEventListener("click", () => {
-                        showHideAllTerjemah(data.ayat, condition);
-                        condition = !condition;
+                // ── Progress bar: pakai IntersectionObserver (efisien & akurat) ──
+                const totalAyatCount = data.ayat.length;
+                let maxSeenAyat = 0;
+
+                const progressObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const ayatNum = parseInt(entry.target.dataset.ayat);
+                            if (ayatNum > maxSeenAyat) {
+                                maxSeenAyat = ayatNum;
+                                const pct = Math.round(maxSeenAyat / totalAyatCount * 100);
+                                const fill  = document.getElementById('surah-progress-fill');
+                                const pctEl = document.getElementById('progress-pct');
+                                if (fill)  fill.style.width = pct + '%';
+                                if (pctEl) pctEl.textContent = pct + '%';
+                            }
+                        }
                     });
+                }, { threshold: 0.3 });
+
+                // Observe semua ayat
+                for (let i = 1; i <= totalAyatCount; i++) {
+                    const el = document.getElementById(`isi-ayat${i}`);
+                    if (el) progressObserver.observe(el);
                 }
 
-                let totalAyat = data.ayat.length;
-                jumpTo.max = totalAyat;
+                // Cleanup saat ganti surah
+                document.addEventListener('ayat-rendered', () => {
+                    progressObserver.disconnect();
+                }, { once: true });
 
-                jumpTo.addEventListener("keypress", (e) => {
-                    if (e.key === "Enter") {
-                        const nomorAyat = jumpTo.value;
-                        if (nomorAyat > totalAyat || nomorAyat <= 0) {
-                            alert(
-                                __(
-                                    "ayat_not_found",
-                                    "Ayat yang Anda masukkan tidak tersedia!",
-                                ),
-                            );
-                        }
-                        const elementToJump = document.getElementById(
-                            `isi-ayat${nomorAyat}`,
-                        );
-                        if (!elementToJump) return;
-                        elementToJump.style.backgroundColor = "#f1f9f9";
-                        elementToJump.scrollIntoView();
-                        elementToJump.addEventListener("mouseout", () => {
-                            elementToJump.style.backgroundColor = null;
+                // ── Bottom nav wiring ──
+                const prevBotBtn = document.getElementById('surah-prev-bottom');
+                const nextBotBtn = document.getElementById('surah-next-bottom');
+                if (prevBotBtn) {
+                    if (!data.suratSebelumnya || nomorSurah == 1) {
+                        prevBotBtn.style.visibility = 'hidden';
+                    } else {
+                        prevBotBtn.addEventListener('click', () => {
+                            loadSurahDetails(data.suratSebelumnya.nomor);
+                            document.documentElement.scrollIntoView({ behavior: 'smooth' });
                         });
                     }
-                });
+                }
+                if (nextBotBtn) {
+                    if (!data.suratSelanjutnya || nomorSurah == 114) {
+                        nextBotBtn.style.visibility = 'hidden';
+                    } else {
+                        nextBotBtn.addEventListener('click', () => {
+                            loadSurahDetails(data.suratSelanjutnya.nomor);
+                            document.documentElement.scrollIntoView({ behavior: 'smooth' });
+                        });
+                    }
+                }
             });
 
             pagination.style.display = "none";
+            npDone();
         })
         .catch((error) => {
+            npDone();
             console.error(error);
         });
 }
@@ -509,11 +603,6 @@ function componentTitleSurah(surah) {
         <label for='scroll-input'>${__("jump_to_ayat", "Lompat ke ayat:")}</label>
         <input id='scroll-input' maxlength="3" type="number" value="1">
       </div>
-      <button id="toggle-translation-btn" class="btn-toggle-translation"
-        title="${__("hide_translation", "Sembunyikan Terjemahan")}">
-        <i class="fa-solid fa-eye-slash"></i>
-        <span>${__("hide_translation", "Sembunyikan Terjemahan")}</span>
-      </button>
       <button id="surah-next">${__("next_surah", "Surah Selanjutnya")}</button>
     </div>
     `;
@@ -558,6 +647,12 @@ function componentDetailSurah(surah) {
                 </span>
             </div>
             <div class="ayat-btns">
+                <button class="btn-audio-ayat btn-hover-only"
+                    id="audio-btn-${nomorAyat}"
+                    title="${__("play_audio", "Putar murottal ayat ini")}"
+                    onclick="playAyatAudio(${surah.nomor}, ${nomorAyat}, this)">
+                    <i class="fa-solid fa-play"></i>
+                </button>
                 <button class="btn-bookmark-ayat"
                     id="bookmark-btn-${nomorAyat}"
                     title="${__("save_bookmark", "Simpan bookmark ayat ini")}"
@@ -584,11 +679,12 @@ function componentDetailSurah(surah) {
                     onclick="openTafsir(${surah.nomor}, ${nomorAyat})">
                     <i class="fa-solid fa-book"></i>
                 </button>
-            </div>
-            <div class="ayat-action">
-                <a id="toggleTerjemahan${nomorAyat}" class="show-hide-terjemahan">
-                    ${__("see_translation", "Lihat terjemahan")}
-                </a>
+                <button class="btn-copy-ayat btn-hover-only"
+                    id="copy-btn-${nomorAyat}"
+                    title="${__("copy_ayat", "Salin ayat")}"
+                    onclick="copyAyat(${surah.nomor}, ${nomorAyat}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', this)">
+                    <i class="fa-regular fa-copy"></i>
+                </button>
             </div>
         </div>
         </div>
@@ -597,6 +693,44 @@ function componentDetailSurah(surah) {
 
         ayat.innerHTML = isiAyat;
         detailSurah.appendChild(ayat);
+
+        // ── Progress indicator ──
+        const progress = document.createElement('div');
+        progress.className = 'surah-progress-bar-wrap';
+        progress.innerHTML = `
+            <div class="surah-progress-info">
+                <span class="surah-progress-label">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span id="progress-text">${surah.ayat.length} ${__('ayat_word','ayat')}</span>
+                </span>
+                <span class="surah-progress-pct" id="progress-pct">0%</span>
+            </div>
+            <div class="surah-progress-track">
+                <div class="surah-progress-fill" id="surah-progress-fill" style="width:0%"></div>
+            </div>
+        `;
+        detailSurah.insertBefore(progress, ayat);
+
+        // ── Bottom navigation prev/next ──
+        const bottomNav = document.createElement('div');
+        bottomNav.className = 'surah-bottom-nav';
+        bottomNav.id = 'surah-bottom-nav';
+        bottomNav.innerHTML = `
+            <button class="surah-bottom-btn" id="surah-prev-bottom">
+                <i class="fa-solid fa-chevron-left"></i>
+                <span>${__('prev_surah','Surah Sebelumnya')}</span>
+            </button>
+            <div class="surah-bottom-info">
+                <span class="surah-bottom-name">${surah.namaLatin ?? surah.nama_latin}</span>
+                <span class="surah-bottom-count">${surah.ayat.length} ${__('ayat_word','ayat')}</span>
+            </div>
+            <button class="surah-bottom-btn surah-bottom-next" id="surah-next-bottom">
+                <span>${__('next_surah','Surah Selanjutnya')}</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        `;
+        detailSurah.appendChild(bottomNav);
+
         resolve(detailSurah);
     });
 }
@@ -637,32 +771,11 @@ function initiateTerjemah(listAyat) {
 
             ComponentTerjemahan(ayat).then((element) => {
                 ayatSurah.appendChild(element);
-
-                const toggleTerjemahan = document.getElementById(
-                    `toggleTerjemahan${nomorAyat}`,
-                );
-                const bodyTerjemahan = document.getElementById(
-                    `terjemahan${nomorAyat}`,
-                );
-
-                let show = true;
-                toggleTerjemahan.addEventListener("click", () => {
-                    if (show) {
-                        bodyTerjemahan.style.display = "block";
-                        toggleTerjemahan.innerHTML = __(
-                            "hide_translation_s",
-                            "Sembunyikan terjemahan",
-                        );
-                        show = false;
-                    } else {
-                        bodyTerjemahan.style.display = "none";
-                        toggleTerjemahan.innerHTML = __(
-                            "see_translation",
-                            "Lihat terjemahan",
-                        );
-                        show = true;
-                    }
-                });
+                // Ikuti setting showTranslation (default: tampil)
+                const bodyTerjemahan = document.getElementById(`terjemahan${nomorAyat}`);
+                if (bodyTerjemahan) {
+                    bodyTerjemahan.style.display = (window.__showTranslation !== false) ? "block" : "none";
+                }
             });
         });
         resolve();
