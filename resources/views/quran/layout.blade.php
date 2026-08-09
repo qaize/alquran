@@ -11,6 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{asset('css/styles.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script
       src="https://kit.fontawesome.com/4cbbb9fb69.js"
       crossorigin="anonymous"
@@ -25,7 +30,7 @@
     <div class="app-wrapper">
 
       {{-- LEFT SIDEBAR: Navigation --}}
-      <aside class="sidebar-left">
+      <aside class="sidebar-left sidebar-left-enter">
         <div class="sidebar-logo">
           <div class="logo-ornament">☽</div>
           <span class="logo-text">Al Quran</span>
@@ -99,6 +104,9 @@
             <i class="fa-solid fa-bars"></i>
           </button>
           <span class="mobile-logo">☽ Al Quran</span>
+          <button class="burger-btn" id="topbar-darkmode-btn" title="Toggle Dark Mode">
+            <i class="fa-solid fa-moon"></i>
+          </button>
           <button class="burger-btn" id="burger-right-btn" data-i18n-title="favorites_bookmark" title="Favorit & Bookmark">
             <i class="fa-solid fa-star"></i>
           </button>
@@ -106,11 +114,11 @@
 
         @yield('search')
 
-        <div class="info" id="info-section">
-          <div class="info-inner">
+        <div class="info animate__animated animate__fadeIn" id="info-section" style="animation-duration:1s;">
+          <div class="info-inner animate__animated animate__zoomIn" style="animation-delay:0.2s;animation-duration:0.8s;">
             <span class="info-ornament">﷽</span>
           </div>
-          <p class="info-subtitle" data-i18n="bismillah_subtitle">Dengan menyebut nama Allah Yang Maha Pengasih lagi Maha Penyayang</p>
+          <p class="info-subtitle animate__animated animate__fadeInUp" style="animation-delay:0.5s;animation-duration:0.6s;" data-i18n="bismillah_subtitle">Dengan menyebut nama Allah Yang Maha Pengasih lagi Maha Penyayang</p>
         </div>
 
         @yield('surah')
@@ -217,6 +225,17 @@
 
         <div class="settings-panel-body">
 
+        {{-- FONT GROUP — expandable --}}
+        <div class="settings-group" id="settings-group-font">
+          <button class="settings-group-trigger" id="settings-group-font-btn">
+            <div class="settings-group-trigger-left">
+              <i class="fa-solid fa-font"></i>
+              <span data-i18n="settings_font_group">Pengaturan Font</span>
+            </div>
+            <i class="fa-solid fa-chevron-down settings-group-arrow" id="settings-group-font-arrow"></i>
+          </button>
+          <div class="settings-group-body" id="settings-group-font-body">
+
         {{-- Font Size Arab --}}
         <div class="settings-section">
           <label class="settings-label">
@@ -281,6 +300,9 @@
           <p class="settings-preview settings-preview-arab" id="arab-font-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
         </div>
 
+          </div>{{-- .settings-group-body --}}
+        </div>{{-- .settings-group --}}
+
         {{-- Warna Latar --}}
         <div class="settings-section">
           <label class="settings-label">
@@ -308,6 +330,22 @@
             </button>
           </div>
           <p class="settings-selected-label"><span data-i18n="settings_selected">Dipilih:</span> <span id="bg-selected-name">Putih</span></p>
+        </div>
+
+        {{-- Dark Mode --}}
+        <div class="settings-section">
+          <label class="settings-label">
+            <i class="fa-solid fa-moon"></i>
+            <span data-i18n="settings_dark_mode">Mode Gelap</span>
+          </label>
+          <div class="tajweed-toggle-wrap">
+            <label class="toggle-switch">
+              <input type="checkbox" id="dark-mode-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="dark-mode-toggle-label" id="dark-mode-toggle-label" data-i18n="dark_mode_off">Nonaktif</span>
+          </div>
+          <p class="settings-hint" data-i18n="settings_dark_mode_hint">Tampilan latar gelap, nyaman untuk membaca di malam hari.</p>
         </div>
 
         {{-- Bahasa --}}
@@ -468,6 +506,55 @@
         </div>
 
         {{-- Reset --}}
+        {{-- Tampilkan Terjemahan --}}
+        <div class="settings-section">
+          <label class="settings-label">
+            <i class="fa-solid fa-language"></i>
+            <span data-i18n="settings_show_trans">Tampilkan Terjemahan</span>
+          </label>
+          <div class="tajweed-toggle-wrap">
+            <label class="toggle-switch">
+              <input type="checkbox" id="show-translation-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span id="show-translation-label" data-i18n="trans_visible">Tampil</span>
+          </div>
+          <p class="settings-hint" data-i18n="settings_show_trans_hint">Tampilkan teks latin dan terjemahan di bawah setiap ayat.</p>
+        </div>
+
+        {{-- Pilihan Qori --}}
+        <div class="settings-section">
+          <label class="settings-label">
+            <i class="fa-solid fa-microphone"></i>
+            <span data-i18n="settings_qori">Pilihan Qori</span>
+          </label>
+          <select id="qori-select" class="settings-select">
+            <option value="05">Misyari Rasyid Al-Afasy</option>
+            <option value="03">Abdurrahman As-Sudais</option>
+            <option value="01">Abdullah Al-Juhany</option>
+            <option value="02">Abdul Muhsin Al-Qasim</option>
+            <option value="04">Ibrahim Al-Dossari</option>
+            <option value="06">Yasser Al-Dosari</option>
+          </select>
+          <p class="settings-hint" data-i18n="settings_qori_hint">Digunakan saat memutar audio murottal per ayat.</p>
+        </div>
+
+        {{-- Auto-play --}}
+        <div class="settings-section">
+          <label class="settings-label">
+            <i class="fa-solid fa-list"></i>
+            <span data-i18n="settings_autoplay">Auto-play Ayat</span>
+          </label>
+          <div class="tajweed-toggle-wrap">
+            <label class="toggle-switch">
+              <input type="checkbox" id="autoplay-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+            <span id="autoplay-label" data-i18n="autoplay_off">Nonaktif</span>
+          </div>
+          <p class="settings-hint" data-i18n="settings_autoplay_hint">Otomatis putar ayat berikutnya setelah selesai.</p>
+        </div>
+
         <div class="settings-section settings-footer-row">
           <button id="settings-reset-btn" class="settings-reset-btn">
             <i class="fa-solid fa-rotate-left"></i> <span data-i18n="settings_reset">Reset ke Default</span>
@@ -549,6 +636,34 @@
     </div>
 
     @yield('script')
+
+    <script>
+    /* ── SMOOTH SCROLL — native, compatible dengan CSS Grid layout ── */
+    (function initScroll() {
+        // Lenis tidak kompatibel dengan layout grid ini (body bukan scroll container)
+        // Gunakan native scrollIntoView + scroll-behavior: smooth dari CSS
+        // Expose __lenis-compatible API agar kode lain tetap bekerja
+        window.__lenis = {
+            scrollTo: function(target, opts) {
+                if (typeof target === 'number') {
+                    window.scrollTo({ top: target, behavior: 'smooth' });
+                    return;
+                }
+                if (typeof target === 'string') {
+                    target = document.querySelector(target);
+                }
+                if (!target) return;
+                const offset = (opts && opts.offset) ? opts.offset : -80;
+                const rect = target.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                window.scrollTo({
+                    top: rect.top + scrollTop + offset,
+                    behavior: 'smooth'
+                });
+            }
+        };
+    })();
+    </script>
 
   </body>
 </html>
