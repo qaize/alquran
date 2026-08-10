@@ -13,8 +13,6 @@
    ============================================================ --}}
 
 {{-- External libs --}}
-<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
 {{-- App modules (load order: dependencies first) --}}
 <script src="{{asset('js/toast.js')}}"></script>
@@ -29,6 +27,7 @@
 
 {{-- Core app — dimuat terakhir karena memanggil fungsi dari semua modul di atas --}}
 <script src="{{asset('js/script.js')}}"></script>
+<script src="{{asset('js/usage.js')}}"></script>
 
 <script>
 
@@ -53,26 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initTajweedToggle(); } catch(e) { console.error('initTajweedToggle error:', e); }
     try { initDarkModeTopbar(); } catch(e) { console.error('initDarkModeTopbar error:', e); }
     try { initSettingsGroups(); } catch(e) { console.error('initSettingsGroups error:', e); }
+    try { initUsageTracker();   } catch(e) { console.error('initUsageTracker error:', e); }
 });
 
-/* ──────────────────────────────────────────────
-   AUTOCOMPLETE (jQuery UI)
-   ────────────────────────────────────────────── */
-$(function () {
-    var listSurah = [];
-    loadAllSurah().then(function (data) {
-        data.forEach(function (element) {
-            listSurah.push(element.nama_latin);
-        });
-    });
-
-    $('#search-input').autocomplete({
-        source: function (request, response) {
-            response(listSurah.filter(function (s) {
-                return s.toLowerCase().includes(request.term.toLowerCase());
-            }));
-        },
-        minLength: 1
-    });
-});
 </script>

@@ -46,6 +46,25 @@ function getAudioUrlFromAyat(ayatData) {
     return null;
 }
 
+/* ── Highlight ayat yang sedang diputar ── */
+function highlightPlayingAyat(nomorAyat) {
+    // Hapus highlight sebelumnya
+    clearPlayingHighlight();
+
+    const el = document.getElementById(`isi-ayat${nomorAyat}`);
+    if (!el) return;
+
+    el.classList.add('ayat-playing');
+
+    // Auto-scroll ke ayat, dengan offset sedikit dari atas
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearPlayingHighlight() {
+    document.querySelectorAll('.ayat-playing').forEach(el => {
+        el.classList.remove('ayat-playing');
+    });
+}
 function setActiveAyatData(ayatArray) {
     // Dipanggil dari loadSurahDetails setelah data ayat tersedia
     __audioData = ayatArray;
@@ -89,16 +108,24 @@ function playAyatAudio(nomorSurah, nomorAyat, btnEl) {
         __audioPlaying = true;
         setAudioBtnState(btnEl, 'playing');
         updateMiniPlayerState('playing');
+        highlightPlayingAyat(nomorAyat);
     });
     __audioObj.addEventListener('pause', () => {
         __audioPlaying = false;
         setAudioBtnState(btnEl, 'paused');
         updateMiniPlayerState('paused');
+        // Tetap tampilkan highlight saat pause (biar user tahu posisi)
     });
     __audioObj.addEventListener('ended', () => {
         __audioPlaying = false;
         setAudioBtnState(btnEl, 'idle');
         updateMiniPlayerState('ended');
+        clearPlayingHighlight();
+        // Capture durasi sebelum __audioObj di-null-kan oleh stopAudio/autoNextAyat
+        const playedDuration = __audioObj ? (__audioObj.duration || 0) : 0;
+        if (typeof trackAudio === 'function' && playedDuration > 0) {
+            trackAudio(playedDuration);
+        }
         autoNextAyat(nomorSurah, nomorAyat);
     });
     __audioObj.addEventListener('error', (e) => {
@@ -148,6 +175,7 @@ function stopAudio() {
     if (__audioAyat && __audioAyat.btn) setAudioBtnState(__audioAyat.btn, 'idle');
     __audioAyat    = null;
     __audioPlaying = false;
+    clearPlayingHighlight();
     hideMiniPlayer();
 }
 

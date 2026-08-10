@@ -142,6 +142,7 @@ function fetchTafsirSurah(nomorSurah) {
             if (typeof NProgress !== 'undefined') NProgress.done();
             const data = json.data && json.data.tafsir ? json.data.tafsir : [];
             tafsirCache.set(nomorSurah, data);
+            if (typeof trackApiCall === 'function') trackApiCall('tafsir');
             return data;
         })
         .catch(err => {
@@ -235,6 +236,7 @@ function fetchAsbabForSurah(nomorSurah) {
             if (typeof NProgress !== 'undefined') NProgress.done();
             const data = json.data || [];
             asbabCache.set(nomorSurah, data);
+            if (typeof trackApiCall === 'function') trackApiCall('asbab');
             return data;
         })
         .catch(err => {

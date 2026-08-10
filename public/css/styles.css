@@ -1051,8 +1051,6 @@ input {
     border-radius: 50px;
     border: 2px solid var(--border);
     overflow: hidden;
-    max-width: 600px;
-    margin: 0 auto;
     transition:
         border-color var(--transition),
         box-shadow var(--transition);
@@ -1103,26 +1101,49 @@ input {
     color: var(--navy);
 }
 
-/* Autocomplete dropdown jQuery UI override */
-.ui-autocomplete {
-    border: 1px solid var(--border) !important;
-    border-radius: var(--radius-sm) !important;
-    box-shadow: var(--shadow-md) !important;
-    font-family: "Inter", sans-serif !important;
-    font-size: 13px !important;
+/* ── Search clear button ── */
+.search-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: var(--text-light);
+    color: var(--white);
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-right: 6px;
+    transition: background var(--transition), transform var(--transition);
 }
 
-.ui-menu-item-wrapper {
-    padding: 8px 14px !important;
-    color: var(--text-dark) !important;
+.search-clear-btn:hover {
+    background: var(--gold);
+    transform: scale(1.1);
 }
 
-.ui-state-active,
-.ui-menu-item-wrapper.ui-state-active {
-    background: var(--blue-soft) !important;
-    color: var(--navy) !important;
-    border: none !important;
+/* Sembunyikan teks panjang jQuery UI ARIA ("65 results are available...") */
+.ui-helper-hidden-accessible {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
 }
+
+/* ── Search result highlight ── */
+mark.search-highlight {
+    background: rgba(201, 168, 76, 0.35);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+    font-weight: 600;
+}
+
+
 
 /* ── 11. INFO SECTION ── */
 .info {
@@ -1179,7 +1200,7 @@ input {
 #main-body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 12px;
     padding: 20px 24px 30px;
     animation: fadeIn 0.5s ease;
 }
@@ -1208,16 +1229,18 @@ input {
 .surah-card {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 14px 14px 14px 12px;
-    box-shadow: var(--shadow-sm);
+    gap: 14px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 16px;
+    padding: 16px 16px 16px 14px;
+    box-shadow:
+        0 2px 8px rgba(201,168,76,0.06),
+        0 1px 3px rgba(0,0,0,0.04);
     transition:
-        transform var(--transition),
-        box-shadow var(--transition),
-        border-color var(--transition);
+        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
     position: relative;
     overflow: hidden;
 }
@@ -1229,24 +1252,77 @@ input {
     top: 0;
     bottom: 0;
     width: 4px;
-    background: linear-gradient(180deg, var(--gold), var(--navy-light));
+    background: linear-gradient(180deg, var(--gold), var(--gold-light), var(--navy-light));
     border-radius: 4px 0 0 4px;
 }
 
+.surah-card::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(201,168,76,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
 .surah-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+    box-shadow:
+        0 8px 24px rgba(201,168,76,0.15),
+        0 4px 12px rgba(0,0,0,0.06);
     border-color: var(--gold-light);
+}
+
+.surah-card:hover::after {
+    opacity: 1;
+}
+
+/* Dark mode cards */
+.theme-dark .surah-card {
+    background: linear-gradient(135deg, #1a2e45 0%, #0d2137 100%);
+    border-color: rgba(232,201,122,0.15);
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(232,201,122,0.05);
+}
+
+.theme-dark .surah-card:hover {
+    border-color: rgba(232,201,122,0.4);
+    box-shadow:
+        0 8px 28px rgba(0,0,0,0.4),
+        0 0 20px rgba(232,201,122,0.08),
+        inset 0 1px 0 rgba(232,201,122,0.1);
+}
+
+.theme-dark .surah-card::before {
+    background: linear-gradient(180deg, var(--gold-light), var(--gold), rgba(232,201,122,0.3));
 }
 
 .card-nomor {
     font-family: "Amiri", serif;
-    font-size: 26px;
+    font-size: 22px;
     color: var(--gold);
-    min-width: 36px;
-    text-align: center;
+    min-width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
     line-height: 1;
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03));
+    border: 1.5px solid rgba(201,168,76,0.25);
+    border-radius: 12px;
+    position: relative;
+}
+
+.theme-dark .card-nomor {
+    background: linear-gradient(135deg, rgba(232,201,122,0.1), rgba(232,201,122,0.03));
+    border-color: rgba(232,201,122,0.3);
+    color: var(--gold-light);
 }
 
 .card-info {
@@ -1256,12 +1332,17 @@ input {
 
 .card-name {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--navy);
     margin-bottom: 3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: 0.2px;
+}
+
+.theme-dark .card-name {
+    color: #ffffff;
 }
 
 .card-arti {
@@ -1270,6 +1351,48 @@ input {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-style: italic;
+}
+
+.theme-dark .card-arti {
+    color: rgba(255,255,255,0.55);
+}
+
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10.5px;
+    color: var(--text-light);
+    margin-top: 3px;
+}
+
+.card-meta i {
+    font-size: 9px;
+    color: var(--gold);
+    opacity: 0.7;
+}
+
+.theme-dark .card-meta {
+    color: rgba(255,255,255,0.4);
+}
+
+.card-arab {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    font-size: 22px;
+    color: var(--navy);
+    text-align: right;
+    direction: rtl;
+    line-height: 1.4;
+    flex-shrink: 0;
+    opacity: 0.85;
+    padding-left: 8px;
+}
+
+.theme-dark .card-arab {
+    color: var(--gold-light);
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 .card-actions {
@@ -1333,6 +1456,24 @@ input {
     color: var(--gold);
 }
 
+.theme-dark .btn-star {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.4);
+}
+
+.theme-dark .btn-star:hover {
+    background: rgba(232,201,122,0.12);
+    border-color: var(--gold-light);
+    color: var(--gold-light);
+}
+
+.theme-dark .btn-star.favorited {
+    background: rgba(232,201,122,0.12);
+    border-color: var(--gold-light);
+    color: var(--gold-light);
+}
+
 /* ── 14. DATA EMPTY ── */
 .data-empty {
     grid-column: 1 / -1;
@@ -1377,6 +1518,19 @@ input {
     border-color: var(--navy);
     color: var(--white);
     box-shadow: var(--shadow-md);
+}
+
+.theme-dark .btn-pagination {
+    background: #0d2137;
+    border-color: rgba(232,201,122,0.3);
+    color: var(--gold-light);
+}
+
+.theme-dark .btn-pagination:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+    box-shadow: 0 4px 16px rgba(201,168,76,0.3);
 }
 
 /* Keep JS show/hide logic working — script uses style.display */
@@ -1572,37 +1726,23 @@ input {
     flex: 1;
     height: calc(100vh - 160px);
     overflow-y: auto;
-    border-radius: var(--radius-md);
+    border-radius: 0;
     background: var(--ayat-bg, var(--white));
     padding: 10px 18px 20px;
     text-align: right;
     transition: background 0.3s ease;
-    /* Gradient border via outline + box-shadow trick */
-    border: 2px solid transparent;
-    background-clip: padding-box;
+    border: 2px solid var(--gold-light);
+    border-top: none;
+    border-bottom: none;
     box-shadow:
-        0 0 0 2px var(--gold-light),
         0 4px 24px rgba(201, 168, 76, 0.12),
         inset 0 0 0 1px rgba(201, 168, 76, 0.08);
     position: relative;
 }
 
-/* Decorative top line using pseudo-element */
+/* Decorative top line — disabled, progress bar serves as card top */
 .ayat::before {
-    content: "";
-    display: block;
-    height: 3px;
-    margin: -10px -18px 12px;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        var(--gold-light) 20%,
-        var(--gold) 50%,
-        var(--gold-light) 80%,
-        transparent 100%
-    );
-    opacity: 0.8;
+    display: none;
 }
 
 .ayat::-webkit-scrollbar {
@@ -1745,6 +1885,10 @@ input {
 
 /* Dark navy mode — teks Arab putih */
 /* Dark navy mode — class .theme-dark di <html>, berlaku ke semua .ayat */
+.theme-dark .ayat {
+    border-color: rgba(232,201,122,0.25);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(232,201,122,0.05);
+}
 .theme-dark .ayat .arabic {
     color: #ffffff;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
@@ -1883,19 +2027,142 @@ input {
 }
 
 /* ── 21. SUGGESTION DROPDOWN ── */
+
+/* Wrapper untuk positioning dropdown relatif terhadap search bar */
+.search-container {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 .suggestion {
     display: none;
     position: absolute;
-    border: 1px solid var(--border);
-    background: var(--white);
-    box-shadow: var(--shadow-md);
-    top: 100%;
+    top: calc(100% + 6px);
     left: 0;
     right: 0;
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
-    z-index: 99;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+    overflow: hidden;
+    max-height: 340px;
     overflow-y: auto;
-    max-height: 200px;
+    /* Animasi muncul */
+    transform-origin: top center;
+    animation: suggestionIn 0.18s ease;
+}
+
+.suggestion.open {
+    display: block;
+}
+
+@keyframes suggestionIn {
+    from { opacity: 0; transform: translateY(-6px) scaleY(0.95); }
+    to   { opacity: 1; transform: translateY(0)   scaleY(1); }
+}
+
+/* Custom scrollbar suggestion */
+.suggestion::-webkit-scrollbar { width: 4px; }
+.suggestion::-webkit-scrollbar-track { background: transparent; }
+.suggestion::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+/* Header count */
+.suggestion-header {
+    padding: 6px 14px;
+    font-size: 11px;
+    color: var(--text-light);
+    background: var(--blue-soft);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+}
+
+.sug-count {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 12px;
+}
+
+/* Item */
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    transition: background var(--transition);
+    border-bottom: 1px solid rgba(205, 228, 245, 0.5);
+}
+
+.suggestion-item:last-child { border-bottom: none; }
+
+.suggestion-item:hover,
+.suggestion-item.active {
+    background: var(--blue-soft);
+}
+
+/* Nomor surah */
+.sug-nomor {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--navy);
+    color: var(--gold);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.suggestion-item:hover .sug-nomor,
+.suggestion-item.active .sug-nomor {
+    background: var(--gold);
+    color: var(--navy);
+}
+
+/* Body nama + arti */
+.sug-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.sug-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sug-arti {
+    font-size: 11.5px;
+    color: var(--text-mid);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Nama Arab */
+.sug-arab {
+    flex-shrink: 0;
+    font-family: "Amiri", serif;
+    font-size: 17px;
+    color: var(--navy-light);
+    direction: rtl;
 }
 
 /* ── 22. FOOTER ── */
@@ -1931,6 +2198,265 @@ input {
     font-size: 14px;
     opacity: 0.7;
 }
+
+/* ── DATA USAGE FOOTER BUTTON ── */
+.usage-footer-btn {
+    position: absolute;
+    right: 14px;
+    bottom: 50%;
+    transform: translateY(50%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    padding: 4px 10px 4px 8px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.usage-footer-btn:hover {
+    background: rgba(201,168,76,0.18);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.usage-footer-btn i {
+    font-size: 12px;
+}
+
+.usage-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.2px;
+}
+
+/* ── DATA USAGE POPUP PANEL ── */
+.usage-panel {
+    position: fixed;
+    bottom: 54px;
+    right: 14px;
+    width: 300px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 999;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.usage-panel.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+.usage-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 10px;
+    background: var(--navy);
+    color: var(--white);
+}
+
+.usage-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.usage-panel-title i { color: var(--gold); }
+
+.usage-panel-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    transition: color var(--transition);
+}
+
+.usage-panel-close:hover { color: var(--white); }
+
+/* Total row */
+.usage-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px 6px;
+}
+
+.usage-total-label {
+    font-size: 11px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.usage-total-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+/* Bar */
+.usage-bar-wrap { padding: 0 14px 10px; }
+
+.usage-bar {
+    height: 8px;
+    background: var(--blue-soft);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+}
+
+.usage-bar-api   { background: var(--navy-light); transition: width 0.5s ease; }
+.usage-bar-audio { background: var(--gold);        transition: width 0.5s ease; }
+
+.usage-bar-legend {
+    display: flex;
+    gap: 14px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-mid);
+}
+
+.ubl-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.ubl-api   .ubl-dot { background: var(--navy-light); }
+.ubl-audio .ubl-dot { background: var(--gold); }
+
+/* Stats */
+.usage-stats {
+    padding: 0 14px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.usage-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    background: var(--blue-soft);
+    border-radius: var(--radius-sm);
+}
+
+.usage-stat > i {
+    color: var(--navy-light);
+    width: 16px;
+    text-align: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.usage-stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.usage-stat-label {
+    font-size: 10.5px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.usage-stat-value {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* Breakdown */
+.usage-breakdown {
+    padding: 0 14px 8px;
+}
+
+.usage-breakdown-title {
+    font-size: 10.5px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 5px;
+}
+
+.usage-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-mid);
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(205,228,245,0.5);
+}
+
+.usage-breakdown-row:last-child { border-bottom: none; }
+
+.usage-breakdown-row span:first-child { text-transform: capitalize; }
+.usage-breakdown-row span:last-child  { font-weight: 600; color: var(--text-dark); }
+
+/* Meta */
+.usage-meta {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 14px 8px;
+    font-size: 10.5px;
+    color: var(--text-light);
+    border-top: 1px solid var(--border);
+}
+
+/* Reset */
+.usage-reset-btn {
+    display: block;
+    width: calc(100% - 28px);
+    margin: 0 14px 12px;
+    padding: 7px;
+    background: none;
+    border: 1px solid rgba(220,53,69,0.25);
+    border-radius: var(--radius-sm);
+    color: #dc3545;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.usage-reset-btn:hover {
+    background: rgba(220,53,69,0.07);
+    border-color: #dc3545;
+}
+
+/* Dark mode */
+.theme-dark .usage-panel {
+    background: var(--navy-mid);
+    border-color: rgba(201,168,76,0.2);
+}
+
+.theme-dark .usage-total-value { color: var(--white); }
+.theme-dark .usage-stat { background: rgba(255,255,255,0.05); }
+.theme-dark .usage-stat-value { color: var(--white); }
+.theme-dark .usage-breakdown-row { color: rgba(255,255,255,0.6); border-color: rgba(255,255,255,0.06); }
+.theme-dark .usage-breakdown-row span:last-child { color: var(--white); }
+.theme-dark .usage-meta { color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.08); }
 
 /* ── 23. RESPONSIVE ── */
 @media (max-width: 1100px) {
@@ -4744,9 +5270,18 @@ input {
 }
 .tj-modal-letter-text {
     font-family: var(--arabic-font-family, "Amiri", serif);
-    font-size: 38px;
+    font-size: 52px;
     direction: rtl;
     line-height: 1.6;
+}
+.tj-modal-arab-inline {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    font-size: 22px;
+    direction: rtl;
+    unicode-bidi: bidi-override;
+    color: #0d2137;
+    font-weight: 600;
+    vertical-align: middle;
 }
 .tj-modal-section {
     margin-bottom: 12px;
@@ -5501,21 +6036,31 @@ input {
     position: sticky;
     top: 0;
     z-index: 50;
-    /* Hanya bar tipis, tanpa background block */
     padding: 0;
     pointer-events: none;
+    background: var(--ayat-bg, var(--white));
+    border-left: 2px solid var(--gold-light);
+    border-right: 2px solid var(--gold-light);
+    border-top: 2px solid var(--gold-light);
+    border-radius: 24px 24px 0 0;
+    margin: 0 0 -2px 0;
+    box-shadow: 0 0 0 0 transparent;
 }
 .surah-progress-info {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     padding: 4px 20px 2px;
-    background: linear-gradient(to bottom, rgba(232,244,253,0.95), transparent);
+    background: var(--ayat-bg, var(--white));
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }
 .theme-dark .surah-progress-info {
-    background: linear-gradient(to bottom, rgba(13,33,55,0.92), transparent);
+    background: var(--ayat-bg, #1a2e45);
+}
+.theme-dark .surah-progress-bar-wrap {
+    background: var(--ayat-bg, #1a2e45);
+    border-color: rgba(232,201,122,0.25);
 }
 .surah-progress-label {
     font-size: 10.5px;
@@ -5540,13 +6085,14 @@ input {
     height: 2px;
     background: transparent;
     overflow: hidden;
+    border-radius: 2px;
 }
 .surah-progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--gold-light), var(--gold), var(--gold-light));
     background-size: 200% 100%;
     animation: progressShimmer 2s linear infinite;
-    border-radius: 0;
+    border-radius: 2px;
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 0 8px rgba(201,168,76,0.6);
 }
@@ -5554,7 +6100,14 @@ input {
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
-.theme-dark .surah-progress-label { color: rgba(255,255,255,0.4); }
+.theme-dark .surah-progress-label { color: rgba(255,255,255,0.7); }
+.theme-dark .surah-progress-pct { color: var(--gold-light); }
+.theme-dark .surah-progress-track {
+    background: rgba(255,255,255,0.06);
+}
+.theme-dark .surah-progress-fill {
+    box-shadow: 0 0 10px rgba(232,201,122,0.5);
+}
 
 /* ── SURAH BOTTOM NAV ── */
 .surah-bottom-nav {
@@ -5563,13 +6116,16 @@ input {
     justify-content: space-between;
     gap: 12px;
     padding: 20px 24px 28px;
-    margin-top: 8px;
+    margin-top: 0;
+    border: 2px solid var(--gold-light);
     border-top: 1px solid var(--border);
-    background: linear-gradient(180deg, transparent, rgba(13,33,55,0.03));
+    border-radius: 0 0 24px 24px;
+    background: var(--ayat-bg, var(--white));
 }
 .theme-dark .surah-bottom-nav {
-    border-top-color: rgba(255,255,255,0.08);
-    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.15));
+    border-color: rgba(232,201,122,0.25);
+    border-top-color: rgba(255,255,255,0.06);
+    background: var(--ayat-bg, #1a2e45);
 }
 .surah-bottom-btn {
     display: flex;
@@ -5613,11 +6169,72 @@ input {
     font-size: 11px;
     color: var(--text-light);
 }
+.theme-dark .surah-bottom-btn {
+    background: #0d2137;
+    border-color: rgba(232,201,122,0.3);
+    color: var(--gold-light);
+}
+.theme-dark .surah-bottom-btn:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+    box-shadow: 0 4px 12px rgba(201,168,76,0.35);
+}
+.theme-dark .surah-bottom-count {
+    color: rgba(255,255,255,0.6);
+}
 @media (max-width: 480px) {
     .surah-bottom-nav { padding: 14px 12px 20px; gap: 8px; }
     .surah-bottom-btn { padding: 8px 12px; font-size: 12px; }
     .surah-bottom-btn span { display: none; }
     .surah-bottom-info { display: none; }
+}
+
+/* ── AYAT PLAYING HIGHLIGHT — dim + glow saat audio diputar ── */
+.ayat-playing {
+    position: relative;
+    background: rgba(201, 168, 76, 0.08) !important;
+    border-radius: var(--radius-sm);
+    outline: 2px solid rgba(201, 168, 76, 0.45);
+    outline-offset: 2px;
+    transition: background 0.3s ease, outline 0.3s ease;
+}
+
+/* Subtle breathing animation */
+.ayat-playing::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-sm);
+    background: rgba(201, 168, 76, 0.06);
+    animation: ayatPlayingBreath 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes ayatPlayingBreath {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1;   }
+}
+
+/* Badge "sedang diputar" kecil */
+.ayat-playing .ayat-nomor-inline::after {
+    content: '▶';
+    display: inline-block;
+    font-size: 8px;
+    color: var(--gold);
+    margin-left: 4px;
+    animation: playingPulse 1s ease-in-out infinite;
+    vertical-align: middle;
+}
+
+@keyframes playingPulse {
+    0%, 100% { opacity: 1;   transform: scale(1);    }
+    50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+.theme-dark .ayat-playing {
+    background: rgba(201, 168, 76, 0.12) !important;
+    outline-color: rgba(201, 168, 76, 0.55);
 }
 
 /* ── AYAT JUMP HIGHLIGHT — smooth fade pulse ── */
