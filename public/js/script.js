@@ -496,6 +496,30 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
             info.style.display = "none";
 
             titleSurah.appendChild(componentTitleSurah(data));
+
+            // ── Sync tombol terjemahan di navbar ──
+            const transToggleBtn = document.getElementById('surah-trans-toggle');
+            if (transToggleBtn) {
+                transToggleBtn.addEventListener('click', () => {
+                    const cur = typeof getSettings === 'function' ? getSettings() : {};
+                    cur.showTranslation = !(cur.showTranslation !== false);
+                    if (typeof saveSettings === 'function') saveSettings(cur);
+                    if (typeof applySettings === 'function') applySettings(cur);
+
+                    // Update tampilan tombol
+                    const isOn = cur.showTranslation;
+                    transToggleBtn.classList.toggle('active', isOn);
+                    transToggleBtn.querySelector('i').className = `fa-solid ${isOn ? 'fa-eye' : 'fa-eye-slash'}`;
+                    transToggleBtn.querySelector('span').textContent = isOn
+                        ? __('trans_visible', 'Terjemahan')
+                        : __('trans_hidden', 'Terjemahan');
+
+                    // Sync dengan toggle di settings panel
+                    const settingsToggle = document.getElementById('show-translation-toggle');
+                    if (settingsToggle) settingsToggle.checked = isOn;
+                });
+            }
+
             const nextSurah = document.getElementById("surah-next");
             const prevSurah = document.getElementById("surah-prev");
 
@@ -673,37 +697,6 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                     });
                 }
 
-                // ── Progress bar: pakai IntersectionObserver (efisien & akurat) ──
-                const totalAyatCount = data.ayat.length;
-                let maxSeenAyat = 0;
-
-                const progressObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const ayatNum = parseInt(entry.target.dataset.ayat);
-                            if (ayatNum > maxSeenAyat) {
-                                maxSeenAyat = ayatNum;
-                                const pct = Math.round(maxSeenAyat / totalAyatCount * 100);
-                                const fill  = document.getElementById('surah-progress-fill');
-                                const pctEl = document.getElementById('progress-pct');
-                                if (fill)  fill.style.width = pct + '%';
-                                if (pctEl) pctEl.textContent = pct + '%';
-                            }
-                        }
-                    });
-                }, { threshold: 0.3 });
-
-                // Observe semua ayat
-                for (let i = 1; i <= totalAyatCount; i++) {
-                    const el = document.getElementById(`isi-ayat${i}`);
-                    if (el) progressObserver.observe(el);
-                }
-
-                // Cleanup saat ganti surah
-                document.addEventListener('ayat-rendered', () => {
-                    progressObserver.disconnect();
-                }, { once: true });
-
                 // ── Bottom nav wiring ──
                 const prevBotBtn = document.getElementById('surah-prev-bottom');
                 const nextBotBtn = document.getElementById('surah-next-bottom');
@@ -744,17 +737,70 @@ function componentTitleSurah(surah) {
     title.classList.add("title-Surah");
 
     title.innerHTML = `
-    <h2>${surah.namaLatin ?? surah.nama_latin} (${surah.nama})</h2>
-    <h3>${surah.arti}</h3>
-    <div class='scroll-navigation'>
-      <button id="surah-prev">${__("prev_surah", "Surah Sebelumnya")}</button>
-      <div class="jump-group">
-        <label for='scroll-input'>${__("jump_to_ayat", "Lompat ke ayat:")}</label>
-        <input id='scroll-input' maxlength="3" type="number" value="1">
-      </div>
-      <button id="surah-next">${__("next_surah", "Surah Selanjutnya")}</button>
+    <div class="title-surah-header">
+        <div class="title-surah-header-inner">
+            <span class="title-surah-name">${surah.namaLatin ?? surah.nama_latin}</span>
+            <span class="title-surah-arab">${surah.nama}</span>
+        </div>
+        <button class="title-surah-collapse-btn" id="title-collapse-btn" title="Sembunyikan">
+            <i class="fa-solid fa-chevron-up"></i>
+        </button>
+    </div>
+    <div class="title-surah-body" id="title-surah-body">
+        <p class="title-surah-arti">${surah.arti}</p>
+        <div class="scroll-navigation">
+          <button id="surah-prev"><i class="fa-solid fa-chevron-left"></i> ${__("prev_surah", "Sebelumnya")}</button>
+          <div class="jump-group">
+            <label for="scroll-input">${__("jump_to_ayat", "Lompat ke:")}</label>
+            <input id="scroll-input" maxlength="3" type="number">
+          </div>
+          <button id="surah-next">${__("next_surah", "Selanjutnya")} <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="surah-trans-toggle-wrap">
+          <button id="surah-trans-toggle" class="surah-trans-btn ${window.__showTranslation !== false ? 'active' : ''}">
+            <i class="fa-solid ${window.__showTranslation !== false ? 'fa-eye' : 'fa-eye-slash'}"></i>
+            <span>${window.__showTranslation !== false ? __('trans_visible','Terjemahan') : __('trans_hidden','Terjemahan')}</span>
+          </button>
+        </div>
     </div>
     `;
+
+    // Collapse/expand logic
+    const collapseBtn = title.querySelector('#title-collapse-btn');
+    const body        = title.querySelector('#title-surah-body');
+    const icon        = collapseBtn.querySelector('i');
+
+    // Set max-height awal
+    requestAnimationFrame(() => {
+        body.style.maxHeight = body.scrollHeight + 'px';
+    });
+
+    collapseBtn.addEventListener('click', () => {
+        const isCollapsed = body.classList.contains('collapsed');
+        if (isCollapsed) {
+            // Expand — pakai nilai besar, lalu setelah transisi selesai set ke 'none'
+            body.classList.remove('collapsed');
+            body.style.maxHeight = '600px';
+            body.addEventListener('transitionend', () => {
+                if (!body.classList.contains('collapsed')) {
+                    body.style.maxHeight = 'none';
+                }
+            }, { once: true });
+            collapseBtn.classList.remove('is-collapsed');
+            collapseBtn.title = 'Sembunyikan';
+        } else {
+            // Collapse — set eksplisit dulu baru animate ke 0
+            body.style.maxHeight = body.scrollHeight + 'px';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    body.classList.add('collapsed');
+                    body.style.maxHeight = '0px';
+                });
+            });
+            collapseBtn.classList.add('is-collapsed');
+            collapseBtn.title = 'Tampilkan';
+        }
+    });
 
     return title;
 }
@@ -782,7 +828,14 @@ function componentDetailSurah(surah) {
 
         const ayat = document.createElement("div");
         ayat.classList.add("ayat");
-        let isiAyat = "";
+
+        // Bismillah ornament — tampil di atas ayat pertama (kecuali At-Taubah nomor 9)
+        let isiAyat = surah.nomor !== 9 ? `
+        <div class="ayat-bismillah">
+            <span class="ayat-bsm-line"></span>
+            <span class="ayat-bsm-text">﷽</span>
+            <span class="ayat-bsm-line"></span>
+        </div>` : '';
         surah.ayat.forEach((ayat) => {
             const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
             const teksArab = ayat.teksArab ?? ayat.ar;
@@ -842,23 +895,6 @@ function componentDetailSurah(surah) {
 
         ayat.innerHTML = isiAyat;
         detailSurah.appendChild(ayat);
-
-        // ── Progress indicator ──
-        const progress = document.createElement('div');
-        progress.className = 'surah-progress-bar-wrap';
-        progress.innerHTML = `
-            <div class="surah-progress-info">
-                <span class="surah-progress-label">
-                    <i class="fa-solid fa-book-open"></i>
-                    <span id="progress-text">${surah.ayat.length} ${__('ayat_word','ayat')}</span>
-                </span>
-                <span class="surah-progress-pct" id="progress-pct">0%</span>
-            </div>
-            <div class="surah-progress-track">
-                <div class="surah-progress-fill" id="surah-progress-fill" style="width:0%"></div>
-            </div>
-        `;
-        detailSurah.insertBefore(progress, ayat);
 
         // ── Bottom navigation prev/next ──
         const bottomNav = document.createElement('div');

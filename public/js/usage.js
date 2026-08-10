@@ -105,12 +105,22 @@ function _formatDate(ts) {
 // ── UI ──
 
 function _refreshUsageDisplay() {
+    const data  = _loadUsage();
+    const total = data.apiBytes + data.audioBytes;
+    const text  = total > 0 ? _formatBytes(total) : null;
+
+    // Footer badge (desktop)
     const badge = document.getElementById('usage-badge');
     if (badge) {
-        const data = _loadUsage();
-        const total = data.apiBytes + data.audioBytes;
-        badge.textContent = _formatBytes(total);
-        badge.style.display = total > 0 ? 'inline-flex' : 'none';
+        badge.textContent    = text || '0 B';
+        badge.style.display  = text ? 'inline-flex' : 'none';
+    }
+
+    // Topbar badge (mobile)
+    const badgeMobile = document.getElementById('usage-badge-mobile');
+    if (badgeMobile) {
+        badgeMobile.textContent   = text || '0B';
+        badgeMobile.style.display = text ? 'inline-flex' : 'none';
     }
 
     // Re-render panel jika sedang terbuka
@@ -123,14 +133,12 @@ function _refreshUsageDisplay() {
 function initUsageTracker() {
     _refreshUsageDisplay();
 
-    const btn = document.getElementById('usage-footer-btn');
-    if (!btn) return;
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
+    // Helper: buka/tutup panel dari tombol apapun
+    function openPanelFrom(triggerBtn) {
         let panel = document.getElementById('usage-panel');
         if (panel) {
             panel.classList.toggle('open');
+            if (panel.classList.contains('open')) _renderUsagePanel(panel);
             return;
         }
 
@@ -141,16 +149,25 @@ function initUsageTracker() {
 
         _renderUsagePanel(panel);
 
-        // Tutup saat klik luar
-        document.addEventListener('mousedown', function closePanel(e2) {
-            if (!panel.contains(e2.target) && e2.target !== btn) {
+        document.addEventListener('mousedown', function closePanel(e) {
+            const btnFooter  = document.getElementById('usage-footer-btn');
+            const btnMobile  = document.getElementById('usage-footer-btn-mobile');
+            if (!panel.contains(e.target) && e.target !== btnFooter && e.target !== btnMobile) {
                 panel.classList.remove('open');
                 document.removeEventListener('mousedown', closePanel);
             }
         });
 
         requestAnimationFrame(() => panel.classList.add('open'));
-    });
+    }
+
+    // Footer button (desktop)
+    const btn = document.getElementById('usage-footer-btn');
+    if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); openPanelFrom(btn); });
+
+    // Topbar button (mobile)
+    const btnMobile = document.getElementById('usage-footer-btn-mobile');
+    if (btnMobile) btnMobile.addEventListener('click', (e) => { e.stopPropagation(); openPanelFrom(btnMobile); });
 }
 
 function _renderUsagePanel(panel) {

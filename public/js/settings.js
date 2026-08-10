@@ -488,15 +488,16 @@ function applySettings(s) {
     // Dark mode toggle (independent of bgColor)
     if (s.darkMode) {
         document.documentElement.classList.add('theme-dark');
-        document.getElementById('dark-mode-toggle') && (document.getElementById('dark-mode-toggle').checked = true);
+        const toggle = document.getElementById('dark-mode-toggle');
+        if (toggle) toggle.checked = true;
         const lbl = document.getElementById('dark-mode-toggle-label');
         if (lbl) lbl.setAttribute('data-i18n', 'dark_mode_on'), lbl.textContent = getCurrentLang() === 'en' ? 'Active' : 'Aktif';
         const topBtn = document.getElementById('topbar-darkmode-btn');
         if (topBtn) { topBtn.querySelector('i').className = 'fa-solid fa-sun'; topBtn.classList.add('darkmode-active'); }
     } else {
-        // Only remove theme-dark if bgColor is also not dark
-        if (s.bgColor !== '#1a2e45') document.documentElement.classList.remove('theme-dark');
-        document.getElementById('dark-mode-toggle') && (document.getElementById('dark-mode-toggle').checked = false);
+        document.documentElement.classList.remove('theme-dark');
+        const toggle = document.getElementById('dark-mode-toggle');
+        if (toggle) toggle.checked = false;
         const lbl = document.getElementById('dark-mode-toggle-label');
         if (lbl) lbl.setAttribute('data-i18n', 'dark_mode_off'), lbl.textContent = getCurrentLang() === 'en' ? 'Inactive' : 'Nonaktif';
         const topBtn = document.getElementById('topbar-darkmode-btn');
@@ -764,15 +765,24 @@ function initDarkModeTopbar() {
     btn.addEventListener('click', () => {
         const cur = getSettings();
         cur.darkMode = !cur.darkMode;
-        if (cur.darkMode) {
-            cur.bgColor = '#1a2e45';
-            cur.bgName  = getCurrentLang() === 'en' ? 'Dark Navy' : 'Biru Gelap';
-        } else {
-            cur.bgColor = '#ffffff';
-            cur.bgName  = getCurrentLang() === 'en' ? 'White' : 'Putih';
-        }
+        cur.bgColor  = cur.darkMode ? '#1a2e45' : '#ffffff';
+        cur.bgName   = cur.darkMode
+            ? (getCurrentLang() === 'en' ? 'Dark Navy' : 'Biru Gelap')
+            : (getCurrentLang() === 'en' ? 'White'     : 'Putih');
         saveSettings(cur);
         applySettings(cur);
+
+        // Sync settings panel toggle
+        const panelToggle = document.getElementById('dark-mode-toggle');
+        if (panelToggle) panelToggle.checked = cur.darkMode;
+        const panelLabel = document.getElementById('dark-mode-toggle-label');
+        if (panelLabel) {
+            panelLabel.setAttribute('data-i18n', cur.darkMode ? 'dark_mode_on' : 'dark_mode_off');
+            panelLabel.textContent = cur.darkMode
+                ? (getCurrentLang() === 'en' ? 'Active'   : 'Aktif')
+                : (getCurrentLang() === 'en' ? 'Inactive' : 'Nonaktif');
+        }
+
         // Animate icon
         const icon = btn.querySelector('i');
         icon.classList.add('animate__animated', 'animate__rotateIn');

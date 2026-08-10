@@ -197,7 +197,7 @@ function showMiniPlayer(nomorSurah, nomorAyat) {
         player.id = 'mini-audio-player';
         player.className = 'mini-audio-player';
         player.innerHTML = `
-            <div class="mini-player-progress"><div class="mini-player-bar" id="mini-player-progress-bar"></div></div>
+            <div class="mini-player-drag-handle" id="mini-player-drag-handle"></div>
             <div class="mini-player-body">
                 <div class="mini-player-info">
                     <i class="fa-solid fa-music mini-player-icon"></i>
@@ -225,6 +225,9 @@ function showMiniPlayer(nomorSurah, nomorAyat) {
                     </button>
                 </div>
             </div>
+            <div class="mini-player-progress">
+                <div class="mini-player-bar" id="mini-player-progress-bar"></div>
+            </div>
         `;
         document.body.appendChild(player);
 
@@ -251,6 +254,9 @@ function showMiniPlayer(nomorSurah, nomorAyat) {
             const btn  = document.getElementById(`audio-btn-${next}`);
             if (btn) playAyatAudio(__audioAyat.surah, next, btn);
         });
+
+        // ── Drag to float ──
+        initMiniPlayerDrag(player);
     }
 
     const key = getQoriKey();
@@ -261,6 +267,69 @@ function showMiniPlayer(nomorSurah, nomorAyat) {
 
     updateAutoPlayBtn();
     requestAnimationFrame(() => player.classList.add('visible'));
+}
+
+function initMiniPlayerDrag(player) {
+    const handle = document.getElementById('mini-player-drag-handle');
+    if (!handle) return;
+
+    let isDragging = false;
+    let startX, startY, startLeft, startTop;
+
+    function onStart(e) {
+        // Jika belum floating, convert ke floating dulu
+        if (!player.classList.contains('floating')) {
+            const rect = player.getBoundingClientRect();
+            player.style.left   = rect.left + 'px';
+            player.style.top    = rect.top  + 'px';
+            player.style.width  = rect.width + 'px';
+            player.classList.add('floating');
+        }
+
+        isDragging = true;
+        player.classList.add('dragging');
+
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        startX    = clientX;
+        startY    = clientY;
+        startLeft = parseInt(player.style.left) || 0;
+        startTop  = parseInt(player.style.top)  || 0;
+
+        e.preventDefault();
+    }
+
+    function onMove(e) {
+        if (!isDragging) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        let newLeft = startLeft + (clientX - startX);
+        let newTop  = startTop  + (clientY - startY);
+
+        // Clamp agar tidak keluar viewport
+        const pw = player.offsetWidth;
+        const ph = player.offsetHeight;
+        newLeft = Math.max(0, Math.min(window.innerWidth  - pw, newLeft));
+        newTop  = Math.max(0, Math.min(window.innerHeight - ph, newTop));
+
+        player.style.left = newLeft + 'px';
+        player.style.top  = newTop  + 'px';
+    }
+
+    function onEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        player.classList.remove('dragging');
+    }
+
+    handle.addEventListener('mousedown',  onStart);
+    handle.addEventListener('touchstart', onStart, { passive: false });
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup',   onEnd);
+    document.addEventListener('touchend',  onEnd);
 }
 
 function updateAutoPlayBtn() {

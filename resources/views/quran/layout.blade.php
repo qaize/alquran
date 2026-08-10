@@ -107,6 +107,10 @@
           <button class="burger-btn" id="topbar-darkmode-btn" title="Toggle Dark Mode">
             <i class="fa-solid fa-moon"></i>
           </button>
+          <button class="burger-btn" id="usage-footer-btn-mobile" title="Data Usage">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span class="usage-badge usage-badge-mobile" id="usage-badge-mobile" style="display:none;">0B</span>
+          </button>
           <button class="burger-btn" id="burger-right-btn" data-i18n-title="favorites_bookmark" title="Favorit & Bookmark">
             <i class="fa-solid fa-star"></i>
           </button>
@@ -560,6 +564,18 @@
         </div>
 
         <div class="settings-section settings-footer-row">
+          {{-- Backup & Restore --}}
+          <div class="settings-backup-row">
+            <button id="settings-export-btn" class="settings-backup-btn settings-backup-export">
+              <i class="fa-solid fa-file-arrow-down"></i>
+              <span>Export Backup</span>
+            </button>
+            <label class="settings-backup-btn settings-backup-import" for="settings-backup-file">
+              <i class="fa-solid fa-file-arrow-up"></i>
+              <span>Import Backup</span>
+            </label>
+            <input type="file" id="settings-backup-file" accept=".json" style="display:none;">
+          </div>
           <button id="settings-reset-btn" class="settings-reset-btn">
             <i class="fa-solid fa-rotate-left"></i> <span data-i18n="settings_reset">Reset ke Default</span>
           </button>
