@@ -41,17 +41,17 @@ const TAJWEED_INFO = {
     'h': { name: 'Hamzat Wasl', desc: 'Hamzah wasal tidak dibaca ketika menyambung bacaan dengan kata sebelumnya. Dibaca hanya saat memulai (ibtida) dari kata tersebut.' },
     's': { name: 'Huruf Sukun', desc: 'Huruf yang tidak memiliki harakat (tanda baca). Diucapkan dengan mematikan huruf tanpa menambahkan bunyi vokal apapun.' },
     'l': { name: 'Lam Syamsiyyah', desc: 'Huruf Lam pada kata sandang (al) tidak dibunyikan. Bacaan langsung berpindah ke huruf setelahnya yang dibaca dengan tasydid (penekanan ganda).' },
-    'n': { name: 'Mad Thabi\'i', desc: 'Mad asli. Dipanjangkan selama 2 harakat (satu alif). Terjadi ketika ada huruf mad (Ø§ Ùˆ ÙŠ) dan tidak bertemu hamzah atau sukun setelahnya.' },
+    'n': { name: 'Mad Thabi\'i', desc: 'Mad asli. Dipanjangkan selama 2 harakat (satu alif). Terjadi ketika ada huruf mad (ا و ي) dan tidak bertemu hamzah atau sukun setelahnya.' },
     'p': { name: 'Mad Jaiz Munfashil', desc: 'Mad yang dipisah. Terjadi saat huruf mad di akhir kata bertemu hamzah di awal kata berikutnya. Boleh dibaca 2, 4, atau 5 harakat.' },
     'm': { name: 'Mad Lazim', desc: 'Mad yang wajib dipanjangkan selama 6 harakat (tiga alif). Terjadi saat huruf mad bertemu huruf bertasydid atau bersukun asli dalam satu kata.' },
-    'q': { name: 'Qalqalah', desc: 'Bunyi pantulan atau getaran pada huruf Qaf, Tha, Ba, Jim, dan Dal (Ù‚Ø·Ø¨Ø¬Ø¯) ketika huruf tersebut bersukun atau saat berhenti (waqaf).' },
+    'q': { name: 'Qalqalah', desc: 'Bunyi pantulan atau getaran pada huruf Qaf, Tha, Ba, Jim, dan Dal (قطبجد) ketika huruf tersebut bersukun atau saat berhenti (waqaf).' },
     'o': { name: 'Mad Wajib Muttashil', desc: 'Mad yang wajib disambung. Terjadi saat huruf mad dan hamzah berada dalam satu kata. Wajib dipanjangkan selama 4 sampai 5 harakat.' },
     'c': { name: 'Ikhfa Syafawi', desc: 'Mim mati bertemu huruf Ba. Mim dibunyikan secara samar-samar melalui bibir yang hampir merapat, disertai dengung selama 2 harakat.' },
     'f': { name: 'Ikhfa Haqiqi', desc: 'Nun mati atau tanwin bertemu salah satu dari 15 huruf ikhfa. Nun dibunyikan samar (antara izhar dan idgham), disertai dengung selama 2 harakat. Posisi lidah menyesuaikan huruf ikhfa yang ditemui.' },
     'w': { name: 'Idgham Syafawi', desc: 'Mim mati bertemu huruf Mim. Kedua mim dilebur menjadi satu mim bertasydid. Dibaca dengan dengung selama 2 harakat.' },
     'i': { name: 'Iqlab', desc: 'Nun mati atau tanwin bertemu huruf Ba. Bunyi nun diganti (ditukar) menjadi bunyi Mim, lalu dibaca dengan dengung selama 2 harakat sambil merapatkan kedua bibir.' },
-    'a': { name: 'Idgham bi Ghunnah', desc: 'Nun mati atau tanwin bertemu huruf Ya, Nun, Mim, atau Waw (ÙŠÙ†Ù…Ùˆ). Nun dilebur ke huruf sesudahnya dan dibaca dengan dengung selama 2 harakat.' },
-    'u': { name: 'Idgham bila Ghunnah', desc: 'Nun mati atau tanwin bertemu huruf Lam atau Ra (Ù„ Ø±). Nun dilebur sepenuhnya ke huruf sesudahnya. Dibaca tanpa dengung sama sekali.' },
+    'a': { name: 'Idgham bi Ghunnah', desc: 'Nun mati atau tanwin bertemu huruf Ya, Nun, Mim, atau Waw (ينمو). Nun dilebur ke huruf sesudahnya dan dibaca dengan dengung selama 2 harakat.' },
+    'u': { name: 'Idgham bila Ghunnah', desc: 'Nun mati atau tanwin bertemu huruf Lam atau Ra (ل ر). Nun dilebur sepenuhnya ke huruf sesudahnya. Dibaca tanpa dengung sama sekali.' },
     'd': { name: 'Idgham Mutajanisain', desc: 'Dua huruf yang memiliki makhraj (tempat keluar) yang sama bertemu berurutan. Huruf pertama yang mati dilebur ke huruf kedua yang berharakat.' },
     'b': { name: 'Idgham Mutaqaribain', desc: 'Dua huruf yang makhrajnya berdekatan bertemu berurutan. Huruf pertama yang mati dilebur ke huruf kedua yang berharakat.' },
     'g': { name: 'Ghunnah', desc: 'Bunyi dengung yang keluar dari pangkal hidung selama 2 harakat. Terjadi pada huruf Nun atau Mim yang bertasydid (ditandai dengan tasydid/syaddah).' }
@@ -60,7 +60,7 @@ const TAJWEED_INFO = {
 /**
  * Parse raw tajweed text from API ke HTML berwarna.
  * Format tag: [X:NUM[TEXT] atau [X[TEXT]
- * Contoh: [h:1[Ù±] atau [n[Ù…ÙŽÙ°]
+ * Contoh: [h:1[ٱ] atau [n[مَٰ]
  */
 function parseTajweedText(rawText) {
     if (!rawText) return '';
@@ -135,6 +135,7 @@ function fetchTajweedSurah(nomorSurah) {
                 map.set(ayah.numberInSurah, parseTajweedText(ayah.text));
             });
             tajweedCache.set(nomorSurah, map);
+            if (typeof trackApiCall === 'function') trackApiCall('tajweed');
             return map;
         })
         .catch(err => {
@@ -608,7 +609,10 @@ function getTajwidGuideHTML() {
         modal.querySelector('.tj-modal-title').textContent = name;
         modal.querySelector('.tj-modal-letter-text').textContent = text;
         modal.querySelector('.tj-modal-letter-text').style.color = color;
-        modal.querySelector('.tj-modal-desc').textContent = desc;
+        // Wrap Arabic characters in desc with larger font span
+        const descHTML = desc.replace(/([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+(?:\s[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+)*)/g,
+            '<span class="tj-modal-arab-inline">$1</span>');
+        modal.querySelector('.tj-modal-desc').innerHTML = descHTML;
         modal.querySelector('.tj-modal-color-dot').style.background = color;
         modal.querySelector('.tj-modal-color-label').textContent = 'Warna: ' + name;
 

@@ -44,44 +44,178 @@ function __(key, fallback) {
     return typeof t === "function" ? t(key) : fallback;
 }
 
-function Surah(nomor, nama_latin, arti) {
+function Surah(nomor, nama_latin, arti, nama, tempatTurun, jumlahAyat) {
     this.nomor = nomor;
     this.nama_latin = nama_latin;
     this.arti = arti;
+    this.nama = nama || '';
+    this.tempatTurun = tempatTurun || '';
+    this.jumlahAyat = jumlahAyat || 0;
 }
 
-searchInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        searchSurah = searchInput.value;
-        page = 1;
-        currentIndex = 0;
-        mainBody.innerHTML = "";
-        loadPagingSurah(currentIndex, page * offset);
-    }
-});
+// ── Debounce helper ──
+function debounce(fn, delay) {
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
 
-document.addEventListener("click", function (event) {
-    if (event.target !== searchInput) {
-        searchButton.style.borderRightColor = "#dddddd";
-        searchButton.style.borderTopColor = "#dddddd";
-        searchButton.style.borderLeftColor = "#dddddd";
-        searchButton.style.borderBottomRightRadius = "10px";
-        searchInput.style.borderBottomLeftRadius = "10px";
-        searchInput.style.borderBottom = "2px solid #dddddd";
-        searchInput.blur();
-    }
-});
-
-searchInput.addEventListener("focus", () => {
-    searchInput.style.borderBottom = "2px solid rgb(142, 239, 239)";
-});
-
-searchButton.addEventListener("click", () => {
-    searchSurah = searchInput.value;
+// ── Trigger search: hanya dipanggil dari tombol Cari atau Enter ──
+function triggerSearch(query) {
+    closeSuggestion();
+    searchSurah = (query !== undefined ? query : searchInput.value).trim();
+    searchInput.value = searchSurah;
     page = 1;
     currentIndex = 0;
     mainBody.innerHTML = "";
+    updateClearButton();
     loadPagingSurah(currentIndex, page * offset);
+}
+
+// ── Clear button ──
+const clearButton = document.getElementById("search-clear");
+function updateClearButton() {
+    if (clearButton) {
+        clearButton.style.display = searchInput.value.length > 0 ? "flex" : "none";
+    }
+}
+
+if (clearButton) {
+    clearButton.addEventListener("click", () => {
+        searchInput.value = "";
+        updateClearButton();
+        closeSuggestion();
+        triggerSearch("");
+        searchInput.focus();
+    });
+}
+
+// ── Tombol Cari ──
+searchButton.addEventListener("click", () => triggerSearch());
+
+// ── Enter langsung cari ──
+searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        const active = suggestionEl.querySelector(".suggestion-item.active");
+        if (active) {
+            triggerSearch(active.dataset.value);
+        } else {
+            triggerSearch();
+        }
+        return;
+    }
+    if (e.key === "ArrowDown") { e.preventDefault(); moveSuggestion(1);  return; }
+    if (e.key === "ArrowUp")   { e.preventDefault(); moveSuggestion(-1); return; }
+    if (e.key === "Escape")    { closeSuggestion(); return; }
+});
+
+// Update clear button realtime tanpa debounce
+searchInput.addEventListener("input", updateClearButton);
+
+/*  ─────────────────────────────────────────────
+    DROPDOWN SUGGESTION  (debounce 300ms, client-side filter dari cache)
+    ───────────────────────────────────────────── */
+const suggestionEl = document.getElementById("search-suggestion");
+
+function renderSuggestion(items) {
+    suggestionEl.innerHTML = "";
+    if (!items.length) { closeSuggestion(); return; }
+
+    // Header: jumlah hasil
+    const header = document.createElement("div");
+    header.className = "suggestion-header";
+    header.innerHTML = `<span class="sug-count">${items.length > 8 ? '8+' : items.length}</span> hasil`;
+    suggestionEl.appendChild(header);
+
+    items.forEach((s) => {
+        const item = document.createElement("div");
+        item.className = "suggestion-item";
+        item.dataset.value = s.namaLatin;
+
+        const q = searchInput.value.trim();
+        item.innerHTML = `
+            <span class="sug-nomor">${s.nomor}</span>
+            <span class="sug-body">
+                <span class="sug-name">${highlightMatch(s.namaLatin, q)}</span>
+                <span class="sug-arti">${highlightMatch(s.arti, q)}</span>
+            </span>
+            <span class="sug-arab">${s.nama}</span>
+        `;
+
+        item.addEventListener("mousedown", (e) => {
+            // mousedown sebelum blur agar tidak close duluan
+            e.preventDefault();
+            triggerSearch(s.namaLatin);
+        });
+
+        suggestionEl.appendChild(item);
+    });
+
+    suggestionEl.classList.add("open");
+}
+
+function closeSuggestion() {
+    suggestionEl.classList.remove("open");
+    suggestionEl.innerHTML = "";
+}
+
+function moveSuggestion(dir) {
+    const items = Array.from(suggestionEl.querySelectorAll(".suggestion-item"));
+    if (!items.length) return;
+    const cur = suggestionEl.querySelector(".suggestion-item.active");
+    let idx = cur ? items.indexOf(cur) + dir : (dir === 1 ? 0 : items.length - 1);
+    idx = (idx + items.length) % items.length;
+    items.forEach(i => i.classList.remove("active"));
+    items[idx].classList.add("active");
+    items[idx].scrollIntoView({ block: "nearest" });
+    // Preview teks di input (tidak trigger search)
+    searchInput.value = items[idx].dataset.value;
+    updateClearButton();
+}
+
+const showSuggestions = debounce((q) => {
+    if (!q || q.length < 1) { closeSuggestion(); return; }
+
+    const getList = rawSurahListCache
+        ? Promise.resolve(rawSurahListCache)
+        : fetch("https://equran.id/api/v2/surat")
+            .then(r => r.json())
+            .then(r => {
+                rawSurahListCache = Array.isArray(r) ? r : r.data;
+                isDataLoaded = true;
+                return rawSurahListCache;
+            });
+
+    getList.then((list) => {
+        const lower = q.toLowerCase();
+        const matches = list
+            .filter(s =>
+                s.namaLatin.toLowerCase().includes(lower) ||
+                s.arti.toLowerCase().includes(lower) ||
+                String(s.nomor) === q
+            )
+            .slice(0, 8); // max 8 item di dropdown
+        renderSuggestion(matches);
+    });
+}, 300);
+
+searchInput.addEventListener("input", (e) => {
+    showSuggestions(e.target.value.trim());
+});
+
+searchInput.addEventListener("focus", (e) => {
+    if (e.target.value.trim()) showSuggestions(e.target.value.trim());
+});
+
+// Tutup saat klik di luar
+document.addEventListener("mousedown", (e) => {
+    const container = document.querySelector(".search-container");
+    if (container && !container.contains(e.target)) {
+        closeSuggestion();
+    }
 });
 
 prevButton.addEventListener("click", () => {
@@ -107,62 +241,42 @@ nextButton.addEventListener("click", () => {
     Halaman Utama
 */
 
+// ── Filter & map helper (single source of truth) ──
+function filterAndMapSurah(list) {
+    const q = searchSurah.toLowerCase();
+    return list
+        .filter((el) => {
+            if (!q) return true;
+            return (
+                el.namaLatin.toLowerCase().includes(q) ||
+                el.arti.toLowerCase().includes(q) ||
+                String(el.nomor) === q
+            );
+        })
+        .map((el) => new Surah(el.nomor, el.namaLatin, el.arti, el.nama, el.tempatTurun, el.jumlahAyat));
+}
+
 // fetch semua surah atau cari
 function loadAllSurah() {
     const urlAllSurah = "https://equran.id/api/v2/surat";
 
+    // Cache sudah ada — filter langsung, tidak re-fetch
     if (rawSurahListCache !== null) {
-        const filtered = rawSurahListCache
-            .filter((element) => {
-                const nameLower = element.namaLatin.toLowerCase();
-                const artiLower = element.arti.toLowerCase();
-                return (
-                    nameLower.includes(searchSurah.toLowerCase()) ||
-                    artiLower.includes(searchSurah.toLowerCase()) ||
-                    element.nomor == searchSurah
-                );
-            })
-            .map(
-                (element) =>
-                    new Surah(element.nomor, element.namaLatin, element.arti),
-            );
-        return Promise.resolve(filtered);
+        return Promise.resolve(filterAndMapSurah(rawSurahListCache));
     }
 
+    // Deduplication: gunakan satu promise in-flight
     if (!allDataSurahPromise) {
         allDataSurahPromise = new Promise((resolve, reject) => {
             const xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
-                if (xhttp.readyState == 4 && xhttp.status === 200) {
+                if (xhttp.readyState === 4 && xhttp.status === 200) {
                     const responses = JSON.parse(xhttp.responseText);
-                    const surahList = Array.isArray(responses)
-                        ? responses
-                        : responses.data;
-
-                    rawSurahListCache = surahList;
+                    rawSurahListCache = Array.isArray(responses) ? responses : responses.data;
                     isDataLoaded = true;
-
-                    const filtered = surahList
-                        .filter((element) => {
-                            const nameLower = element.namaLatin.toLowerCase();
-                            const artiLower = element.arti.toLowerCase();
-                            return (
-                                nameLower.includes(searchSurah.toLowerCase()) ||
-                                artiLower.includes(searchSurah.toLowerCase()) ||
-                                element.nomor == searchSurah
-                            );
-                        })
-                        .map(
-                            (element) =>
-                                new Surah(
-                                    element.nomor,
-                                    element.namaLatin,
-                                    element.arti,
-                                ),
-                        );
-
-                    resolve(filtered);
-                } else if (xhttp.readyState == 4) {
+                    if (typeof trackApiCall === 'function') trackApiCall('surat_list');
+                    resolve(filterAndMapSurah(rawSurahListCache));
+                } else if (xhttp.readyState === 4) {
                     reject("Gagal memuat data surah");
                 }
             };
@@ -171,14 +285,18 @@ function loadAllSurah() {
         });
 
         allDataSurahPromise
-            .then(() => {
-                allDataSurahPromise = null;
-            })
-            .catch(() => {
-                allDataSurahPromise = null;
-            });
+            .then(() => { allDataSurahPromise = null; })
+            .catch(() => { allDataSurahPromise = null; });
     }
     return allDataSurahPromise;
+}
+
+// ── Highlight teks yang match query pencarian ──
+function highlightMatch(text, query) {
+    if (!query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "gi");
+    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
 }
 
 // counter untuk stagger animasi kartu
@@ -212,9 +330,11 @@ function surahCard(surah) {
     card.innerHTML = `
   <div class="card-nomor">${numberToArabic(surah.nomor)}</div>
   <div class="card-info">
-    <h3 class="card-name">${surah.nama_latin}</h3>
-    <p class="card-arti">${surah.arti}</p>
+    <h3 class="card-name">${highlightMatch(surah.nama_latin, searchSurah)}</h3>
+    <p class="card-arti">${highlightMatch(surah.arti, searchSurah)}</p>
+    <span class="card-meta"><i class="fa-solid fa-location-dot"></i> ${surah.tempatTurun} &bull; ${surah.jumlahAyat} ayat</span>
   </div>
+  <div class="card-arab">${surah.nama}</div>
   <div class="card-actions">
     <button id="star-${surah.nomor}" class="btn-star ${favClass}" title="${favTitle}"
       onclick="event.stopPropagation(); toggleFavorite(${surah.nomor}, '${surah.nama_latin.replace(/'/g, "\\'")}', '${surah.arti.replace(/'/g, "\\'")}')">
@@ -310,7 +430,30 @@ function loadPagingSurah(currentIndex, totalData) {
 }
 
 // inisiasi halaman utama
+// Set initial history state agar back dari detail bisa kembali ke list
+history.replaceState({ view: 'list' }, '', window.location.href);
 loadPagingSurah(currentIndex, totalData);
+
+// ── Handle tombol Back browser ──
+window.addEventListener('popstate', (e) => {
+    const state = e.state;
+    if (!state || state.view === 'list') {
+        // Kembali ke halaman list
+        searchSurah = "";
+        searchInput.value = "";
+        updateClearButton();
+        page = 1;
+        currentIndex = 0;
+        titleSurah.innerHTML = "";
+        mainBody.innerHTML = "";
+        info.style.display = "block";
+        pagination.style.display = "block";
+        loadPagingSurah(currentIndex, page * offset);
+    } else if (state.view === 'detail' && state.nomor) {
+        // Navigasi antar surah via back/forward
+        loadSurahDetails(state.nomor, false);
+    }
+});
 
 /*
     Detail Surah
@@ -331,6 +474,7 @@ function fetchDetailInformasiSurah(nomor) {
                 const data =
                     response.data !== undefined ? response.data : response;
                 surahDetailCache.set(nomor, data);
+                if (typeof trackApiCall === 'function') trackApiCall('surat_detail');
                 resolve(data);
             })
             .catch((error) => {
@@ -340,7 +484,11 @@ function fetchDetailInformasiSurah(nomor) {
 }
 
 // tampilkan detail surah
-function loadSurahDetails(nomorSurah) {
+function loadSurahDetails(nomorSurah, pushHistory = true) {
+    // Simpan state ke browser history agar tombol Back bekerja
+    if (pushHistory) {
+        history.pushState({ view: 'detail', nomor: nomorSurah }, '', `#surah-${nomorSurah}`);
+    }
     npStart();
     fetchDetailInformasiSurah(nomorSurah)
         .then((data) => {
@@ -487,8 +635,9 @@ function loadSurahDetails(nomorSurah) {
                 const jumpInput = document.getElementById("scroll-input");
                 if (jumpInput) {
                     const totalAyat = data.ayat.length;
-                    jumpInput.max   = totalAyat;
-                    jumpInput.value = "";
+                    jumpInput.max         = totalAyat;
+                    jumpInput.value       = "";
+                    jumpInput.placeholder = `1 - ${totalAyat}`;
 
                     // Clone → hapus listener lama yang menumpuk tiap buka surah
                     const freshInput = jumpInput.cloneNode(true);
