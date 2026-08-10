@@ -1,3 +1,6 @@
+{{-- Hadist Harian Widget --}}
+<div id="hadist-daily-widget" class="hadist-daily-widget"></div>
+
 {{-- Main surah grid --}}
 <div id="main-body" class="main-body"></div>
 

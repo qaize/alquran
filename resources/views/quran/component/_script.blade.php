@@ -29,6 +29,8 @@
 <script src="{{asset('js/script.js')}}"></script>
 <script src="{{asset('js/usage.js')}}"></script>
 <script src="{{asset('js/backup.js')}}"></script>
+<script src="{{asset('js/janji-allah.js')}}"></script>
+<script src="{{asset('js/hadist.js')}}"></script>
 
 <script>
 
@@ -55,6 +57,8 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initSettingsGroups(); } catch(e) { console.error('initSettingsGroups error:', e); }
     try { initUsageTracker();   } catch(e) { console.error('initUsageTracker error:', e); }
     try { initBackupPanel();    } catch(e) { console.error('initBackupPanel error:', e); }
+    try { initJanjiAllah();     } catch(e) { console.error('initJanjiAllah error:', e); }
+    try { initHadist();         } catch(e) { console.error('initHadist error:', e); }
 });
 
 </script>

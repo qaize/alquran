@@ -13,6 +13,7 @@ const BACKUP_KEYS = [
     'quran_settings',
     'quran_favorites',
     'quran_bookmarks',
+    'quran_bookmarks_hadist',
     'quran_last_read',
     'quran_reading_categories',
     'quran_tajweed_enabled',
@@ -122,11 +123,12 @@ function initBackupPanel() {
 
 function _buildDataSummary() {
     const items = [
-        { key: 'quran_favorites',          icon: 'fa-star',              label: 'Favorit' },
-        { key: 'quran_bookmarks',           icon: 'fa-bookmark',          label: 'Bookmark Ayat' },
-        { key: 'quran_last_read',           icon: 'fa-clock-rotate-left', label: 'Terakhir Dibaca' },
-        { key: 'quran_reading_categories',  icon: 'fa-folder-open',       label: 'Kategori Baca' },
-        { key: 'quran_settings',            icon: 'fa-gear',              label: 'Pengaturan' },
+        { key: 'quran_favorites',           icon: 'fa-star',                label: 'Favorit' },
+        { key: 'quran_bookmarks',           icon: 'fa-bookmark',            label: 'Bookmark Ayat' },
+        { key: 'quran_bookmarks_hadist',    icon: 'fa-scroll',              label: 'Bookmark Hadist' },
+        { key: 'quran_last_read',           icon: 'fa-clock-rotate-left',   label: 'Terakhir Dibaca' },
+        { key: 'quran_reading_categories',  icon: 'fa-folder-open',         label: 'Kategori Baca' },
+        { key: 'quran_settings',            icon: 'fa-gear',                label: 'Pengaturan' },
         { key: 'quran_tajweed_enabled',     icon: 'fa-wand-magic-sparkles', label: 'Status Tajwid' },
     ];
 
