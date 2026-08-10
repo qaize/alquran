@@ -41,6 +41,14 @@
             <i class="fa-solid fa-house nav-icon"></i>
             <span data-i18n="nav_home">Beranda</span>
           </a>
+          <a href="#" class="nav-item" id="nav-janji-allah-btn">
+            <i class="fa-solid fa-star-and-crescent nav-icon"></i>
+            <span>Janji Allah</span>
+          </a>
+          <a href="#" class="nav-item" id="nav-hadist-btn">
+            <i class="fa-solid fa-scroll nav-icon"></i>
+            <span>Hadist</span>
+          </a>
           <a href="#" class="nav-item" id="nav-juz-btn">
             <i class="fa-solid fa-book-open nav-icon"></i>
             <span data-i18n="nav_juz">Juz</span>
@@ -592,36 +600,54 @@
         <div class="bookmark-panel-header">
           <div class="bookmark-panel-title">
             <i class="fa-solid fa-bookmark"></i>
-            <h3 data-i18n="bm_panel_title">Bookmark Ayat Saya</h3>
-            <span id="bookmark-panel-count" class="bookmark-panel-count">0 <span data-i18n="ayat_word">ayat</span></span>
+            <h3 data-i18n="bm_panel_title">Bookmark Saya</h3>
+            <span id="bookmark-panel-count" class="bookmark-panel-count">0</span>
           </div>
           <button id="close-bookmark-panel-btn" class="settings-close-btn" data-i18n-title="close" title="Tutup">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
-        <div class="bookmark-panel-toolbar">
-          <input type="text" id="bookmark-search-input" class="bookmark-search"
-            data-i18n-placeholder="bm_search_placeholder" placeholder="Cari surah atau teks ayat...">
-          <button id="bookmark-clear-all-btn" class="bookmark-clear-btn" data-i18n-title="bm_clear_all" title="Hapus semua bookmark">
-            <i class="fa-solid fa-trash-can"></i> <span data-i18n="bm_clear_all">Hapus Semua</span>
+        {{-- Tab selector --}}
+        <div class="bm-panel-tabs">
+          <button class="bm-panel-tab active" id="bm-tab-ayat" data-tab="ayat">
+            <i class="fa-solid fa-book-quran"></i>
+            <span>Ayat</span>
+            <span class="bm-tab-count" id="bm-count-ayat">0</span>
+          </button>
+          <button class="bm-panel-tab" id="bm-tab-hadist" data-tab="hadist">
+            <i class="fa-solid fa-scroll"></i>
+            <span>Hadist</span>
+            <span class="bm-tab-count" id="bm-count-hadist">0</span>
           </button>
         </div>
 
-        <div id="bookmark-panel-list" class="bookmark-panel-list">
-          {{-- Populated by JS --}}
+        <div class="bookmark-panel-toolbar">
+          <input type="text" id="bookmark-search-input" class="bookmark-search"
+            placeholder="Cari bookmark...">
+          <button id="bookmark-clear-all-btn" class="bookmark-clear-btn" title="Hapus semua">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
         </div>
 
+        {{-- Ayat list --}}
+        <div id="bookmark-panel-list" class="bookmark-panel-list bm-panel-section active">
+          {{-- Populated by JS --}}
+        </div>
         <div id="bookmark-panel-empty" class="bookmark-panel-empty" style="display:none;">
           <i class="fa-regular fa-bookmark"></i>
-          <p data-i18n="bm_panel_empty">Belum ada ayat yang disimpan.</p>
-          <small data-i18n="bm_panel_empty_hint">
-            Cara menyimpan bookmark:<br>
-            1. Buka salah satu surah<br>
-            2. Arahkan kursor ke ayat yang disukai<br>
-            3. Klik tombol 🔖 yang muncul di samping nomor ayat<br><br>
-            Ayat tersimpan bisa dibuka kembali kapan saja dari menu ini.
-          </small>
+          <p>Belum ada ayat yang disimpan.</p>
+          <small>Buka surah → arahkan ke ayat → klik 🔖</small>
+        </div>
+
+        {{-- Hadist list --}}
+        <div id="bookmark-hadist-list" class="bookmark-panel-list bm-panel-section" style="display:none;">
+          {{-- Populated by JS --}}
+        </div>
+        <div id="bookmark-hadist-empty" class="bookmark-panel-empty" style="display:none;">
+          <i class="fa-regular fa-bookmark"></i>
+          <p>Belum ada hadist yang disimpan.</p>
+          <small>Buka panel Hadist → detail → klik 🔖</small>
         </div>
 
       </div>

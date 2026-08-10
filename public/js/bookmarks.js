@@ -1,9 +1,10 @@
-/* bookmarks.js — Bookmark ayat + panel */
+/* bookmarks.js — Bookmark ayat + bookmark hadist + panel */
 
 /* ──────────────────────────────────────────────
    BOOKMARK AYAT — localStorage
    ────────────────────────────────────────────── */
-const BOOKMARKS_KEY = 'quran_bookmarks';
+const BOOKMARKS_KEY        = 'quran_bookmarks';
+const BOOKMARKS_HADIST_KEY = 'quran_bookmarks_hadist';
 
 function getBookmarks() {
     try { return JSON.parse(localStorage.getItem(BOOKMARKS_KEY)) || []; }
@@ -12,6 +13,62 @@ function getBookmarks() {
 
 function saveBookmarks(list) {
     localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(list));
+}
+
+/* ──────────────────────────────────────────────
+   BOOKMARK HADIST — localStorage
+   ────────────────────────────────────────────── */
+function getBookmarksHadist() {
+    try { return JSON.parse(localStorage.getItem(BOOKMARKS_HADIST_KEY)) || []; }
+    catch (e) { return []; }
+}
+
+function saveBookmarksHadist(list) {
+    localStorage.setItem(BOOKMARKS_HADIST_KEY, JSON.stringify(list));
+}
+
+function isBookmarkedHadist(kitabId, nomor) {
+    return getBookmarksHadist().some(b => b.kitabId === kitabId && b.nomor === nomor);
+}
+
+function toggleBookmarkHadist(kitabId, kitabNama, kitabArab, nomor, arab, idn) {
+    const list = getBookmarksHadist();
+    const idx  = list.findIndex(b => b.kitabId === kitabId && b.nomor === nomor);
+
+    if (idx >= 0) {
+        list.splice(idx, 1);
+        saveBookmarksHadist(list);
+        showToast({
+            type: 'info',
+            icon: 'fa-bookmark',
+            label: 'Bookmark dihapus',
+            message: `${kitabNama} — No. ${nomor}`,
+            duration: 2000,
+        });
+    } else {
+        list.unshift({ kitabId, kitabNama, kitabArab, nomor, arab, idn, savedAt: Date.now() });
+        saveBookmarksHadist(list);
+        showToast({
+            type: 'bookmark',
+            label: 'Hadist disimpan',
+            message: `${kitabNama} — No. ${nomor}`,
+        });
+    }
+
+    renderBookmarks();
+
+    // Sync tombol bookmark di panel hadist jika ada
+    _syncHadistBookmarkBtn(kitabId, nomor);
+}
+
+function _syncHadistBookmarkBtn(kitabId, nomor) {
+    const btn = document.getElementById('hadist-bookmark-btn');
+    if (!btn) return;
+    const isOn = isBookmarkedHadist(kitabId, nomor);
+    btn.classList.toggle('bookmarked', isOn);
+    btn.title = isOn ? 'Hapus bookmark' : 'Simpan bookmark';
+    const icon = btn.querySelector('i');
+    if (icon) icon.className = isOn ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark';
 }
 
 function isBookmarked(nomorSurah, nomorAyat) {
@@ -88,7 +145,7 @@ function renderBookmarks() {
 function renderBookmarkCountBadge() {
     const badge = document.getElementById('bookmark-count-badge');
     if (!badge) return;
-    const count = getBookmarks().length;
+    const count = getBookmarks().length + getBookmarksHadist().length;
     if (count > 0) {
         badge.textContent = count;
         badge.style.display = 'inline-flex';
@@ -176,28 +233,137 @@ function renderBookmarkPanel(filter = '') {
     const panelList  = document.getElementById('bookmark-panel-list');
     const panelEmpty = document.getElementById('bookmark-panel-empty');
     const panelCount = document.getElementById('bookmark-panel-count');
+    const hadistList  = document.getElementById('bookmark-hadist-list');
+    const hadistEmpty = document.getElementById('bookmark-hadist-empty');
     if (!panelList) return;
 
-    panelList.querySelectorAll('.bm-panel-item').forEach(el => el.remove());
+    // Update count badges
+    const ayatCount   = getBookmarks().length;
+    const hadistCount = getBookmarksHadist().length;
+    const total       = ayatCount + hadistCount;
 
-    let list = getBookmarks();
+    if (panelCount) panelCount.textContent = total;
+
+    const cntAyat   = document.getElementById('bm-count-ayat');
+    const cntHadist = document.getElementById('bm-count-hadist');
+    if (cntAyat)   cntAyat.textContent   = ayatCount;
+    if (cntHadist) cntHadist.textContent = hadistCount;
+
+    // ── Render Ayat ──
+    panelList.querySelectorAll('.bm-panel-item').forEach(el => el.remove());
+    let listAyat = getBookmarks();
     if (filter) {
         const q = filter.toLowerCase();
-        list = list.filter(b =>
+        listAyat = listAyat.filter(b =>
             b.namaLatin.toLowerCase().includes(q) ||
             b.teksArab.includes(filter) ||
             (b.teksIndonesia || '').toLowerCase().includes(q)
         );
     }
-
-    if (panelCount) panelCount.textContent = `${getBookmarks().length} ${t('ayat_word')}`;
-
-    if (list.length === 0) {
+    if (listAyat.length === 0) {
         if (panelEmpty) panelEmpty.style.display = 'flex';
     } else {
         if (panelEmpty) panelEmpty.style.display = 'none';
-        list.forEach(bm => panelList.appendChild(buildBookmarkItem(bm, true)));
+        listAyat.forEach(bm => panelList.appendChild(buildBookmarkItem(bm, true)));
     }
+
+    // ── Render Hadist ──
+    if (hadistList) {
+        hadistList.querySelectorAll('.bm-panel-item').forEach(el => el.remove());
+        let listHadist = getBookmarksHadist();
+        if (filter) {
+            const q = filter.toLowerCase();
+            listHadist = listHadist.filter(b =>
+                b.kitabNama.toLowerCase().includes(q) ||
+                (b.arab || '').includes(filter) ||
+                (b.idn || '').toLowerCase().includes(q)
+            );
+        }
+        if (listHadist.length === 0) {
+            if (hadistEmpty) hadistEmpty.style.display = 'flex';
+        } else {
+            if (hadistEmpty) hadistEmpty.style.display = 'none';
+            listHadist.forEach(bm => hadistList.appendChild(buildBookmarkHadistItem(bm)));
+        }
+    }
+
+    // ── Enforce display sesuai tab aktif ──
+    const activeTab = document.querySelector('.bm-panel-tab.active');
+    const isAyatTab = !activeTab || activeTab.dataset.tab === 'ayat';
+
+    if (panelList)  panelList.style.display  = isAyatTab ? '' : 'none';
+    if (panelEmpty && listAyat.length === 0)
+        panelEmpty.style.display = isAyatTab ? 'flex' : 'none';
+    else if (panelEmpty)
+        panelEmpty.style.display = 'none';
+
+    if (hadistList)  hadistList.style.display  = isAyatTab ? 'none' : '';
+    if (hadistEmpty) {
+        const hList = getBookmarksHadist();
+        hadistEmpty.style.display = (!isAyatTab && hList.length === 0) ? 'flex' : 'none';
+    }
+}
+
+// Build hadist bookmark item untuk panel
+function buildBookmarkHadistItem(bm) {
+    const item = document.createElement('div');
+    item.className = 'bm-panel-item';
+    const date = new Date(bm.savedAt).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric'
+    });
+
+    item.innerHTML = `
+        <div class="bm-panel-meta">
+            <div class="bm-panel-surah">
+                <i class="fa-solid fa-scroll"></i>
+                <span class="bm-panel-name">${bm.kitabNama}</span>
+                <span class="bm-panel-num">No. ${bm.nomor}</span>
+            </div>
+            <span class="bm-panel-date">${date}</span>
+        </div>
+        <p class="bm-panel-arab" dir="rtl">${bm.arab || '—'}</p>
+        <p class="bm-panel-idn">${bm.idn || '—'}</p>
+        <div class="bm-panel-actions">
+            <button class="bookmark-go-btn bm-panel-go-btn">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Hadist
+            </button>
+            <button class="bookmark-del-btn bm-panel-del-btn"
+                data-kitab="${bm.kitabId}" data-nomor="${bm.nomor}">
+                <i class="fa-solid fa-trash-can"></i> Hapus
+            </button>
+        </div>
+    `;
+
+    // Buka hadist
+    item.querySelector('.bookmark-go-btn').addEventListener('click', () => {
+        const overlay = document.getElementById('bookmark-panel-overlay');
+        if (overlay) overlay.classList.remove('open');
+        if (typeof openHadistPanel === 'function') {
+            openHadistPanel();
+            setTimeout(() => {
+                // Pilih kitab yang sesuai
+                const kitabBtn = document.querySelector(`.hadist-kitab-btn[data-kitab="${bm.kitabId}"]`);
+                if (kitabBtn) kitabBtn.click();
+                // Navigasi ke nomor
+                setTimeout(() => {
+                    if (typeof _renderHadistDetail === 'function') {
+                        _renderHadistDetail(bm.kitabId, bm.nomor);
+                    }
+                }, 400);
+            }, 300);
+        }
+    });
+
+    // Hapus
+    item.querySelector('.bookmark-del-btn').addEventListener('click', () => {
+        const kitabId = item.querySelector('.bookmark-del-btn').dataset.kitab;
+        const nomor   = parseInt(item.querySelector('.bookmark-del-btn').dataset.nomor);
+        const list    = getBookmarksHadist().filter(b => !(b.kitabId === kitabId && b.nomor === nomor));
+        saveBookmarksHadist(list);
+        renderBookmarks();
+    });
+
+    return item;
 }
 
 function initBookmarks() {
@@ -224,6 +390,34 @@ function initBookmarks() {
         });
     }
 
+    // ── Tab switching: Ayat / Hadist ──
+    document.querySelectorAll('.bm-panel-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.bm-panel-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const isAyat = tab.dataset.tab === 'ayat';
+
+            // Ayat sections
+            const ayatList  = document.getElementById('bookmark-panel-list');
+            const ayatEmpty = document.getElementById('bookmark-panel-empty');
+            // Hadist sections
+            const hadistList  = document.getElementById('bookmark-hadist-list');
+            const hadistEmpty = document.getElementById('bookmark-hadist-empty');
+
+            if (isAyat) {
+                if (ayatList)  ayatList.style.display  = '';
+                if (ayatEmpty) ayatEmpty.style.display = getBookmarks().length === 0 ? 'flex' : 'none';
+                if (hadistList)  hadistList.style.display  = 'none';
+                if (hadistEmpty) hadistEmpty.style.display = 'none';
+            } else {
+                if (ayatList)  ayatList.style.display  = 'none';
+                if (ayatEmpty) ayatEmpty.style.display = 'none';
+                if (hadistList)  hadistList.style.display  = '';
+                if (hadistEmpty) hadistEmpty.style.display = getBookmarksHadist().length === 0 ? 'flex' : 'none';
+            }
+        });
+    });
+
     // Tutup panel
     const closePanel = document.getElementById('close-bookmark-panel-btn');
     if (closePanel) {
@@ -248,13 +442,19 @@ function initBookmarks() {
         });
     }
 
-    // Hapus semua
+    // Hapus semua — ikut tab aktif
     const clearBtn = document.getElementById('bookmark-clear-all-btn');
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            if (!confirm(t('confirm_clear_bm'))) return;
-            saveBookmarks([]);
-            document.querySelectorAll('.btn-bookmark-ayat').forEach(b => b.classList.remove('bookmarked'));
+            const activeTab = document.querySelector('.bm-panel-tab.active');
+            const isAyat    = !activeTab || activeTab.dataset.tab === 'ayat';
+            if (!confirm(isAyat ? 'Hapus semua bookmark ayat?' : 'Hapus semua bookmark hadist?')) return;
+            if (isAyat) {
+                saveBookmarks([]);
+                document.querySelectorAll('.btn-bookmark-ayat').forEach(b => b.classList.remove('bookmarked'));
+            } else {
+                saveBookmarksHadist([]);
+            }
             renderBookmarks();
         });
     }

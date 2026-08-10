@@ -361,6 +361,10 @@ function loadPagingSurah(currentIndex, totalData) {
             titleSurah.innerHTML = "";
             mainBody.innerHTML = "";
             info.style.display = "block";
+
+            // Tampilkan kembali widget hadist harian
+            const hdWidget = document.getElementById('hadist-daily-widget');
+            if (hdWidget) hdWidget.style.display = '';
             const data = allData;
             totalPage = Math.ceil(data.length / offset);
             overflow = data.length % offset;
@@ -494,6 +498,10 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
         .then((data) => {
             titleSurah.innerHTML = "";
             info.style.display = "none";
+
+            // Sembunyikan widget hadist harian saat baca surah
+            const hdWidget = document.getElementById('hadist-daily-widget');
+            if (hdWidget) hdWidget.style.display = 'none';
 
             titleSurah.appendChild(componentTitleSurah(data));
 

@@ -476,7 +476,32 @@ function applySettings(s) {
         root.classList.remove('theme-dark');
     }
     // expose qori globally for audio player
+    const prevQori = window.__activeQori;
     window.__activeQori = s.qori || '05';
+
+    // Kalau qori berubah dan ada audio aktif (play/pause) → reload dengan qori baru
+    if (prevQori && prevQori !== window.__activeQori) {
+        if (typeof __audioAyat !== 'undefined' && __audioAyat &&
+            typeof __audioObj   !== 'undefined' && __audioObj) {
+            const currentSurah   = __audioAyat.surah;
+            const currentAyat    = __audioAyat.ayat;
+            const currentBtn     = __audioAyat.btn;
+            const wasPlaying     = typeof __audioPlaying !== 'undefined' && __audioPlaying;
+            if (typeof stopAudio === 'function') stopAudio();
+            // Auto-play kalau sebelumnya sedang play, auto-pause kalau sedang pause
+            setTimeout(() => {
+                if (typeof playAyatAudio === 'function') {
+                    playAyatAudio(currentSurah, currentAyat, currentBtn);
+                    // Kalau sebelumnya pause, pause lagi setelah canplay
+                    if (!wasPlaying && typeof __audioObj !== 'undefined' && __audioObj) {
+                        __audioObj.addEventListener('canplay', () => {
+                            __audioObj.pause();
+                        }, { once: true });
+                    }
+                }
+            }, 100);
+        }
+    }
 
     // Show/hide terjemahan
     const showTrans = s.showTranslation !== false; // default true
