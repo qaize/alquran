@@ -28,6 +28,7 @@
 {{-- Core app — dimuat terakhir karena memanggil fungsi dari semua modul di atas --}}
 <script src="{{asset('js/script.js')}}"></script>
 <script src="{{asset('js/usage.js')}}"></script>
+<script src="{{asset('js/backup.js')}}"></script>
 
 <script>
 
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initDarkModeTopbar(); } catch(e) { console.error('initDarkModeTopbar error:', e); }
     try { initSettingsGroups(); } catch(e) { console.error('initSettingsGroups error:', e); }
     try { initUsageTracker();   } catch(e) { console.error('initUsageTracker error:', e); }
+    try { initBackupPanel();    } catch(e) { console.error('initBackupPanel error:', e); }
 });
 
 </script>

@@ -36,25 +36,25 @@ const TAJWEED_MAP = {
     'g': 'ghn'
 };
 
-// Mapping deskripsi tajwid: nama + cara baca
+// Mapping deskripsi tajwid: nama + cara baca + harakat
 const TAJWEED_INFO = {
-    'h': { name: 'Hamzat Wasl', desc: 'Hamzah wasal tidak dibaca ketika menyambung bacaan dengan kata sebelumnya. Dibaca hanya saat memulai (ibtida) dari kata tersebut.' },
-    's': { name: 'Huruf Sukun', desc: 'Huruf yang tidak memiliki harakat (tanda baca). Diucapkan dengan mematikan huruf tanpa menambahkan bunyi vokal apapun.' },
-    'l': { name: 'Lam Syamsiyyah', desc: 'Huruf Lam pada kata sandang (al) tidak dibunyikan. Bacaan langsung berpindah ke huruf setelahnya yang dibaca dengan tasydid (penekanan ganda).' },
-    'n': { name: 'Mad Thabi\'i', desc: 'Mad asli. Dipanjangkan selama 2 harakat (satu alif). Terjadi ketika ada huruf mad (ا و ي) dan tidak bertemu hamzah atau sukun setelahnya.' },
-    'p': { name: 'Mad Jaiz Munfashil', desc: 'Mad yang dipisah. Terjadi saat huruf mad di akhir kata bertemu hamzah di awal kata berikutnya. Boleh dibaca 2, 4, atau 5 harakat.' },
-    'm': { name: 'Mad Lazim', desc: 'Mad yang wajib dipanjangkan selama 6 harakat (tiga alif). Terjadi saat huruf mad bertemu huruf bertasydid atau bersukun asli dalam satu kata.' },
-    'q': { name: 'Qalqalah', desc: 'Bunyi pantulan atau getaran pada huruf Qaf, Tha, Ba, Jim, dan Dal (قطبجد) ketika huruf tersebut bersukun atau saat berhenti (waqaf).' },
-    'o': { name: 'Mad Wajib Muttashil', desc: 'Mad yang wajib disambung. Terjadi saat huruf mad dan hamzah berada dalam satu kata. Wajib dipanjangkan selama 4 sampai 5 harakat.' },
-    'c': { name: 'Ikhfa Syafawi', desc: 'Mim mati bertemu huruf Ba. Mim dibunyikan secara samar-samar melalui bibir yang hampir merapat, disertai dengung selama 2 harakat.' },
-    'f': { name: 'Ikhfa Haqiqi', desc: 'Nun mati atau tanwin bertemu salah satu dari 15 huruf ikhfa. Nun dibunyikan samar (antara izhar dan idgham), disertai dengung selama 2 harakat. Posisi lidah menyesuaikan huruf ikhfa yang ditemui.' },
-    'w': { name: 'Idgham Syafawi', desc: 'Mim mati bertemu huruf Mim. Kedua mim dilebur menjadi satu mim bertasydid. Dibaca dengan dengung selama 2 harakat.' },
-    'i': { name: 'Iqlab', desc: 'Nun mati atau tanwin bertemu huruf Ba. Bunyi nun diganti (ditukar) menjadi bunyi Mim, lalu dibaca dengan dengung selama 2 harakat sambil merapatkan kedua bibir.' },
-    'a': { name: 'Idgham bi Ghunnah', desc: 'Nun mati atau tanwin bertemu huruf Ya, Nun, Mim, atau Waw (ينمو). Nun dilebur ke huruf sesudahnya dan dibaca dengan dengung selama 2 harakat.' },
-    'u': { name: 'Idgham bila Ghunnah', desc: 'Nun mati atau tanwin bertemu huruf Lam atau Ra (ل ر). Nun dilebur sepenuhnya ke huruf sesudahnya. Dibaca tanpa dengung sama sekali.' },
-    'd': { name: 'Idgham Mutajanisain', desc: 'Dua huruf yang memiliki makhraj (tempat keluar) yang sama bertemu berurutan. Huruf pertama yang mati dilebur ke huruf kedua yang berharakat.' },
-    'b': { name: 'Idgham Mutaqaribain', desc: 'Dua huruf yang makhrajnya berdekatan bertemu berurutan. Huruf pertama yang mati dilebur ke huruf kedua yang berharakat.' },
-    'g': { name: 'Ghunnah', desc: 'Bunyi dengung yang keluar dari pangkal hidung selama 2 harakat. Terjadi pada huruf Nun atau Mim yang bertasydid (ditandai dengan tasydid/syaddah).' }
+    'h': { name: 'Hamzat Wasl',          harakaat: null,    label: 'Tidak dibaca',  desc: 'Hamzah wasal tidak dibaca ketika menyambung bacaan dengan kata sebelumnya. Dibaca hanya saat memulai (ibtida) dari kata tersebut.' },
+    's': { name: 'Huruf Sukun',          harakaat: null,    label: 'Mati',          desc: 'Huruf yang tidak memiliki harakat (tanda baca). Diucapkan dengan mematikan huruf tanpa menambahkan bunyi vokal apapun.' },
+    'l': { name: 'Lam Syamsiyyah',       harakaat: null,    label: 'Tidak dibaca',  desc: 'Huruf Lam pada kata sandang (al) tidak dibunyikan. Bacaan langsung berpindah ke huruf setelahnya yang dibaca dengan tasydid (penekanan ganda).' },
+    'n': { name: 'Mad Thabi\'i',         harakaat: 2,       label: '2 harakat',     desc: 'Mad asli. Dipanjangkan selama 2 harakat (satu alif). Terjadi ketika ada huruf mad (ا و ي) dan tidak bertemu hamzah atau sukun setelahnya.' },
+    'p': { name: 'Mad Jaiz Munfashil',   harakaat: [2,5],   label: '2 / 4 / 5 harakat', desc: 'Mad yang dipisah. Terjadi saat huruf mad di akhir kata bertemu hamzah di awal kata berikutnya. Boleh dibaca 2, 4, atau 5 harakat.' },
+    'm': { name: 'Mad Lazim',            harakaat: 6,       label: '6 harakat',     desc: 'Mad yang wajib dipanjangkan selama 6 harakat (tiga alif). Terjadi saat huruf mad bertemu huruf bertasydid atau bersukun asli dalam satu kata.' },
+    'q': { name: 'Qalqalah',             harakaat: null,    label: 'Memantul',      desc: 'Bunyi pantulan atau getaran pada huruf Qaf, Tha, Ba, Jim, dan Dal (قطبجد) ketika huruf tersebut bersukun atau saat berhenti (waqaf).' },
+    'o': { name: 'Mad Wajib Muttashil',  harakaat: [4,5],   label: '4 / 5 harakat', desc: 'Mad yang wajib disambung. Terjadi saat huruf mad dan hamzah berada dalam satu kata. Wajib dipanjangkan selama 4 sampai 5 harakat.' },
+    'c': { name: 'Ikhfa Syafawi',        harakaat: 2,       label: '2 harakat dengung', desc: 'Mim mati bertemu huruf Ba. Mim dibunyikan secara samar-samar melalui bibir yang hampir merapat, disertai dengung selama 2 harakat.' },
+    'f': { name: 'Ikhfa Haqiqi',         harakaat: 2,       label: '2 harakat dengung', desc: 'Nun mati atau tanwin bertemu salah satu dari 15 huruf ikhfa. Nun dibunyikan samar (antara izhar dan idgham), disertai dengung selama 2 harakat. Posisi lidah menyesuaikan huruf ikhfa yang ditemui.' },
+    'w': { name: 'Idgham Syafawi',       harakaat: 2,       label: '2 harakat dengung', desc: 'Mim mati bertemu huruf Mim. Kedua mim dilebur menjadi satu mim bertasydid. Dibaca dengan dengung selama 2 harakat.' },
+    'i': { name: 'Iqlab',               harakaat: 2,       label: '2 harakat dengung', desc: 'Nun mati atau tanwin bertemu huruf Ba. Bunyi nun diganti (ditukar) menjadi bunyi Mim, lalu dibaca dengan dengung selama 2 harakat sambil merapatkan kedua bibir.' },
+    'a': { name: 'Idgham bi Ghunnah',   harakaat: 2,       label: '2 harakat dengung', desc: 'Nun mati atau tanwin bertemu huruf Ya, Nun, Mim, atau Waw (ينمو). Nun dilebur ke huruf sesudahnya dan dibaca dengan dengung selama 2 harakat.' },
+    'u': { name: 'Idgham bila Ghunnah', harakaat: null,    label: 'Tanpa dengung', desc: 'Nun mati atau tanwin bertemu huruf Lam atau Ra (ل ر). Nun dilebur sepenuhnya ke huruf sesudahnya. Dibaca tanpa dengung sama sekali.' },
+    'd': { name: 'Idgham Mutajanisain', harakaat: null,    label: 'Lebur',         desc: 'Dua huruf yang memiliki makhraj (tempat keluar) yang sama bertemu berurutan. Huruf pertama yang mati dilebur ke huruf kedua yang berharakat.' },
+    'b': { name: 'Idgham Mutaqaribain', harakaat: null,    label: 'Lebur',         desc: 'Dua huruf yang makhrajnya berdekatan bertemu berurutan. Huruf pertama yang mati dilebur ke huruf kedua yang berharakat.' },
+    'g': { name: 'Ghunnah',             harakaat: 2,       label: '2 harakat dengung', desc: 'Bunyi dengung yang keluar dari pangkal hidung selama 2 harakat. Terjadi pada huruf Nun atau Mim yang bertasydid (ditandai dengan tasydid/syaddah).' }
 };
 
 /**
@@ -96,9 +96,15 @@ function parseTajweedText(rawText) {
                         j++;
                     }
                     const info = TAJWEED_INFO[identifier] || {};
-                    const tjName = (info.name || '').replace(/"/g, '&quot;');
-                    const tjDesc = (info.desc || '').replace(/"/g, '&quot;');
-                    result += `<span class="tj-${cssClass}" data-tj-name="${tjName}" data-tj-desc="${tjDesc}">${textContent}</span>`;
+                    const tjName     = (info.name  || '').replace(/"/g, '&quot;');
+                    const tjDesc     = (info.desc  || '').replace(/"/g, '&quot;');
+                    const tjLabel    = (info.label || '').replace(/"/g, '&quot;');
+                    const tjHarakaat = info.harakaat !== null && info.harakaat !== undefined
+                        ? (Array.isArray(info.harakaat)
+                            ? info.harakaat.join('/')
+                            : String(info.harakaat))
+                        : '';
+                    result += `<span class="tj-${cssClass}" data-tj-name="${tjName}" data-tj-desc="${tjDesc}" data-tj-label="${tjLabel}" data-tj-harakaat="${tjHarakaat}">${textContent}</span>`;
                     i = j + 1; // Skip ']' penutup
                 } else {
                     result += rawText[i];
@@ -506,24 +512,54 @@ function getTajwidGuideHTML() {
     let tooltipEl = null;
     let modalEl = null;
 
-    // === TOOLTIP (hover only, nama tajwid) ===
+    // === TOOLTIP (hover only, nama tajwid + harakat) ===
     function createTooltip() {
         if (tooltipEl) return tooltipEl;
         tooltipEl = document.createElement('div');
         tooltipEl.className = 'tj-tooltip';
-        tooltipEl.innerHTML = '<div class="tj-tooltip-arrow"></div><span class="tj-tooltip-name"></span>';
+        tooltipEl.innerHTML = `
+            <div class="tj-tooltip-arrow"></div>
+            <span class="tj-tooltip-name"></span>
+            <span class="tj-tooltip-harakaat"></span>
+        `;
         document.body.appendChild(tooltipEl);
         return tooltipEl;
+    }
+
+    function buildHarakaatBar(harakaat) {
+        // Buat visual garis-garis kecil sesuai jumlah harakat
+        if (!harakaat) return '';
+        const nums = harakaat.split('/').map(n => parseInt(n)).filter(n => !isNaN(n));
+        if (!nums.length) return '';
+        const max = nums[nums.length - 1];
+        let bars = '';
+        for (let i = 1; i <= max; i++) {
+            bars += `<span class="tj-hk-bar"></span>`;
+        }
+        return `<span class="tj-hk-wrap">${bars}<span class="tj-hk-num">${harakaat}×</span></span>`;
     }
 
     function showTooltip(e) {
         const span = e.target.closest('[data-tj-name]');
         if (!span) return;
-        const name = span.getAttribute('data-tj-name');
+        const name     = span.getAttribute('data-tj-name');
+        const harakaat = span.getAttribute('data-tj-harakaat');
+        const label    = span.getAttribute('data-tj-label');
         if (!name) return;
 
         const tip = createTooltip();
         tip.querySelector('.tj-tooltip-name').textContent = name;
+
+        const hEl = tip.querySelector('.tj-tooltip-harakaat');
+        if (harakaat) {
+            hEl.innerHTML = buildHarakaatBar(harakaat);
+            hEl.style.display = 'flex';
+        } else if (label) {
+            hEl.textContent = label;
+            hEl.style.display = 'inline-block';
+        } else {
+            hEl.style.display = 'none';
+        }
 
         const rect = span.getBoundingClientRect();
         tip.style.left = rect.left + rect.width / 2 + 'px';
@@ -596,25 +632,61 @@ function getTajwidGuideHTML() {
     }
 
     function openModal(span) {
-        const name = span.getAttribute('data-tj-name');
-        const desc = span.getAttribute('data-tj-desc');
-        const text = span.textContent;
-        // Get color from class
-        const classes = span.className.split(' ');
-        const tjClass = classes.find(c => c.startsWith('tj-'));
+        const name     = span.getAttribute('data-tj-name');
+        const desc     = span.getAttribute('data-tj-desc');
+        const label    = span.getAttribute('data-tj-label');
+        const harakaat = span.getAttribute('data-tj-harakaat');
+        const text     = span.textContent;
+        const classes  = span.className.split(' ');
+        const tjClass  = classes.find(c => c.startsWith('tj-'));
         const colorKey = tjClass ? tjClass.replace('tj-', '') : '';
-        const color = TAJWEED_COLORS[colorKey] || '#537FFF';
+        const color    = TAJWEED_COLORS[colorKey] || '#537FFF';
 
         const modal = createModal();
         modal.querySelector('.tj-modal-title').textContent = name;
         modal.querySelector('.tj-modal-letter-text').textContent = text;
         modal.querySelector('.tj-modal-letter-text').style.color = color;
-        // Wrap Arabic characters in desc with larger font span
+
         const descHTML = desc.replace(/([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+(?:\s[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+)*)/g,
             '<span class="tj-modal-arab-inline">$1</span>');
         modal.querySelector('.tj-modal-desc').innerHTML = descHTML;
         modal.querySelector('.tj-modal-color-dot').style.background = color;
         modal.querySelector('.tj-modal-color-label').textContent = 'Warna: ' + name;
+
+        // Harakat section
+        let harakaatSection = modal.querySelector('.tj-modal-harakaat');
+        if (!harakaatSection) {
+            harakaatSection = document.createElement('div');
+            harakaatSection.className = 'tj-modal-section tj-modal-harakaat';
+            modal.querySelector('.tj-modal-body').insertBefore(
+                harakaatSection,
+                modal.querySelector('.tj-modal-color-badge')
+            );
+        }
+        if (harakaat) {
+            const nums = harakaat.split('/').map(n => parseInt(n)).filter(n => !isNaN(n));
+            const max  = nums[nums.length - 1];
+            let barsHTML = '';
+            for (let i = 1; i <= max; i++) {
+                barsHTML += `<span class="tj-modal-hk-bar"></span>`;
+            }
+            harakaatSection.innerHTML = `
+                <div class="tj-modal-section-label">Panjang Bacaan</div>
+                <div class="tj-modal-hk-visual">
+                    ${barsHTML}
+                    <span class="tj-modal-hk-label">${harakaat} harakat</span>
+                </div>
+            `;
+            harakaatSection.style.display = 'block';
+        } else if (label) {
+            harakaatSection.innerHTML = `
+                <div class="tj-modal-section-label">Cara Baca</div>
+                <div class="tj-modal-hk-label-only">${label}</div>
+            `;
+            harakaatSection.style.display = 'block';
+        } else {
+            harakaatSection.style.display = 'none';
+        }
 
         modal.classList.add('open');
     }
