@@ -358,24 +358,38 @@
         <p class="settings-hint" data-i18n="settings_autoplay_hint">Otomatis putar ayat berikutnya setelah selesai.</p>
       </div>
 
-      {{-- Backup & Reset --}}
-      <div class="settings-section settings-footer-row">
-        <div class="settings-backup-row">
-          <button id="settings-export-btn" class="settings-backup-btn settings-backup-export">
-            <i class="fa-solid fa-file-arrow-down"></i>
-            <span data-i18n="backup_export">Export Backup</span>
-          </button>
-          <label class="settings-backup-btn settings-backup-import" for="settings-backup-file">
-            <i class="fa-solid fa-file-arrow-up"></i>
-            <span data-i18n="backup_import">Import Backup</span>
-          </label>
-          <input type="file" id="settings-backup-file" accept=".json" style="display:none;">
-        </div>
-        <button id="settings-reset-btn" class="settings-reset-btn">
-          <i class="fa-solid fa-rotate-left"></i> <span data-i18n="settings_reset">Reset ke Default</span>
-        </button>
+      {{-- Notifikasi PWA --}}
+      <div class="settings-section">
+        <label class="settings-label">
+          <i class="fa-solid fa-bell"></i>
+          <span>Notifikasi</span>
+        </label>
+        <div id="pwa-notif-settings-container"></div>
       </div>
 
     </div>{{-- .settings-panel-body --}}
+
+    {{-- Backup & Reset — fixed di bawah panel, tidak ikut scroll --}}
+    <div class="settings-footer-row">
+      <div class="settings-backup-row">
+        <button id="settings-export-btn" class="settings-backup-btn settings-backup-export">
+          <i class="fa-solid fa-file-arrow-down"></i>
+          <span data-i18n="backup_export">Export Backup</span>
+        </button>
+        <label class="settings-backup-btn settings-backup-import" for="settings-backup-file">
+          <i class="fa-solid fa-file-arrow-up"></i>
+          <span data-i18n="backup_import">Import Backup</span>
+        </label>
+        <input type="file" id="settings-backup-file" accept=".json" style="display:none;">
+      </div>
+      <div class="settings-footer-btns">
+        <button id="settings-reset-btn" class="settings-reset-btn">
+          <i class="fa-solid fa-rotate-left"></i> <span data-i18n="settings_reset">Reset ke Default</span>
+        </button>
+        <button id="hard-restart-btn" class="settings-hard-restart-btn" title="Clear cache &amp; reload">
+          <i class="fa-solid fa-rotate-right"></i> Hard Restart
+        </button>
+      </div>
+    </div>
   </div>
 </div>

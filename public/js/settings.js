@@ -807,6 +807,11 @@ function initSettings() {
             panel.classList.add('animate__animated','animate__fadeInRight');
             panel.style.animationDuration = '0.3s';
         }
+        // Render PWA notif settings
+        const pwaContainer = document.getElementById('pwa-notif-settings-container');
+        if (pwaContainer && typeof renderPwaNotifSettings === 'function') {
+            renderPwaNotifSettings(pwaContainer);
+        }
     });
     closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
     overlay.addEventListener('click', (e) => {
@@ -982,6 +987,26 @@ function initSettings() {
                 showTransLabel.setAttribute('data-i18n', cur.showTranslation ? 'trans_visible' : 'trans_hidden');
                 showTransLabel.textContent = t(cur.showTranslation ? 'trans_visible' : 'trans_hidden');
             }
+        });
+    }
+
+    // Hard Restart
+    const hardRestartBtn = document.getElementById('hard-restart-btn');
+    if (hardRestartBtn) {
+        hardRestartBtn.addEventListener('click', async () => {
+            hardRestartBtn.disabled = true;
+            hardRestartBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Restarting...';
+            try {
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(k => caches.delete(k)));
+                }
+                if ('serviceWorker' in navigator) {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map(r => r.unregister()));
+                }
+            } catch(e) {}
+            window.location.reload(true);
         });
     }
 

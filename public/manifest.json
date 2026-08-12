@@ -1,0 +1,37 @@
+{
+    "name": "Al Quran Digital",
+    "short_name": "Al Quran",
+    "description": "Al Quran Digital — Baca, dengarkan, dan pelajari Al Quran dengan mudah",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "theme_color": "#0d2137",
+    "background_color": "#0d2137",
+    "lang": "id",
+    "categories": ["education", "lifestyle"],
+    "icons": [
+        {
+            "src": "/img/quran.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/img/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Baca Al Quran",
+            "short_name": "Quran",
+            "description": "Langsung ke halaman baca",
+            "url": "/",
+            "icons": [{ "src": "/img/quran.png", "sizes": "512x512" }]
+        }
+    ]
+}

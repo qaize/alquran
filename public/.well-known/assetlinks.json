@@ -1,0 +1,12 @@
+[
+    {
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "je.xo.qurandigi.twa",
+            "sha256_cert_fingerprints": [
+                "8F:58:D1:59:27:0A:16:C1:EE:CF:D7:86:88:44:21:29:FD:32:3C:06:DA:62:6B:B3:30:DE:38:AC:D5:E2:21:5F"
+            ]
+        }
+    }
+]

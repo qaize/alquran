@@ -15,23 +15,24 @@
 {{-- External libs --}}
 
 {{-- App modules (load order: dependencies first) --}}
-<script src="{{asset('js/toast.js')}}"></script>
-<script src="{{asset('js/settings.js')}}"></script>
-<script src="{{asset('js/favorites.js')}}"></script>
-<script src="{{asset('js/bookmarks.js')}}"></script>
-<script src="{{asset('js/last-read.js')}}"></script>
-<script src="{{asset('js/audio.js')}}"></script>
-<script src="{{asset('js/tajweed.js')}}"></script>
-<script src="{{asset('js/modals.js')}}"></script>
-<script src="{{asset('js/navigation.js')}}"></script>
+<script src="{{asset('js/toast.js')}}?v={{filemtime(public_path('js/toast.js'))}}"></script>
+<script src="{{asset('js/settings.js')}}?v={{filemtime(public_path('js/settings.js'))}}"></script>
+<script src="{{asset('js/favorites.js')}}?v={{filemtime(public_path('js/favorites.js'))}}"></script>
+<script src="{{asset('js/bookmarks.js')}}?v={{filemtime(public_path('js/bookmarks.js'))}}"></script>
+<script src="{{asset('js/last-read.js')}}?v={{filemtime(public_path('js/last-read.js'))}}"></script>
+<script src="{{asset('js/audio.js')}}?v={{filemtime(public_path('js/audio.js'))}}"></script>
+<script src="{{asset('js/tajweed.js')}}?v={{filemtime(public_path('js/tajweed.js'))}}"></script>
+<script src="{{asset('js/modals.js')}}?v={{filemtime(public_path('js/modals.js'))}}"></script>
+<script src="{{asset('js/navigation.js')}}?v={{filemtime(public_path('js/navigation.js'))}}"></script>
 
 {{-- Core app — dimuat terakhir karena memanggil fungsi dari semua modul di atas --}}
-<script src="{{asset('js/script.js')}}"></script>
-<script src="{{asset('js/usage.js')}}"></script>
-<script src="{{asset('js/backup.js')}}"></script>
-<script src="{{asset('js/janji-allah.js')}}"></script>
-<script src="{{asset('js/hadist.js')}}"></script>
-<script src="{{asset('js/prayer-time.js')}}"></script>
+<script src="{{asset('js/script.js')}}?v={{filemtime(public_path('js/script.js'))}}"></script>
+<script src="{{asset('js/usage.js')}}?v={{filemtime(public_path('js/usage.js'))}}"></script>
+<script src="{{asset('js/backup.js')}}?v={{filemtime(public_path('js/backup.js'))}}"></script>
+<script src="{{asset('js/janji-allah.js')}}?v={{filemtime(public_path('js/janji-allah.js'))}}"></script>
+<script src="{{asset('js/hadist.js')}}?v={{filemtime(public_path('js/hadist.js'))}}"></script>
+<script src="{{asset('js/prayer-time.js')}}?v={{filemtime(public_path('js/prayer-time.js'))}}"></script>
+<script src="{{asset('js/pwa.js')}}?v={{filemtime(public_path('js/pwa.js'))}}"></script>
 
 <script>
 
@@ -62,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initJanjiAllah();     } catch(e) { console.error('initJanjiAllah error:', e); }
     try { initHadist();         } catch(e) { console.error('initHadist error:', e); }
     try { initPrayerTime();    } catch(e) { console.error('initPrayerTime error:', e); }
+    try { initPwa();           } catch(e) { console.error('initPwa error:', e); }
 });
 
 </script>
