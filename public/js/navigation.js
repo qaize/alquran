@@ -1,5 +1,30 @@
 /* navigation.js — Mobile drawer + Juz panel */
 
+const NAV_KONTEN_KEY = 'quran_nav_konten_open';
+
+/* ──────────────────────────────────────────────
+   KONTEN ISLAM — collapsible nav group
+   ────────────────────────────────────────────── */
+function initKontenGroup() {
+    const trigger = document.getElementById('nav-konten-btn');
+    const body    = document.getElementById('nav-konten-body');
+    const arrow   = document.getElementById('nav-konten-arrow');
+    if (!trigger || !body) return;
+
+    // Restore state — default: collapsed
+    const isOpen = localStorage.getItem(NAV_KONTEN_KEY) === 'true';
+    if (isOpen) {
+        body.classList.add('open');
+        arrow && arrow.classList.add('rotated');
+    }
+
+    trigger.addEventListener('click', () => {
+        const open = body.classList.toggle('open');
+        arrow && arrow.classList.toggle('rotated', open);
+        localStorage.setItem(NAV_KONTEN_KEY, open);
+    });
+}
+
 /* ──────────────────────────────────────────────
    MOBILE DRAWER
    ────────────────────────────────────────────── */

@@ -17,12 +17,12 @@
     <div class="bm-panel-tabs">
       <button class="bm-panel-tab active" id="bm-tab-ayat" data-tab="ayat">
         <i class="fa-solid fa-book-quran"></i>
-        <span>Ayat</span>
+        <span data-i18n="bm_tab_ayat">Ayat</span>
         <span class="bm-tab-count" id="bm-count-ayat">0</span>
       </button>
       <button class="bm-panel-tab" id="bm-tab-hadist" data-tab="hadist">
         <i class="fa-solid fa-scroll"></i>
-        <span>Hadist</span>
+        <span data-i18n="bm_tab_hadist">Hadist</span>
         <span class="bm-tab-count" id="bm-count-hadist">0</span>
       </button>
     </div>
@@ -41,8 +41,8 @@
     </div>
     <div id="bookmark-panel-empty" class="bookmark-panel-empty" style="display:none;">
       <i class="fa-regular fa-bookmark"></i>
-      <p>Belum ada ayat yang disimpan.</p>
-      <small>Buka surah → arahkan ke ayat → klik 🔖</small>
+      <p data-i18n="bm_ayat_empty">Belum ada ayat yang disimpan.</p>
+      <small data-i18n="bm_ayat_empty_hint">Buka surah → arahkan ke ayat → klik 🔖</small>
     </div>
 
     {{-- Hadist list --}}
@@ -51,8 +51,8 @@
     </div>
     <div id="bookmark-hadist-empty" class="bookmark-panel-empty" style="display:none;">
       <i class="fa-regular fa-bookmark"></i>
-      <p>Belum ada hadist yang disimpan.</p>
-      <small>Buka panel Hadist → detail → klik 🔖</small>
+      <p data-i18n="bm_hadist_empty">Belum ada hadist yang disimpan.</p>
+      <small data-i18n="bm_hadist_empty_hint">Buka panel Hadist → detail → klik 🔖</small>
     </div>
 
   </div>

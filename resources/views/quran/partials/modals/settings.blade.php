@@ -183,10 +183,10 @@
         </div>
         <p class="settings-hint" data-i18n="settings_tajweed_hint">Mewarnai huruf Arab sesuai hukum bacaan tajwid.</p>
         <div class="tajweed-legend" id="tajweed-legend" style="display:none;">
-          <h4 class="tajweed-legend-title"><i class="fa-solid fa-palette"></i> Keterangan Warna Tajwid</h4>
+          <h4 class="tajweed-legend-title"><i class="fa-solid fa-palette"></i> <span data-i18n="tajweed_legend_title">Keterangan Warna Tajwid</span></h4>
 
           <div class="tajweed-legend-group">
-            <span class="tajweed-group-label">Huruf Tidak Dibaca</span>
+            <span class="tajweed-group-label" data-i18n="tajweed_group_silent">Huruf Tidak Dibaca</span>
             <div class="tajweed-legend-item">
               <span class="tj-swatch" style="background:#AAAAAA"></span>
               <div class="tj-legend-text">
@@ -204,7 +204,7 @@
           </div>
 
           <div class="tajweed-legend-group">
-            <span class="tajweed-group-label">Mad (Panjang)</span>
+            <span class="tajweed-group-label" data-i18n="tajweed_group_mad">Mad (Panjang)</span>
             <div class="tajweed-legend-item">
               <span class="tj-swatch" style="background:#537FFF"></span>
               <div class="tj-legend-text">
@@ -236,7 +236,7 @@
           </div>
 
           <div class="tajweed-legend-group">
-            <span class="tajweed-group-label">Hukum Nun Mati &amp; Tanwin</span>
+            <span class="tajweed-group-label" data-i18n="tajweed_group_nun">Hukum Nun Mati &amp; Tanwin</span>
             <div class="tajweed-legend-item">
               <span class="tj-swatch" style="background:#9400A8"></span>
               <div class="tj-legend-text">
@@ -282,7 +282,7 @@
           </div>
 
           <div class="tajweed-legend-group">
-            <span class="tajweed-group-label">Hukum Lainnya</span>
+            <span class="tajweed-group-label" data-i18n="tajweed_group_other">Hukum Lainnya</span>
             <div class="tajweed-legend-item">
               <span class="tj-swatch" style="background:#DD0008"></span>
               <div class="tj-legend-text">
@@ -363,11 +363,11 @@
         <div class="settings-backup-row">
           <button id="settings-export-btn" class="settings-backup-btn settings-backup-export">
             <i class="fa-solid fa-file-arrow-down"></i>
-            <span>Export Backup</span>
+            <span data-i18n="backup_export">Export Backup</span>
           </button>
           <label class="settings-backup-btn settings-backup-import" for="settings-backup-file">
             <i class="fa-solid fa-file-arrow-up"></i>
-            <span>Import Backup</span>
+            <span data-i18n="backup_import">Import Backup</span>
           </label>
           <input type="file" id="settings-backup-file" accept=".json" style="display:none;">
         </div>

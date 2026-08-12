@@ -5,19 +5,42 @@
     <span class="logo-text">Al Quran</span>
   </div>
 
+  {{-- Prayer time widget --}}
+  <div id="prayer-time-widget" class="prayer-time-widget"></div>
+
   <nav class="sidebar-nav">
     <a href="/" class="nav-item active">
       <i class="fa-solid fa-house nav-icon"></i>
       <span data-i18n="nav_home">Beranda</span>
     </a>
-    <a href="#" class="nav-item" id="nav-janji-allah-btn">
-      <i class="fa-solid fa-star-and-crescent nav-icon"></i>
-      <span>Janji Allah</span>
-    </a>
-    <a href="#" class="nav-item" id="nav-hadist-btn">
-      <i class="fa-solid fa-scroll nav-icon"></i>
-      <span>Hadist</span>
-    </a>
+
+    {{-- Konten Islam: expandable group --}}
+    <div class="nav-dropdown" id="nav-konten-dropdown">
+      <button class="nav-item nav-dropdown-trigger" id="nav-konten-btn">
+        <i class="fa-solid fa-book-open-reader nav-icon"></i>
+        <span data-i18n="nav_konten_islam">Konten Islam</span>
+        <i class="fa-solid fa-chevron-down nav-dropdown-arrow" id="nav-konten-arrow"></i>
+      </button>
+      <div class="nav-dropdown-body nav-konten-body" id="nav-konten-body">
+        <a href="#" class="nav-item nav-sub-item" id="nav-janji-allah-btn">
+          <i class="fa-solid fa-star-and-crescent nav-icon"></i>
+          <span data-i18n="nav_janji_allah">Janji Allah</span>
+        </a>
+        <a href="#" class="nav-item nav-sub-item" id="nav-hadist-btn">
+          <i class="fa-solid fa-scroll nav-icon"></i>
+          <span data-i18n="nav_hadist">Hadist</span>
+        </a>
+        <a href="#" class="nav-item nav-sub-item" id="nav-tajwid-guide-btn">
+          <i class="fa-solid fa-graduation-cap nav-icon"></i>
+          <span data-i18n="nav_tajwid_guide">Panduan Tajwid</span>
+        </a>
+        <a href="#" class="nav-item nav-sub-item" id="nav-prayer-time-btn">
+          <i class="fa-solid fa-clock nav-icon"></i>
+          <span data-i18n="nav_prayer_time">Waktu Shalat</span>
+        </a>
+      </div>
+    </div>
+
     <a href="#" class="nav-item" id="nav-juz-btn">
       <i class="fa-solid fa-book-open nav-icon"></i>
       <span data-i18n="nav_juz">Juz</span>
@@ -53,10 +76,7 @@
       <span data-i18n="nav_bookmark">Bookmark</span>
       <span id="bookmark-count-badge" class="last-read-badge" style="display:none;"></span>
     </a>
-    <a href="#" class="nav-item" id="nav-tajwid-guide-btn">
-      <i class="fa-solid fa-graduation-cap nav-icon"></i>
-      <span data-i18n="nav_tajwid_guide">Panduan Tajwid</span>
-    </a>
+
     <a href="#" class="nav-item" id="open-settings-btn">
       <i class="fa-solid fa-gear nav-icon"></i>
       <span data-i18n="nav_settings">Pengaturan</span>

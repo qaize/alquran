@@ -31,6 +31,7 @@
 <script src="{{asset('js/backup.js')}}"></script>
 <script src="{{asset('js/janji-allah.js')}}"></script>
 <script src="{{asset('js/hadist.js')}}"></script>
+<script src="{{asset('js/prayer-time.js')}}"></script>
 
 <script>
 
@@ -49,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initFavoritesNav(); } catch(e) { console.error('initFavoritesNav error:', e); }
     try { initMobileDrawer(); } catch(e) { console.error('initMobileDrawer error:', e); }
     try { initJuz(); } catch(e) { console.error('initJuz error:', e); }
+    try { initKontenGroup(); } catch(e) { console.error('initKontenGroup error:', e); }
     try { initDataSourceModal(); } catch(e) { console.error('initDataSourceModal error:', e); }
     try { initTajwidGuide(); } catch(e) { console.error('initTajwidGuide error:', e); }
     try { initSidebarRightCollapse(); } catch(e) { console.error('initSidebarRightCollapse error:', e); }
@@ -59,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initBackupPanel();    } catch(e) { console.error('initBackupPanel error:', e); }
     try { initJanjiAllah();     } catch(e) { console.error('initJanjiAllah error:', e); }
     try { initHadist();         } catch(e) { console.error('initHadist error:', e); }
+    try { initPrayerTime();    } catch(e) { console.error('initPrayerTime error:', e); }
 });
 
 </script>
