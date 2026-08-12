@@ -34,6 +34,14 @@ let _swRegistration = null;
 function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
 
+    // Auto-reload saat SW baru mengambil alih (setelah activate)
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+
     navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
         .then(reg => {
             _swRegistration = reg;
@@ -44,7 +52,8 @@ function registerServiceWorker() {
                 const newWorker = reg.installing;
                 newWorker.addEventListener('statechange', () => {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        _showUpdateToast();
+                        // Langsung aktivasi SW baru tanpa tunggu user
+                        newWorker.postMessage({ type: 'SKIP_WAITING' });
                     }
                 });
             });
