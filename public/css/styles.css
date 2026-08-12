@@ -3244,15 +3244,16 @@ mark.search-highlight {
 }
 
 .font-btn {
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--blue-soft);
     color: var(--navy);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     transition: all var(--transition);
+    flex-shrink: 0;
 }
 
 .font-btn:hover {
@@ -3383,6 +3384,20 @@ mark.search-highlight {
 .bg-option:hover {
     transform: scale(1.1);
     box-shadow: var(--shadow-sm);
+}
+
+/* Disabled saat dark mode aktif */
+.bg-option.bg-option-disabled,
+.bg-option[disabled] {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none !important;
+    box-shadow: none !important;
+}
+.bg-option.bg-option-disabled:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 .bg-option.selected {
@@ -7096,15 +7111,16 @@ mark.search-highlight {
     background: var(--white);
 }
 .settings-group.open .settings-group-body {
-    max-height: 800px; /* cukup besar untuk semua konten font */
+    max-height: 1000px; /* cukup besar untuk semua konten font */
 }
 .settings-group-body .settings-section {
     border-bottom: 1px solid var(--border);
     margin: 0;
-    padding: 14px 16px;
+    padding: 18px 20px;
 }
 .settings-group-body .settings-section:last-child {
     border-bottom: none;
+    padding-bottom: 20px;
 }
 
 /* ── LONG PRESS — visual feedback saat ditahan ── */
@@ -8149,49 +8165,58 @@ mark.search-highlight {
     transform: translateX(3px);
 }
 
-/* Pagination */
-.hadist-pagination {
+/* Bottom navigation bar */
+.hadist-nav-bar {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 14px;
+    justify-content: space-between;
+    gap: 8px;
     padding: 10px 14px;
     border-top: 1px solid var(--border);
     background: var(--blue-soft);
     flex-shrink: 0;
 }
 
-.hadist-page-btn {
-    width: 32px;
-    height: 32px;
-    background: var(--white);
-    border: 1.5px solid var(--border);
-    border-radius: 50%;
-    color: var(--text-mid);
-    font-size: 12px;
-    cursor: pointer;
+.hadist-nav-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all var(--transition);
-}
-
-.hadist-page-btn:hover:not(:disabled) {
-    border-color: var(--gold);
-    color: var(--gold);
-}
-
-.hadist-page-btn:disabled {
-    opacity: 0.35;
-    cursor: default;
-}
-
-.hadist-page-info {
-    font-size: 12px;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--navy);
+    font-size: 13px;
     font-weight: 600;
-    color: var(--text-mid);
-    min-width: 60px;
-    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    flex: 1;
+    justify-content: center;
+}
+
+.hadist-nav-btn:hover:not(:disabled) {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+}
+
+.hadist-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Random button — square, between prev/next */
+.hadist-nav-random {
+    flex: 0 0 40px;
+    width: 40px;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.hadist-nav-random:hover:not(:disabled) {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--white);
 }
 
 /* Detail view */
