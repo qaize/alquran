@@ -57,9 +57,13 @@ function initMobileDrawer() {
     backdrop.addEventListener('click', closeAllDrawers);
 
     // Tutup drawer saat klik nav item di dalam sidebar kiri (mobile)
+    // Kecuali: dropdown trigger (Konten Islam, Terakhir Dibaca) — jangan tutup
     sidebarLeft.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
-            if (window.innerWidth <= 768) closeAllDrawers();
+            if (window.innerWidth > 768) return;
+            // Jangan tutup kalau ini adalah dropdown trigger
+            if (item.classList.contains('nav-dropdown-trigger')) return;
+            closeAllDrawers();
         });
     });
 }

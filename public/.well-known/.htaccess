@@ -1,0 +1,7 @@
+Options -Indexes
+Allow from all
+
+<IfModule mod_headers.c>
+    Header set Content-Type "application/json"
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>

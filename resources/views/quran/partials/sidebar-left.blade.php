@@ -89,5 +89,9 @@
       <i class="fa-solid fa-database"></i>
       <span data-i18n="data_source_label">Sumber Data</span>
     </button>
+    <button class="data-source-btn pwa-install-btn" id="pwa-install-btn" style="display:none;">
+      <i class="fa-solid fa-download"></i>
+      <span>Install App</span>
+    </button>
   </div>
 </aside>
