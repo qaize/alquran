@@ -48,7 +48,7 @@ function exportBackup() {
     URL.revokeObjectURL(url);
 
     if (typeof showToast === 'function') {
-        showToast({ type: 'success', message: 'Backup berhasil diunduh!', duration: 2500 });
+        showToast({ type: 'success', message: t('backup_exported'), duration: 2500 });
     }
 }
 
@@ -61,23 +61,21 @@ function importBackup(file) {
             const payload = JSON.parse(e.target.result);
 
             if (!payload.data || typeof payload.data !== 'object') {
-                throw new Error('Format file tidak valid');
+                throw new Error(t('backup_invalid'));
             }
 
-            // Konfirmasi sebelum overwrite
             const count = Object.keys(payload.data).length;
             const date  = payload.exportedAt
-                ? new Date(payload.exportedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+                ? new Date(payload.exportedAt).toLocaleDateString(getCurrentLang() === 'en' ? 'en-GB' : 'id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
                 : '—';
 
             const confirmed = confirm(
-                `Import backup dari ${date}?\n\n` +
-                `${count} data akan di-restore.\n` +
-                `Data yang ada sekarang akan ditimpa.`
+                t('backup_confirm')
+                    .replace('{date}', date)
+                    .replace('{count}', count)
             );
             if (!confirmed) return;
 
-            // Restore ke localStorage
             BACKUP_KEYS.forEach(key => {
                 if (payload.data[key] !== undefined) {
                     localStorage.setItem(key, payload.data[key]);
@@ -85,17 +83,16 @@ function importBackup(file) {
             });
 
             if (typeof showToast === 'function') {
-                showToast({ type: 'success', message: 'Backup berhasil di-restore! Halaman akan dimuat ulang.', duration: 2500 });
+                showToast({ type: 'success', message: t('backup_restored'), duration: 2500 });
             }
 
-            // Reload setelah 1.5 detik agar toast sempat terlihat
             setTimeout(() => window.location.reload(), 1500);
 
         } catch (err) {
             if (typeof showToast === 'function') {
-                showToast({ type: 'error', message: 'Gagal membaca file backup: ' + err.message, duration: 3500 });
+                showToast({ type: 'error', message: t('backup_fail') + err.message, duration: 3500 });
             } else {
-                alert('Gagal membaca file backup: ' + err.message);
+                alert(t('backup_fail') + err.message);
             }
         }
     };
@@ -123,13 +120,13 @@ function initBackupPanel() {
 
 function _buildDataSummary() {
     const items = [
-        { key: 'quran_favorites',           icon: 'fa-star',                label: 'Favorit' },
-        { key: 'quran_bookmarks',           icon: 'fa-bookmark',            label: 'Bookmark Ayat' },
-        { key: 'quran_bookmarks_hadist',    icon: 'fa-scroll',              label: 'Bookmark Hadist' },
-        { key: 'quran_last_read',           icon: 'fa-clock-rotate-left',   label: 'Terakhir Dibaca' },
-        { key: 'quran_reading_categories',  icon: 'fa-folder-open',         label: 'Kategori Baca' },
-        { key: 'quran_settings',            icon: 'fa-gear',                label: 'Pengaturan' },
-        { key: 'quran_tajweed_enabled',     icon: 'fa-wand-magic-sparkles', label: 'Status Tajwid' },
+        { key: 'quran_favorites',           icon: 'fa-star',                labelKey: 'backup_fav' },
+        { key: 'quran_bookmarks',           icon: 'fa-bookmark',            labelKey: 'backup_bm_ayat' },
+        { key: 'quran_bookmarks_hadist',    icon: 'fa-scroll',              labelKey: 'backup_bm_hadist' },
+        { key: 'quran_last_read',           icon: 'fa-clock-rotate-left',   labelKey: 'backup_last_read' },
+        { key: 'quran_reading_categories',  icon: 'fa-folder-open',         labelKey: 'backup_categories' },
+        { key: 'quran_settings',            icon: 'fa-gear',                labelKey: 'backup_settings' },
+        { key: 'quran_tajweed_enabled',     icon: 'fa-wand-magic-sparkles', labelKey: 'backup_tajweed' },
     ];
 
     return items.map(item => {
@@ -139,15 +136,15 @@ function _buildDataSummary() {
             try {
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed)) count = `${parsed.length} item`;
-                else count = 'Tersimpan';
-            } catch { count = 'Tersimpan'; }
+                else count = t('backup_saved');
+            } catch { count = t('backup_saved'); }
         } else {
-            count = 'Kosong';
+            count = t('backup_empty');
         }
         return `
             <div class="backup-what-row">
                 <span class="backup-what-icon"><i class="fa-solid ${item.icon}"></i></span>
-                <span class="backup-what-label">${item.label}</span>
+                <span class="backup-what-label">${t(item.labelKey)}</span>
                 <span class="backup-what-count">${count}</span>
             </div>`;
     }).join('');

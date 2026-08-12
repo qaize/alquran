@@ -116,8 +116,8 @@ function openJanjiAllahPanel() {
                 <div class="janji-panel-title">
                     <i class="fa-solid fa-star-and-crescent"></i>
                     <div>
-                        <h2>Janji Allah</h2>
-                        <p>Temukan ayat yang relevan dengan situasimu</p>
+                        <h2>${t('janji_panel_title')}</h2>
+                        <p>${t('janji_search_ph')}</p>
                     </div>
                 </div>
                 <button class="janji-panel-close" id="janji-panel-close">
@@ -128,7 +128,7 @@ function openJanjiAllahPanel() {
             <div class="janji-panel-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="janji-search-input"
-                    placeholder="Cari kondisi atau kategori..."
+                    placeholder="${t('janji_search_ph')}"
                     autocomplete="off">
             </div>
 
@@ -301,15 +301,15 @@ function openJanjiAyat(nomorSurah, ayatArr, kondisi) {
                             <p class="janji-terjemah">"${idn}"</p>
                         </div>
                         <div class="janji-ayat-actions">
-                            <button class="janji-action-btn" title="Buka di Al-Quran"
+                            <button class="janji-action-btn" title="${t('janji_open_quran')}"
                                 onclick="openJanjiInQuran(${nomorSurah}, ${nomor})">
                                 <i class="fa-solid fa-book-open"></i>
-                                <span>Buka Surah</span>
+                                <span>${t('janji_open_quran')}</span>
                             </button>
-                            <button class="janji-action-btn" title="Salin ayat"
+                            <button class="janji-action-btn" title="${t('janji_copy')}"
                                 onclick="copyJanjiAyat('${arab.replace(/'/g,"\\'")}', '${idn.replace(/'/g,"\\'")}', '${namaLatin}', ${nomor})">
                                 <i class="fa-regular fa-copy"></i>
-                                <span>Salin</span>
+                                <span>${t('janji_copy')}</span>
                             </button>
                         </div>
                     </div>
@@ -322,7 +322,7 @@ function openJanjiAyat(nomorSurah, ayatArr, kondisi) {
             ayatBody.innerHTML = `
                 <div class="janji-empty">
                     <i class="fa-solid fa-circle-exclamation"></i>
-                    <p>Gagal memuat ayat. Periksa koneksi internet.</p>
+                    <p>${t('janji_error')}</p>
                 </div>`;
         });
 }
@@ -356,7 +356,7 @@ function copyJanjiAyat(arab, idn, namaLatin, nomor) {
     const text = `${arab}\n\n"${idn}"\n\n(${namaLatin}: ${nomor})`;
     navigator.clipboard.writeText(text).then(() => {
         if (typeof showToast === 'function') {
-            showToast({ type: 'success', message: 'Ayat berhasil disalin!', duration: 2000 });
+            showToast({ type: 'success', message: t('janji_copied'), duration: 2000 });
         }
     });
 }

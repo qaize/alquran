@@ -36,7 +36,7 @@ function _fetchHadist(kitabId, nomor) {
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
             _memCache(cacheKey, data);
-            if (typeof trackApiCall === 'function') trackApiCall('surat_detail');
+            if (typeof trackApiCall === 'function') trackApiCall('hadist');
             return data;
         });
 }
@@ -83,12 +83,12 @@ function initHadistWidget() {
         <div class="hdw-inner">
             <div class="hdw-header">
                 <span class="hdw-icon"><i class="fa-solid fa-scroll"></i></span>
-                <span class="hdw-title">Hadist Hari Ini</span>
+                <span class="hdw-title">${t('hdw_title')}</span>
                 <div class="hdw-header-actions">
-                    <button class="hdw-refresh" id="hdw-refresh-btn" title="Hadist lain">
+                    <button class="hdw-refresh" id="hdw-refresh-btn" title="${t('hdw_show')}">
                         <i class="fa-solid fa-rotate-right"></i>
                     </button>
-                    <button class="hdw-collapse-btn" id="hdw-collapse-btn" title="Sembunyikan">
+                    <button class="hdw-collapse-btn" id="hdw-collapse-btn" title="${t('hdw_hide')}">
                         <i class="fa-solid fa-chevron-up"></i>
                     </button>
                 </div>
@@ -102,7 +102,7 @@ function initHadistWidget() {
                 <div class="hdw-footer">
                     <button class="hdw-more-btn" id="hdw-more-btn">
                         <i class="fa-solid fa-book-open"></i>
-                        Baca Lebih Banyak
+                        ${t('hdw_read_more')}
                     </button>
                 </div>
             </div>
@@ -114,13 +114,27 @@ function initHadistWidget() {
 
     document.getElementById('hdw-refresh-btn').addEventListener('click', () => {
         sessionStorage.removeItem(HADIST_DAILY_KEY);
-        // Auto-expand saat refresh agar hadist terlihat
         _expandWidget();
         _loadDailyWidget(true);
     });
 
     document.getElementById('hdw-more-btn').addEventListener('click', () => {
         openHadistPanel(_widgetCurrent);
+    });
+
+    // Re-render static strings saat bahasa berubah
+    document.addEventListener('lang-changed', () => {
+        const hdwTitle   = container.querySelector('.hdw-title');
+        const hdwMoreBtn = container.querySelector('.hdw-more-btn');
+        const refreshBtn = container.querySelector('#hdw-refresh-btn');
+        const collapseBtn2 = container.querySelector('#hdw-collapse-btn');
+        if (hdwTitle)    hdwTitle.textContent = t('hdw_title');
+        if (hdwMoreBtn)  hdwMoreBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> ${t('hdw_read_more')}`;
+        if (refreshBtn)  refreshBtn.title = t('hdw_show');
+        if (collapseBtn2) {
+            const isCollapsed = container.querySelector('#hdw-collapsible')?.classList.contains('hdw-collapsed');
+            collapseBtn2.title = isCollapsed ? t('hdw_show') : t('hdw_hide');
+        }
     });
 
     // ── Collapse / Expand — default: closed ──
@@ -134,7 +148,7 @@ function initHadistWidget() {
     collapsible.style.maxHeight = '0px';
     collapsible.style.opacity   = '0';
     collapseIcon.className = 'fa-solid fa-chevron-down';
-    collapseBtn.title = 'Tampilkan';
+    collapseBtn.title = t('hdw_show');
 
     // Re-enable transition setelah set default
     requestAnimationFrame(() => {
@@ -144,7 +158,6 @@ function initHadistWidget() {
     function _expandWidget() {
         if (!collapsible.classList.contains('hdw-collapsed')) return;
         collapsible.classList.remove('hdw-collapsed');
-        // Pakai fixed large value, set ke none setelah transisi
         collapsible.style.maxHeight = '600px';
         collapsible.style.opacity   = '1';
         collapsible.addEventListener('transitionend', () => {
@@ -152,12 +165,11 @@ function initHadistWidget() {
                 collapsible.style.maxHeight = 'none';
         }, { once: true });
         collapseIcon.className = 'fa-solid fa-chevron-up';
-        collapseBtn.title = 'Sembunyikan';
+        collapseBtn.title = t('hdw_hide');
     }
 
     function _collapseWidget() {
         if (collapsible.classList.contains('hdw-collapsed')) return;
-        // Set eksplisit dulu baru animate ke 0
         collapsible.style.maxHeight = collapsible.offsetHeight + 'px';
         requestAnimationFrame(() => requestAnimationFrame(() => {
             collapsible.classList.add('hdw-collapsed');
@@ -165,7 +177,7 @@ function initHadistWidget() {
             collapsible.style.opacity   = '0';
         }));
         collapseIcon.className = 'fa-solid fa-chevron-down';
-        collapseBtn.title = 'Tampilkan';
+        collapseBtn.title = t('hdw_show');
     }
 
     collapseBtn.addEventListener('click', () => {
@@ -225,7 +237,7 @@ function _loadDailyWidget(random = false) {
                         data-nomor="${nomor}"
                         data-arab="${arab.replace(/"/g,'&quot;')}"
                         data-idn="${idn.replace(/"/g,'&quot;')}"
-                        title="${isMarked ? 'Hapus bookmark' : 'Simpan bookmark'}">
+                        title="${isMarked ? t('hdw_bm_remove') : t('hdw_bm_save')}">
                         <i class="${isMarked ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
                     </button>
                 </div>
@@ -246,7 +258,7 @@ function _loadDailyWidget(random = false) {
                     const isOn = typeof isBookmarkedHadist === 'function' &&
                                  isBookmarkedHadist(bmBtn.dataset.kitab, parseInt(bmBtn.dataset.nomor));
                     bmBtn.classList.toggle('bookmarked', isOn);
-                    bmBtn.title = isOn ? 'Hapus bookmark' : 'Simpan bookmark';
+                    bmBtn.title = isOn ? t('hdw_bm_remove') : t('hdw_bm_save');
                     const icon = bmBtn.querySelector('i');
                     if (icon) icon.className = isOn ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark';
                 });
@@ -256,7 +268,7 @@ function _loadDailyWidget(random = false) {
             body.innerHTML = `
                 <div class="hdw-error">
                     <i class="fa-solid fa-wifi"></i>
-                    <span>Gagal memuat. Periksa koneksi.</span>
+                    <span>${t('hdw_error')}</span>
                 </div>`;
         });
 }
@@ -337,9 +349,9 @@ function openHadistPanel(target = null) {
             <div class="hadist-search-bar">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="number" id="hadist-goto-input"
-                    placeholder="Nomor hadist, lalu Enter..."
+                    placeholder="${t('hadist_goto_placeholder')}"
                     min="1">
-                <button id="hadist-goto-btn" title="Cari">
+                <button id="hadist-goto-btn" title="${t('hadist_goto_placeholder')}">
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
@@ -347,20 +359,20 @@ function openHadistPanel(target = null) {
             <div class="hadist-panel-body" id="hadist-panel-body">
                 <div class="hadist-loading">
                     <i class="fa-solid fa-spinner fa-spin"></i>
-                    <span>Memuat hadist...</span>
+                    <span>${t('hadist_loading')}</span>
                 </div>
             </div>
 
             <div class="hadist-nav-bar" id="hadist-nav-bar">
-                <button class="hadist-nav-btn" id="hadist-prev-btn" title="Hadist sebelumnya">
+                <button class="hadist-nav-btn" id="hadist-prev-btn" title="${t('hadist_prev_title')}">
                     <i class="fa-solid fa-chevron-left"></i>
-                    <span>Sebelumnya</span>
+                    <span>${t('hadist_prev')}</span>
                 </button>
-                <button class="hadist-nav-btn hadist-nav-random" id="hadist-random-btn" title="Hadist acak">
+                <button class="hadist-nav-btn hadist-nav-random" id="hadist-random-btn" title="${t('hadist_random')}">
                     <i class="fa-solid fa-shuffle"></i>
                 </button>
-                <button class="hadist-nav-btn" id="hadist-next-btn" title="Hadist berikutnya">
-                    <span>Berikutnya</span>
+                <button class="hadist-nav-btn" id="hadist-next-btn" title="${t('hadist_next_title')}">
+                    <span>${t('hadist_next')}</span>
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
@@ -455,7 +467,7 @@ function _renderHadistDetail(kitabId, nomor) {
     _panelState.nomor = nomor;
     _updateNavButtons();
 
-    body.innerHTML = `<div class="hadist-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>Memuat hadist...</span></div>`;
+    body.innerHTML = `<div class="hadist-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>${t('hadist_loading')}</span></div>`;
 
     _fetchHadist(kitabId, nomor)
         .then(data => {
@@ -466,7 +478,6 @@ function _renderHadistDetail(kitabId, nomor) {
             const kitabNama = _getKitabNama(kitabId);
             const kitabArab = _getKitabArab(kitabId);
 
-            // Sync state dengan nomor aktual dari API
             _panelState.nomor = nomorH;
             _updateNavButtons();
 
@@ -487,19 +498,19 @@ function _renderHadistDetail(kitabId, nomor) {
                     </div>
 
                     <div class="hadist-detail-idn">
-                        <div class="hdi-label"><i class="fa-solid fa-language"></i> Terjemahan</div>
+                        <div class="hdi-label"><i class="fa-solid fa-language"></i> ${t('hadist_translation')}</div>
                         <p>${idn}</p>
                     </div>
 
                     <div class="hadist-detail-actions">
                         <button class="hadist-action-btn ${isMarked ? 'bookmarked' : ''}" id="hadist-bookmark-btn"
-                            title="${isMarked ? 'Hapus bookmark' : 'Simpan bookmark'}">
+                            title="${isMarked ? t('hdw_bm_remove') : t('hdw_bm_save')}">
                             <i class="${isMarked ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
-                            Bookmark
+                            ${t('hadist_bookmark')}
                         </button>
                         <button class="hadist-action-btn" id="hadist-copy-btn">
                             <i class="fa-regular fa-copy"></i>
-                            Salin
+                            ${t('hadist_copy')}
                         </button>
                     </div>
                 </div>
@@ -512,7 +523,7 @@ function _renderHadistDetail(kitabId, nomor) {
                     toggleBookmarkHadist(kitabId, kitabNama, kitabArab, nomorH, arab, idn);
                     const isOn = typeof isBookmarkedHadist === 'function' && isBookmarkedHadist(kitabId, nomorH);
                     bookmarkBtn.classList.toggle('bookmarked', isOn);
-                    bookmarkBtn.title = isOn ? 'Hapus bookmark' : 'Simpan bookmark';
+                    bookmarkBtn.title = isOn ? t('hdw_bm_remove') : t('hdw_bm_save');
                     const icon = bookmarkBtn.querySelector('i');
                     if (icon) icon.className = isOn ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark';
                 });
@@ -523,12 +534,12 @@ function _renderHadistDetail(kitabId, nomor) {
                 const text = `${arab}\n\n"${idn}"\n\n(${kitabNama} No. ${nomorH})`;
                 navigator.clipboard.writeText(text).then(() => {
                     if (typeof showToast === 'function')
-                        showToast({ type: 'success', message: 'Hadist berhasil disalin!', duration: 2000 });
+                        showToast({ type: 'success', message: t('hdw_copied'), duration: 2000 });
                 });
             });
         })
         .catch(() => {
-            body.innerHTML = `<div class="hadist-empty"><i class="fa-solid fa-wifi"></i><p>Gagal memuat hadist ini.</p></div>`;
+            body.innerHTML = `<div class="hadist-empty"><i class="fa-solid fa-wifi"></i><p>${t('hadist_error')}</p></div>`;
         });
 }
 
