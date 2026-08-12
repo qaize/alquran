@@ -1,0 +1,44 @@
+/* ── TOASTIFY — inner content styling ── */
+.toastify {
+    font-family: "Inter", Arial, sans-serif !important;
+    padding: 0 !important;
+}
+.tz-toast-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    min-width: 220px;
+    max-width: 300px;
+}
+.tz-toast-icon {
+    font-size: 16px;
+    color: var(--gold-light);
+    flex-shrink: 0;
+}
+.tz-toast-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+.tz-toast-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.tz-toast-msg {
+    font-size: 13px;
+    color: #ffffff;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* Override posisi default Toastify agar tidak tertimpa footer */
+#toast-container {
+    bottom: 70px !important;
+}

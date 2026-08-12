@@ -1,0 +1,39 @@
+name: Deploy to FTP Server
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    name: Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: alquran
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Deploy to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /htdocs/
+          protocol: ftp
+          port: 21
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            **/vendor/**
+            .env
+            .gitignore
+            README.md
+            composer.lock
+            storage/logs/**
+            storage/framework/cache/**
+            storage/framework/sessions/**
+            storage/framework/views/**

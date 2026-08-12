@@ -1,0 +1,10 @@
+/* ── LONG PRESS — visual feedback saat ditahan ── */
+.ayat-longpress-pending {
+    animation: longPressPulse 2s ease forwards;
+    border-radius: var(--radius-sm);
+}
+@keyframes longPressPulse {
+    0%   { outline: 2px solid transparent;           background: transparent; }
+    20%  { outline: 2px solid rgba(201,168,76,0.3);  background: rgba(201,168,76,0.04); }
+    100% { outline: 2px solid var(--gold);           background: rgba(201,168,76,0.12); }
+}

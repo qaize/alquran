@@ -1,0 +1,49 @@
+/* ── CUSTOM SCROLLBAR — elegan & proporsional ── */
+/* Main content area */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(13, 33, 55, 0.18);
+    border-radius: 99px;
+    transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(13, 33, 55, 0.35);
+}
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+/* Sidebar scrollbar lebih tipis */
+.sidebar-left::-webkit-scrollbar,
+.sidebar-right::-webkit-scrollbar,
+.settings-panel-body::-webkit-scrollbar,
+.juz-panel-list::-webkit-scrollbar,
+.bookmark-panel-list::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar-left::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+}
+.sidebar-left::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.3);
+}
+/* Dark mode scrollbar */
+.theme-dark ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.12);
+}
+.theme-dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.25);
+}
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(13,33,55,0.18) transparent;
+}
+.sidebar-left, .sidebar-right {
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+}

@@ -1,0 +1,293 @@
+/* ── 18. AYAT CONTAINER ── */
+.ayat {
+    flex: 1;
+    height: calc(100vh - 160px);
+    overflow-y: auto;
+    border-radius: var(--radius-sm);
+    background: var(--ayat-bg, var(--white));
+    padding: 10px 18px 20px;
+    text-align: right;
+    transition: background 0.3s ease;
+    border: 3px solid var(--gold-light);
+    box-shadow:
+        0 4px 24px rgba(201, 168, 76, 0.12),
+        inset 0 0 0 1px rgba(201, 168, 76, 0.08);
+    position: relative;
+}
+
+/* Decorative top line */
+.ayat::before { display: none; }
+.ayat::after  { display: none; }
+
+.ayat::-webkit-scrollbar {
+    width: 10px;
+}
+.ayat::-webkit-scrollbar-track {
+    background: var(--blue-soft);
+    border-radius: 10px;
+}
+.ayat::-webkit-scrollbar-thumb {
+    background: var(--gold-light);
+    border-radius: 10px;
+    border: 2px solid var(--blue-soft);
+}
+.ayat::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+}
+
+/* ── Bismillah di atas konten ayat ── */
+.ayat-bismillah {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 20px 10px;
+}
+
+.ayat-bsm-line {
+    flex: 1;
+    height: 1px;
+    max-width: 60px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.45));
+}
+
+.ayat-bismillah .ayat-bsm-line:last-child {
+    background: linear-gradient(90deg, rgba(201,168,76,0.45), transparent);
+}
+
+.ayat-bsm-text {
+    font-family: "Amiri", serif;
+    font-size: 26px;
+    color: var(--navy);
+    letter-spacing: 1px;
+    line-height: 1.6;
+    text-shadow: 0 1px 6px rgba(201,168,76,0.15);
+    flex-shrink: 0;
+}
+
+.theme-dark .ayat-bsm-text {
+    color: var(--gold-light);
+    text-shadow: 0 1px 8px rgba(201,168,76,0.25);
+}
+
+.barisSurah {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition);
+    border-bottom: 1px solid transparent;
+    background-image: linear-gradient(var(--ayat-bg, #fff), var(--ayat-bg, #fff)),
+        linear-gradient(90deg, transparent 0%, var(--gold) 30%, rgba(201,168,76,0.5) 50%, var(--gold) 70%, transparent 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.barisSurah:last-child {
+    border-bottom: none;
+    background-image: none;
+}
+
+.barisSurah:hover {
+    background: var(--blue-soft);
+    background-image: none;
+}
+
+/* kolom nomor-ayat lama — tidak dipakai, sembunyikan */
+.nomor-ayat {
+    display: none;
+}
+
+/* Teks Arab + nomor inline di ujung kiri (akhir kalimat RTL) */
+.ayat-nav {
+    display: flex;
+    align-items: center;
+    direction: rtl;
+    gap: 12px;
+    width: 100%;
+}
+
+.ayat-nomor-inline {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.urutan-ayat {
+    width: 36px;
+    height: 36px;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 60%, #b8943c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition), filter var(--transition);
+    flex-shrink: 0;
+}
+
+.barisSurah:hover .urutan-ayat {
+    transform: scale(1.1) rotate(6deg);
+    filter: brightness(1.1);
+}
+
+.urutan-ayat span {
+    font-family: "Amiri", serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+}
+
+.theme-dark .ayat .urutan-ayat {
+    background: linear-gradient(160deg, rgba(232,201,122,0.9) 0%, var(--gold) 60%, #b8943c 100%);
+}
+
+.theme-dark .ayat .urutan-ayat span {
+    color: var(--navy);
+}
+
+.isi-ayat {
+    flex: 1;
+    width: 100%;
+}
+
+/* tombol bookmark + lastread + asbab — bookmark selalu tampil, sisanya hover */
+.nomor-ayat .ayat-btns {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+}
+
+.ayat-btns {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    padding-top: 4px;
+    direction: ltr;
+}
+
+/* Hover-only buttons: hidden by default, show on row hover */
+.btn-hover-only {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.barisSurah:hover .btn-hover-only {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Tetap tampil jika sudah dibookmark */
+.isi-ayat:has(.btn-bookmark-ayat.bookmarked) .ayat-btns {
+    display: flex;
+}
+
+/* Asbabun Nuzul & Tafsir button */
+.btn-asbab-ayat,
+.btn-tafsir-ayat {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-light);
+    font-size: 11px;
+    padding: 0;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    flex-shrink: 0;
+}
+.btn-asbab-ayat:hover {
+    background: rgba(201, 168, 76, 0.1);
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: scale(1.1);
+}
+.btn-tafsir-ayat:hover {
+    background: rgba(30, 73, 118, 0.08);
+    border-color: var(--navy-light);
+    color: var(--navy-light);
+    transform: scale(1.1);
+}
+
+.theme-dark .ayat .btn-asbab-ayat,
+.theme-dark .ayat .btn-tafsir-ayat {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.5);
+}
+
+.arabic {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    font-size: var(--arabic-font-size, 36px);
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.8;
+    direction: rtl;
+}
+
+/* Dark navy mode — teks Arab putih */
+/* Dark navy mode — class .theme-dark di <html>, berlaku ke semua .ayat */
+.theme-dark .ayat {
+    border-color: rgba(232,201,122,0.25);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(232,201,122,0.05);
+}
+.theme-dark .ayat .arabic {
+    color: #ffffff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+.theme-dark .ayat .barisSurah:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+.theme-dark .ayat .isi-ayat {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+.theme-dark .ayat .show-hide-terjemahan {
+    color: #ffffff;
+}
+.theme-dark .ayat .tulisan-latin {
+    color: #ffffff;
+}
+.theme-dark .ayat .terjemahan {
+    background: rgba(232, 201, 122, 0.1);
+    border-left-color: #e8c97a;
+    color: #ffffff;
+}
+.theme-dark .ayat .btn-bookmark-ayat {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.5);
+}
+.theme-dark .ayat .btn-bookmark-ayat.bookmarked {
+    color: #e8c97a;
+    border-color: #e8c97a;
+}
+.theme-dark .ayat .btn-audio-ayat,
+.theme-dark .ayat .btn-copy-ayat {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.5);
+}
+
+.ayat-action {
+    text-align: left;
+    padding-top: 4px;
+}
+
+.show-hide-terjemahan {
+    cursor: pointer;
+    font-size: 11.5px;
+    color: var(--text-light);
+    font-style: italic;
+    transition: color var(--transition);
+    border-bottom: 1px dashed var(--border);
+}
+
+.show-hide-terjemahan:hover {
+    color: var(--navy);
+}

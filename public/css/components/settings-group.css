@@ -1,0 +1,62 @@
+/* ── SETTINGS EXPANDABLE GROUP ── */
+.settings-group {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 2px;
+}
+.settings-group-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background var(--transition);
+}
+.settings-group-trigger:hover {
+    background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-light) 100%);
+}
+.settings-group-trigger-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 500;
+}
+.settings-group-trigger-left i {
+    color: var(--gold);
+    font-size: 13px;
+    width: 16px;
+    text-align: center;
+}
+.settings-group-arrow {
+    color: var(--gold-light);
+    font-size: 11px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.settings-group.open .settings-group-arrow {
+    transform: rotate(180deg);
+}
+.settings-group-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--white);
+}
+.settings-group.open .settings-group-body {
+    max-height: 1000px; /* cukup besar untuk semua konten font */
+}
+.settings-group-body .settings-section {
+    border-bottom: 1px solid var(--border);
+    margin: 0;
+    padding: 18px 20px;
+}
+.settings-group-body .settings-section:last-child {
+    border-bottom: none;
+    padding-bottom: 20px;
+}

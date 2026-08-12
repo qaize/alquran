@@ -1,0 +1,9 @@
+/* ── 7. MAIN CONTENT COLUMN ── */
+.main-content {
+    background: var(--blue-soft);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 60px;
+    overflow-x: hidden;
+}

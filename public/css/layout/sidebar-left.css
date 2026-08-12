@@ -1,0 +1,527 @@
+/* ── 4. LEFT SIDEBAR ── */
+.sidebar-left {
+    background: var(--navy);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    border-right: 1px solid var(--navy-mid);
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 24px 20px 18px;
+    border-bottom: 1px solid var(--navy-light);
+}
+
+.logo-ornament {
+    font-size: 22px;
+    color: var(--gold);
+}
+
+.logo-text {
+    font-family: "Cinzel", serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 1px;
+}
+
+/* ── 5. SIDEBAR NAV ITEMS ── */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+    gap: 4px;
+    flex: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    color: #a8c4d8;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition:
+        background var(--transition),
+        color var(--transition),
+        transform 0.15s ease;
+}
+
+.nav-item:hover {
+    background: var(--navy-mid);
+    color: var(--white);
+    transform: translateX(2px);
+}
+
+.nav-item:active {
+    transform: translateX(2px) scale(0.98);
+}
+
+.nav-item.active {
+    background: linear-gradient(90deg, var(--navy-light), var(--navy-mid));
+    color: var(--gold-light);
+    border-left: 3px solid var(--gold);
+}
+
+.nav-icon {
+    font-size: 15px;
+    width: 18px;
+    text-align: center;
+    color: var(--gold);
+    opacity: 0.85;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity var(--transition);
+}
+
+.nav-item:hover .nav-icon {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+/* ── 5b. NAV DROPDOWN — inline expandable ── */
+.nav-dropdown {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-dropdown-trigger {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    color: #a8c4d8;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background var(--transition),
+        color var(--transition);
+    font-family: inherit;
+}
+
+.nav-dropdown-trigger:hover {
+    background: var(--navy-mid);
+    color: var(--white);
+}
+
+.nav-dropdown-arrow {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-light);
+    transition: transform 0.22s ease;
+    flex-shrink: 0;
+}
+
+.nav-dropdown-arrow.rotated {
+    transform: rotate(180deg);
+}
+
+.nav-dropdown-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    margin: 0 4px 2px;
+}
+
+.nav-dropdown-body.open {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.nav-dropdown-body::-webkit-scrollbar {
+    width: 3px;
+}
+.nav-dropdown-body::-webkit-scrollbar-thumb {
+    background: var(--navy-light);
+    border-radius: 3px;
+}
+
+/* Konten Islam group body — reuse nav-dropdown-body + extra max-height */
+.nav-konten-body.open {
+    max-height: 200px;
+}
+
+/* Sub-items indented inside konten group */
+.nav-sub-item {
+    padding-left: 28px !important;
+    font-size: 13px !important;
+}
+
+.nav-sub-item .nav-icon {
+    font-size: 12px;
+}
+
+/* Kategori terakhir dibaca */
+.lr-category-list {
+    padding: 4px 0;
+}
+
+.lr-cat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    transition: background var(--transition);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.lr-cat-item:last-child {
+    border-bottom: none;
+}
+
+.lr-cat-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.lr-cat-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+}
+
+.lr-cat-name {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #a8c4d8;
+    white-space: nowrap;
+    overflow: hidden;
+    flex: 1;
+    min-width: 0;
+    position: relative;
+}
+
+.lr-cat-name span {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Saat hover: geser span ke kiri sejauh penuh */
+.lr-cat-item:hover .lr-cat-name span {
+    animation: lr-marquee 2s linear infinite;
+}
+
+/* Teks yang tidak overflow tidak perlu animasi */
+.lr-cat-item:hover .lr-cat-name[data-no-scroll] span {
+    animation: none;
+}
+
+@keyframes lr-marquee {
+    0% {
+        transform: translateX(0px);
+    }
+    15% {
+        transform: translateX(0px);
+    }
+    85% {
+        transform: translateX(var(--marquee-offset, -60%));
+    }
+    100% {
+        transform: translateX(var(--marquee-offset, -60%));
+    }
+}
+
+/* Tooltip nama kategori lengkap */
+.lr-cat-item {
+    position: relative;
+}
+
+.lr-cat-tooltip {
+    position: absolute;
+    left: 12px;
+    bottom: calc(100% + 4px);
+    background: var(--navy);
+    border: 1px solid var(--gold-light);
+    color: #a8c4d8;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.lr-cat-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 14px;
+    border: 5px solid transparent;
+    border-top-color: var(--gold-light);
+}
+
+.lr-cat-item:hover .lr-cat-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.lr-cat-badge {
+    flex-shrink: 0;
+    min-width: 36px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 11px;
+    background: rgba(201, 168, 76, 0.25);
+    border: 1px solid rgba(201, 168, 76, 0.5);
+    color: #f0d97a;
+    font-size: 10.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.3px;
+}
+
+.lr-cat-badge-empty {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 400;
+}
+
+.lr-cat-del {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 11px;
+    padding: 2px 4px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: color var(--transition);
+}
+.lr-cat-del:hover {
+    color: #e74c3c;
+}
+
+.lr-add-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: #a8c4d8;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition:
+        background var(--transition),
+        color var(--transition);
+}
+.lr-add-btn:hover {
+    background: rgba(201, 168, 76, 0.12);
+    color: var(--gold-light);
+}
+.lr-add-btn i {
+    font-size: 10px;
+}
+
+/* Input inline tambah kategori */
+.lr-add-input-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lr-new-cat-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(201, 168, 76, 0.4);
+    border-radius: 4px;
+    color: var(--white);
+    font-size: 12px;
+    padding: 4px 8px;
+    height: 28px;
+    font-family: inherit;
+    outline: none;
+}
+.lr-new-cat-input:focus {
+    border-color: var(--gold);
+    background: rgba(255, 255, 255, 0.15);
+}
+.lr-new-cat-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.lr-new-cat-confirm,
+.lr-new-cat-cancel {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition);
+}
+.lr-new-cat-confirm {
+    background: rgba(201, 168, 76, 0.25);
+    color: var(--gold-light);
+}
+.lr-new-cat-confirm:hover {
+    background: var(--gold);
+    color: var(--navy);
+}
+.lr-new-cat-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.5);
+}
+.lr-new-cat-cancel:hover {
+    background: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+}
+
+.lr-empty-hint {
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #a8c4d8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Favorit dropdown */
+.favorites-dropdown-list {
+    padding: 4px 0;
+}
+
+.fav-dd-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background var(--transition);
+    cursor: pointer;
+}
+.fav-dd-item:last-child {
+    border-bottom: none;
+}
+.fav-dd-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.fav-dd-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.fav-dd-nomor {
+    font-family: "Amiri", serif;
+    font-size: 15px;
+    color: var(--gold);
+    min-width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.fav-dd-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.fav-dd-name {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fav-dd-arti {
+    display: block;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fav-dd-del {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 11px;
+    padding: 2px 4px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: color var(--transition);
+}
+.fav-dd-del:hover {
+    color: #e74c3c;
+}
+
+/* ── 6. SIDEBAR LEFT FOOTER ── */
+.sidebar-footer-info {
+    padding: 18px 16px 24px;
+    text-align: center;
+    border-top: 1px solid var(--navy-mid);
+}
+
+.ornament-divider {
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+}
+
+.data-source-label {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 4px;
+}
+
+.data-source-link {
+    font-size: 12px;
+    color: var(--gold-light);
+    font-style: italic;
+    transition: color var(--transition);
+}
+
+.data-source-link:hover {
+    color: var(--white);
+}

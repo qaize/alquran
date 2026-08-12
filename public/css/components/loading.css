@@ -1,0 +1,51 @@
+/* ── 20. LOADING SCREEN ── */
+#loading-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 33, 55, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#loading-screen[style*="block"] {
+    display: flex;
+}
+
+.loader-ring {
+    width: 72px;
+    height: 72px;
+    border: 4px solid rgba(255, 255, 255, 0.15);
+    border-top: 4px solid var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.loader-ornament {
+    font-size: 22px;
+    color: var(--gold-light);
+    animation: spin 1s linear infinite reverse;
+}
+
+.loading-text {
+    color: var(--white);
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

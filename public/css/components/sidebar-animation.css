@@ -1,0 +1,10 @@
+/* ── SIDEBAR LEFT ENTRY ANIMATION — hanya opacity, tidak conflict dengan mobile drawer transform ── */
+@media (min-width: 769px) {
+    .sidebar-left-enter {
+        animation: sidebarFadeIn 0.5s ease forwards;
+    }
+    @keyframes sidebarFadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+}

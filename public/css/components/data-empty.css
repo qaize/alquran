@@ -1,0 +1,9 @@
+/* ── 14. DATA EMPTY ── */
+.data-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-mid);
+    font-size: 18px;
+    font-weight: 500;
+}

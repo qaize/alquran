@@ -1,0 +1,54 @@
+/* ── 15. PAGINATION ── */
+.pagination {
+    display: none;
+    text-align: center;
+    padding: 10px 20px 20px;
+    gap: 12px;
+    justify-content: center;
+}
+
+.pagination.visible,
+#pagination[style*="block"] {
+    display: flex;
+}
+
+.btn-pagination {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+.btn-pagination:hover {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+}
+
+.theme-dark .btn-pagination {
+    background: #0d2137;
+    border-color: rgba(232,201,122,0.3);
+    color: var(--gold-light);
+}
+
+.theme-dark .btn-pagination:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+    box-shadow: 0 4px 16px rgba(201,168,76,0.3);
+}
+
+/* Keep JS show/hide logic working — script uses style.display */
+#prev,
+#next {
+    /* inherits .btn-pagination from class */
+}

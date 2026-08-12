@@ -1,0 +1,25 @@
+/* ── 1. CSS VARIABLES ── */
+:root {
+    --navy: #0d2137;
+    --navy-mid: #163352;
+    --navy-light: #1e4976;
+    --blue-soft: #e8f4fd;
+    --blue-card: #f0f8ff;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-pale: #fdf6e3;
+    --text-dark: #1a2e45;
+    --text-mid: #4a6580;
+    --text-light: #8aa5bf;
+    --white: #ffffff;
+    --border: #cde4f5;
+    --shadow-sm: 0 2px 8px rgba(13, 33, 55, 0.08);
+    --shadow-md: 0 4px 20px rgba(13, 33, 55, 0.13);
+    --shadow-lg: 0 8px 32px rgba(13, 33, 55, 0.18);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --sidebar-w: 220px;
+    --sidebar-r-w: 240px;
+    --transition: 0.22s ease;
+}

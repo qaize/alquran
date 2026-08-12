@@ -1,0 +1,706 @@
+/* ══════════════════════════════════════════════
+   SIDEBAR TABS (Favorit / Bookmark)
+   ══════════════════════════════════════════════ */
+.sidebar-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border);
+    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sidebar-tab {
+    flex: 1;
+    padding: 12px 6px;
+    background: none;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition:
+        color var(--transition),
+        border-color var(--transition);
+}
+
+.sidebar-tab:hover {
+    color: var(--navy);
+}
+
+.sidebar-tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--gold);
+}
+
+.sidebar-tab i {
+    font-size: 11px;
+    color: var(--gold);
+}
+
+.sidebar-tab-content {
+    display: none;
+}
+.sidebar-tab-content.active {
+    display: block;
+}
+
+/* ══════════════════════════════════════════════
+   LAST READ BADGE (di nav sidebar kiri)
+   ══════════════════════════════════════════════ */
+.last-read-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 50px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════
+   BOOKMARK BUTTON (pada tiap ayat — hover)
+   ══════════════════════════════════════════════ */
+.btn-bookmark-ayat {
+    display: none; /* tampil saat .barisSurah:hover */
+    width: 26px;
+    height: 26px;
+    margin-top: 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-light);
+    font-size: 11px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.barisSurah:hover .btn-bookmark-ayat {
+    display: flex;
+}
+
+.btn-bookmark-ayat:hover {
+    background: var(--gold-pale);
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: scale(1.1);
+}
+
+.btn-bookmark-ayat.bookmarked {
+    background: var(--gold-pale);
+    border-color: var(--gold);
+    color: var(--gold);
+    display: flex; /* selalu tampil jika sudah dibookmark */
+}
+
+/* Tampilkan ayat-btns jika ada bookmark aktif */
+.nomor-ayat:has(.btn-bookmark-ayat.bookmarked) .ayat-btns {
+    display: flex;
+}
+
+/* nomor-ayat column — tombol horizontal di bawah nomor */
+.nomor-ayat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.nomor-ayat .ayat-btns {
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+}
+
+.barisSurah:hover .nomor-ayat .ayat-btns {
+    display: flex;
+}
+
+/* ══════════════════════════════════════════════
+   BOOKMARK LIST (sidebar kanan tab)
+   ══════════════════════════════════════════════ */
+.bookmarks-list {
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bookmarks-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--text-light);
+}
+
+.bookmark-item {
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    transition:
+        box-shadow var(--transition),
+        border-color var(--transition);
+}
+
+.bookmark-item:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--gold-light);
+}
+
+.bookmark-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.bookmark-surah-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.bookmark-ayat-num {
+    font-size: 10px;
+    color: var(--white);
+    background: var(--gold);
+    padding: 2px 7px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.bookmark-arab {
+    font-family: "Amiri", serif;
+    font-size: 18px;
+    color: var(--navy);
+    text-align: right;
+    direction: rtl;
+    line-height: 1.8;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+}
+
+.bookmark-idn {
+    font-size: 11px;
+    color: var(--text-mid);
+    line-height: 1.5;
+    text-align: justify;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.bookmark-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bookmark-go-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, var(--navy-light), var(--navy));
+    color: var(--white);
+    border: none;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.bookmark-go-btn:hover {
+    background: linear-gradient(135deg, var(--gold), #b8943c);
+    color: var(--navy);
+}
+
+.bookmark-del-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition:
+        color var(--transition),
+        background var(--transition);
+}
+
+.bookmark-del-btn:hover {
+    color: #e74c3c;
+    background: #fff5f5;
+}
+
+/* ══════════════════════════════════════════════
+   LAST READ TOAST
+   ══════════════════════════════════════════════ */
+.last-read-toast {
+    position: fixed;
+    bottom: 60px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--navy);
+    border: 1.5px solid var(--gold);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    box-shadow: var(--shadow-lg);
+    z-index: 9998;
+    min-width: 240px;
+    max-width: 320px;
+    animation: toastSlideIn 0.3s ease;
+    cursor: default;
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.last-read-toast.toast-hide {
+    animation: toastSlideOut 0.35s ease forwards;
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+.toast-icon {
+    color: var(--gold);
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.toast-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.toast-info {
+    font-size: 13px;
+    color: var(--white);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 4px;
+    flex-shrink: 0;
+    transition: color var(--transition);
+}
+
+.toast-close:hover {
+    color: var(--white);
+}
+
+/* ══════════════════════════════════════════════
+   FULL BOOKMARK PANEL
+   ══════════════════════════════════════════════ */
+.bookmark-panel-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 33, 55, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.bookmark-panel-overlay.open {
+    display: flex;
+}
+
+.bookmark-panel {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    width: 680px;
+    max-width: 96vw;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: slideUp 0.25s ease;
+}
+
+/* Header */
+.bookmark-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    border-bottom: 2px solid var(--gold);
+    flex-shrink: 0;
+}
+
+.bookmark-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--white);
+}
+
+.bookmark-panel-title i {
+    color: var(--gold);
+    font-size: 16px;
+}
+.bookmark-panel-title h3 {
+    font-size: 15px;
+    font-weight: 600;
+    font-family: "Cinzel", serif;
+}
+
+.bookmark-panel-count {
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 50px;
+    margin-left: 4px;
+}
+
+/* Toolbar */
+.bookmark-panel-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--blue-soft);
+}
+
+.bookmark-search {
+    flex: 1;
+    height: 38px;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    padding: 0 16px;
+    font-size: 13px;
+    outline: none;
+    background: var(--white);
+    transition: border-color var(--transition);
+}
+
+.bookmark-search:focus {
+    border-color: var(--gold);
+}
+.bookmark-search::placeholder {
+    color: var(--text-light);
+}
+
+.bookmark-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: none;
+    border: 1.5px solid #e74c3c;
+    border-radius: 50px;
+    color: #e74c3c;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all var(--transition);
+}
+
+.bookmark-clear-btn:hover {
+    background: #e74c3c;
+    color: var(--white);
+}
+
+/* List area */
+.bookmark-panel-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.bookmark-panel-list::-webkit-scrollbar {
+    width: 6px;
+}
+.bookmark-panel-list::-webkit-scrollbar-track {
+    background: var(--blue-soft);
+}
+.bookmark-panel-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.bookmark-panel-empty {
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 60px 20px;
+    color: var(--text-light);
+    text-align: center;
+}
+
+.bookmark-panel-empty i {
+    font-size: 36px;
+    color: var(--gold-light);
+    opacity: 0.5;
+}
+.bookmark-panel-empty p {
+    font-size: 14px;
+    font-weight: 500;
+}
+.bookmark-panel-empty small {
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* Panel item card */
+.bm-panel-item {
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    transition:
+        box-shadow var(--transition),
+        border-color var(--transition);
+}
+
+.bm-panel-item:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--gold-light);
+}
+
+.bm-panel-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.bm-panel-surah {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bm-panel-surah i {
+    color: var(--gold);
+    font-size: 13px;
+}
+.bm-panel-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+}
+.bm-panel-num {
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 50px;
+}
+
+.bm-panel-date {
+    font-size: 11px;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.bm-panel-arab {
+    font-family: "Amiri", serif;
+    font-size: 26px;
+    color: var(--navy);
+    text-align: right;
+    direction: rtl;
+    line-height: 1.9;
+    margin-bottom: 8px;
+    padding: 10px 14px;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    border-right: 3px solid var(--gold);
+}
+
+.bm-panel-latin {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--text-mid);
+    margin-bottom: 6px;
+    direction: ltr;
+    line-height: 1.6;
+}
+
+.bm-panel-idn {
+    font-size: 13px;
+    color: var(--text-dark);
+    text-align: justify;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: var(--gold-pale);
+    border-left: 3px solid var(--gold-light);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.bm-panel-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.bm-panel-go-btn {
+    padding: 7px 18px;
+    font-size: 12px;
+}
+
+.bm-panel-del-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.bm-panel-del-btn:hover {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: #fff5f5;
+}
+
+
+/* ── Bookmark panel dua tab ── */
+.bm-panel-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border);
+    background: var(--white);
+    flex-shrink: 0;
+}
+
+.bm-panel-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 8px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    color: var(--text-light);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition);
+}
+
+.bm-panel-tab:hover {
+    color: var(--navy);
+}
+
+.bm-panel-tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--gold);
+}
+
+.bm-tab-count {
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--blue-soft);
+    color: var(--navy-light);
+    padding: 1px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.bm-panel-tab.active .bm-tab-count {
+    background: var(--gold-pale);
+    color: var(--gold);
+}
+
+/* Hadist bookmark btn bookmarked state */
+.hadist-action-btn.bookmarked {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-pale);
+}
+
+.theme-dark .bm-panel-tabs {
+    background: var(--navy-mid);
+    border-color: rgba(255,255,255,0.1);
+}
+
+.theme-dark .bm-panel-tab.active {
+    color: var(--gold-light);
+    border-bottom-color: var(--gold);
+}

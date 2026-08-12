@@ -1,0 +1,65 @@
+/* ============================================================
+   AL-QUR'AN DIGITAL — styles.css
+   Palet: biru dongker (#0d2137) + biru muda (#e8f4fd) + emas (#c9a84c)
+   ============================================================ */
+
+/* ── 0. ARABIC FONT FACES (CDN) ── */
+@font-face {
+    font-family: "Amiri Quran";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/amiri-quran.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/amiri-quran.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Scheherazade";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/scheherazade-regular.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/scheherazade-regular.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Noorehuda";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehuda.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehuda.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "KFGQPC Hafs";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/uthmanic-hafs1-ver14.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/uthmanic-hafs1-ver14.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Noto Naskh Arabic";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-naskh-arabic-regular.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-naskh-arabic-regular.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}

@@ -1,0 +1,469 @@
+/* ══════════════════════════════════════════════
+   SAVE LAST-READ SLIDE-UP PANEL
+   ══════════════════════════════════════════════ */
+.save-lastread-slide {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    width: 380px;
+    max-width: 94vw;
+    background: var(--white);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.15);
+    z-index: 6000;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.save-lastread-slide.open {
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.save-lastread-slide-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #0d7377, #14a3a8);
+    border-bottom: 2px solid var(--gold);
+}
+
+.save-lastread-slide-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.save-lastread-slide-title i {
+    color: var(--gold);
+}
+
+.save-lastread-slide-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.save-lastread-slide-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.save-lastread-slide-body {
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.save-lastread-slide-body::-webkit-scrollbar {
+    width: 5px;
+}
+.save-lastread-slide-body::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.slide-category-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition);
+    width: 100%;
+    text-align: left;
+}
+
+.slide-category-item:hover {
+    background: #e6f7f7;
+    border-color: #14a3a8;
+    transform: translateX(3px);
+}
+
+.slide-cat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #0d7377, #14a3a8);
+    border-radius: 6px;
+    flex-shrink: 0;
+    color: var(--white);
+    font-size: 11px;
+}
+
+.slide-cat-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.slide-cat-check {
+    color: #14a3a8;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity var(--transition);
+}
+
+.slide-category-item:hover .slide-cat-check {
+    opacity: 1;
+}
+
+.slide-add-category-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-top: 4px;
+    background: none;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-md);
+    color: #0d7377;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: all var(--transition);
+}
+
+.slide-add-category-btn:hover {
+    border-color: #14a3a8;
+    background: #e6f7f7;
+}
+
+.save-lastread-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 5999;
+}
+
+.save-lastread-backdrop.open {
+    display: block;
+}
+
+/* ══════════════════════════════════════════════
+   BTN LASTREAD AYAT (di samping bookmark)
+   ══════════════════════════════════════════════ */
+.btn-lastread-ayat {
+    display: flex;
+    width: 26px;
+    height: 26px;
+    margin-top: 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-light);
+    font-size: 11px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.barisSurah:hover .btn-lastread-ayat {
+    display: flex;
+}
+
+.btn-lastread-ayat:hover {
+    background: #e6f7f7;
+    border-color: #14a3a8;
+    color: #0d7377;
+    transform: scale(1.1);
+}
+
+/* Tooltip untuk btn-bookmark dan btn-lastread */
+.btn-bookmark-ayat::after,
+.btn-lastread-ayat::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--navy);
+    color: #a8c4d8;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+    z-index: 50;
+}
+
+.btn-bookmark-ayat:hover::after,
+.btn-lastread-ayat:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Dark theme overrides */
+.theme-dark .ayat .btn-lastread-ayat {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.theme-dark .ayat .btn-lastread-ayat:hover {
+    background: rgba(20, 163, 168, 0.2);
+    border-color: #14a3a8;
+    color: #14a3a8;
+}
+
+/* Saved flash state */
+.btn-lastread-ayat.saved {
+    display: flex;
+    background: #e6f7f7;
+    border-color: #14a3a8;
+    color: #0d7377;
+}
+
+/* ── LAST READ POPUP ── */
+.lr-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 33, 55, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 6000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.lr-popup-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.lr-popup {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    width: 340px;
+    max-width: 92vw;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transform: translateY(16px);
+    transition: transform 0.22s ease;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+.lr-popup-overlay.open .lr-popup {
+    transform: translateY(0);
+}
+
+.lr-popup-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    padding: 14px 16px 12px;
+    border-bottom: 2px solid var(--gold);
+    position: relative;
+}
+
+.lr-popup-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 600;
+}
+.lr-popup-title i {
+    color: var(--gold-light);
+}
+
+.lr-popup-meta {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 3px;
+    padding-left: 22px;
+}
+
+.lr-popup-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.12);
+    border: none;
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition);
+}
+.lr-popup-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.lr-popup-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+    max-height: 280px;
+}
+
+.lr-popup-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background var(--transition);
+}
+.lr-popup-item:last-child {
+    border-bottom: none;
+}
+.lr-popup-item:hover {
+    background: var(--blue-soft);
+}
+.lr-popup-item i {
+    color: var(--gold);
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.lr-popup-item-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--navy);
+}
+
+.lr-popup-item-pos {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-mid);
+    background: var(--blue-soft);
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.lr-popup-item-empty {
+    font-size: 12px;
+    color: var(--text-light);
+    flex-shrink: 0;
+}
+
+.lr-popup-footer {
+    border-top: 1px solid var(--border);
+    padding: 8px 12px;
+    background: var(--blue-soft);
+}
+
+.lr-popup-add-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.lr-popup-add-input {
+    flex: 1;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0 8px;
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--text-dark);
+    outline: none;
+    background: var(--white);
+}
+.lr-popup-add-input:focus {
+    border-color: var(--gold);
+}
+
+.lr-popup-add-confirm,
+.lr-popup-add-cancel {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition);
+    flex-shrink: 0;
+}
+.lr-popup-add-confirm {
+    background: var(--gold-pale);
+    color: var(--gold);
+}
+.lr-popup-add-confirm:hover {
+    background: var(--gold);
+    color: var(--white);
+}
+.lr-popup-add-cancel {
+    background: var(--blue-soft);
+    color: var(--text-light);
+}
+.lr-popup-add-cancel:hover {
+    background: #fde8e8;
+    color: #e74c3c;
+}
+
+.lr-popup-add-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 7px;
+    background: none;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-mid);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all var(--transition);
+}
+.lr-popup-add-btn:hover {
+    border-color: var(--gold-light);
+    color: var(--navy);
+    background: var(--gold-pale);
+}

@@ -1,0 +1,96 @@
+/* ── 17. DETAIL SURAH LAYOUT ── */
+.detailSurah {
+    width: 100%;
+    display: flex;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+    padding: 20px 20px 0;
+    animation: fadeIn 0.4s ease;
+}
+
+.detail {
+    width: 280px;
+    flex-shrink: 0;
+    padding: 18px 16px;
+    background: linear-gradient(
+        160deg,
+        var(--white) 60%,
+        var(--blue-soft) 100%
+    );
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--radius-md);
+    margin-right: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-mid);
+    height: fit-content;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    box-shadow: var(--shadow-sm);
+}
+
+.detail p {
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.deskripsi {
+    text-align: justify;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-mid);
+}
+
+.deskripsi label {
+    display: block;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.hide-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-right: 8px;
+    justify-content: flex-start;
+    padding-top: 4px;
+}
+
+#hide-detail-button {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+}
+
+#hide-detail-button span {
+    font-size: 20px;
+    color: var(--text-light);
+    transition: color var(--transition);
+}
+
+#hide-detail-button span:hover {
+    color: var(--gold);
+}
+
+#show-all-terjemahan-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+}
+
+#show-all-terjemahan-button i {
+    font-size: 20px;
+    color: var(--text-light);
+    transition: color var(--transition);
+}
+
+#show-all-terjemahan-button i:hover {
+    color: var(--gold);
+}

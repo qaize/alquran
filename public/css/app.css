@@ -1,0 +1,62 @@
+/* ============================================================
+   AL-QUR'AN DIGITAL — app.css (modular entry point)
+   Import semua file CSS dalam urutan yang benar.
+   ============================================================ */
+
+/* ── BASE ── */
+@import url('base/fonts.css');
+@import url('base/variables.css');
+@import url('base/reset.css');
+
+/* ── LAYOUT ── */
+@import url('layout/app-wrapper.css');
+@import url('layout/sidebar-left.css');
+@import url('layout/main-content.css');
+@import url('layout/sidebar-right.css');
+@import url('layout/footer.css');
+
+/* ── COMPONENTS ── */
+@import url('components/banner.css');
+@import url('components/search.css');
+@import url('components/info.css');
+@import url('components/surah-grid.css');
+@import url('components/surah-card.css');
+@import url('components/data-empty.css');
+@import url('components/pagination.css');
+@import url('components/surah-detail.css');
+@import url('components/detail-layout.css');
+@import url('components/ayat.css');
+@import url('components/terjemahan.css');
+@import url('components/loading.css');
+@import url('components/suggestion.css');
+@import url('components/toggle-translation.css');
+@import url('components/ayat-fullwidth.css');
+@import url('components/tajwid-modal.css');
+@import url('components/tajwid-colors.css');
+@import url('components/data-source.css');
+@import url('components/audio-player.css');
+@import url('components/nprogress.css');
+@import url('components/toast.css');
+@import url('components/overscroll.css');
+@import url('components/darkmode-topbar.css');
+@import url('components/scrollbar.css');
+@import url('components/settings-group.css');
+@import url('components/longpress.css');
+@import url('components/sidebar-animation.css');
+@import url('components/pwa.css');
+
+/* ── PANELS ── */
+@import url('panels/settings.css');
+@import url('panels/bookmark.css');
+@import url('panels/juz.css');
+@import url('panels/favorites.css');
+@import url('panels/last-read.css');
+@import url('panels/save-lastread.css');
+@import url('panels/backup.css');
+@import url('panels/tajwid-guide.css');
+@import url('panels/janji-allah.css');
+@import url('panels/hadist.css');
+@import url('panels/prayer-time.css');
+
+/* ── RESPONSIVE ── */
+@import url('responsive.css');
