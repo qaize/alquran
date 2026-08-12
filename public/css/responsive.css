@@ -1,7 +1,7 @@
 /* ── 23. RESPONSIVE ── */
 @media (max-width: 1100px) {
     .app-wrapper {
-        grid-template-columns: var(--sidebar-w) 1fr;
+        grid-template-columns: 1fr;
     }
     .sidebar-right {
         display: none;
@@ -17,6 +17,8 @@
     .app-wrapper.sidebar-collapsed {
         grid-template-columns: 1fr;
         grid-template-areas: "main";
+        margin-left: 0;
+        width: 100%;
     }
 
     /* Bismillah — perkecil di mobile agar muat layar */

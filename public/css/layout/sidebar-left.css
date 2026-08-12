@@ -4,9 +4,11 @@
     color: var(--white);
     display: flex;
     flex-direction: column;
-    position: sticky;
+    position: fixed;
     top: 0;
-    height: 100vh;
+    left: 0;
+    width: var(--sidebar-w);
+    height: calc(100vh - 42px); /* tinggi viewport dikurangi footer */
     overflow-y: auto;
     z-index: 100;
     border-right: 1px solid var(--navy-mid);
