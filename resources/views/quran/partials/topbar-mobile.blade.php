@@ -4,9 +4,6 @@
     <i class="fa-solid fa-bars"></i>
   </button>
   <span class="mobile-logo">☽ Al Quran</span>
-  <button class="burger-btn" id="topbar-darkmode-btn" title="Toggle Dark Mode">
-    <i class="fa-solid fa-moon"></i>
-  </button>
   <button class="burger-btn" id="usage-footer-btn-mobile" title="Data Usage">
     <i class="fa-solid fa-chart-pie"></i>
     <span class="usage-badge usage-badge-mobile" id="usage-badge-mobile" style="display:none;">0B</span>
