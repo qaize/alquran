@@ -6,17 +6,17 @@ const HADIST_API   = 'https://hadis-api-id.vercel.app';
 const HADIST_CACHE_KEY = 'quran_hadist_cache';
 const HADIST_DAILY_KEY = 'quran_hadist_daily';
 
-// Daftar kitab
+// Daftar kitab — total sesuai data aktual API (hadis-api-id.vercel.app)
 const HADIST_KITAB = [
-    { id: 'abu-dawud',  nama: 'Abu Dawud',    arab: 'أبو داود',   total: 5274 },
-    { id: 'bukhari',    nama: 'Bukhari',       arab: 'البخاري',    total: 7008 },
-    { id: 'tirmidzi',   nama: 'Tirmidzi',      arab: 'الترمذي',    total: 3956 },
-    { id: 'ibnu-majah', nama: 'Ibnu Majah',    arab: 'ابن ماجه',   total: 4341 },
-    { id: 'nasai',      nama: "An-Nasa'i",     arab: 'النسائي',    total: 5774 },
-    { id: 'malik',      nama: 'Malik',         arab: 'مالك',       total: 1857 },
-    { id: 'muslim',     nama: 'Muslim',        arab: 'مسلم',       total: 5362 },
+    { id: 'abu-dawud',  nama: 'Abu Dawud',    arab: 'أبو داود',   total: 4419 },
+    { id: 'bukhari',    nama: 'Bukhari',       arab: 'البخاري',    total: 6638 },
+    { id: 'tirmidzi',   nama: 'Tirmidzi',      arab: 'الترمذي',    total: 3625 },
+    { id: 'ibnu-majah', nama: 'Ibnu Majah',    arab: 'ابن ماجه',   total: 4285 },
+    { id: 'nasai',      nama: "An-Nasa'i",     arab: 'النسائي',    total: 5364 },
+    { id: 'malik',      nama: 'Malik',         arab: 'مالك',       total: 1587 },
+    { id: 'muslim',     nama: 'Muslim',        arab: 'مسلم',       total: 4930 },
     { id: 'ahmad',      nama: 'Ahmad',         arab: 'أحمد',       total: 4305 },
-    { id: 'darimi',     nama: 'Ad-Darimi',     arab: 'الدارمي',    total: 3367 },
+    { id: 'darimi',     nama: 'Ad-Darimi',     arab: 'الدارمي',    total: 2949 },
 ];
 
 // ── Helpers ──
@@ -119,7 +119,9 @@ function initHadistWidget() {
         _loadDailyWidget(true);
     });
 
-    document.getElementById('hdw-more-btn').addEventListener('click', openHadistPanel);
+    document.getElementById('hdw-more-btn').addEventListener('click', () => {
+        openHadistPanel(_widgetCurrent);
+    });
 
     // ── Collapse / Expand — default: closed ──
     const collapseBtn  = document.getElementById('hdw-collapse-btn');
@@ -176,6 +178,7 @@ function initHadistWidget() {
 }
 
 let _widgetRandomOffset = 0;
+let _widgetCurrent = null; // { kitabId, nomor } dari hadist yang sedang tampil di widget
 
 function _loadDailyWidget(random = false) {
     const body = document.getElementById('hdw-body');
@@ -187,7 +190,7 @@ function _loadDailyWidget(random = false) {
         ? (() => {
             _widgetRandomOffset++;
             const kitab = HADIST_KITAB[_widgetRandomOffset % HADIST_KITAB.length];
-            const nomor = Math.floor(Math.random() * Math.min(kitab.total, 300)) + 1;
+            const nomor = Math.floor(Math.random() * kitab.total) + 1;
             return _fetchHadist(kitab.id, nomor);
           })()
         : _getDailyHadist();
@@ -197,11 +200,14 @@ function _loadDailyWidget(random = false) {
             const h        = data.data ?? data;
             const arab     = h.arab    ?? h.text_ar ?? '';
             const idn      = h.id      ?? h.text_id ?? h.Indonesia ?? '';
-            const kitabId  = data.perawiSlug ?? data.name ?? '';
+            const kitabId  = data.slug ?? data.perawiSlug ?? data.name ?? '';
             const kitabNama = _getKitabNama(kitabId);
             const kitabArab = _getKitabArab(kitabId);
             const nomor    = h.number  ?? h.no ?? '';
             const isMarked = typeof isBookmarkedHadist === 'function' && isBookmarkedHadist(kitabId, nomor);
+
+            // Simpan referensi hadist aktif untuk tombol "Baca Lebih Banyak"
+            _widgetCurrent = { kitabId, nomor };
 
             body.innerHTML = `
                 <div class="hdw-kitab-badge">
@@ -268,25 +274,41 @@ function _getKitabArab(slug) {
    PANEL BROWSER HADIST
    ══════════════════════════════════════════ */
 let _panelState = {
-    kitab:     HADIST_KITAB[1], // default: Bukhari
-    page:      1,
-    limit:     15,
-    view:      'list',   // 'list' | 'detail'
-    detailData: null,
+    kitab:   HADIST_KITAB[1], // default: Bukhari
+    nomor:   1,               // hadist yang sedang ditampilkan
 };
 
-function openHadistPanel() {
+// Ambil nomor random dari kitab yang dipilih (range 1 s/d total aktual)
+function _randomNomor(kitab) {
+    return Math.floor(Math.random() * kitab.total) + 1;
+}
+
+function openHadistPanel(target = null) {
     let overlay = document.getElementById('hadist-panel-overlay');
-    if (overlay) { overlay.classList.add('open'); _renderHadistList(); return; }
+    if (overlay) {
+        overlay.classList.add('open');
+        if (target && target.kitabId && target.nomor) {
+            // Sync kitab aktif ke kitab dari widget
+            const kitab = HADIST_KITAB.find(k => k.id === target.kitabId);
+            if (kitab) {
+                _panelState.kitab = kitab;
+                overlay.querySelectorAll('.hadist-kitab-btn').forEach(b => {
+                    b.classList.toggle('active', b.dataset.kitab === kitab.id);
+                });
+            }
+            _panelState.nomor = target.nomor;
+            _renderHadistDetail(target.kitabId, target.nomor);
+        } else {
+            _panelState.nomor = _randomNomor(_panelState.kitab);
+            _renderHadistDetail(_panelState.kitab.id, _panelState.nomor);
+        }
+        return;
+    }
 
     overlay = document.createElement('div');
     overlay.id = 'hadist-panel-overlay';
     overlay.className = 'hadist-panel-overlay';
 
-    // Pre-fetch halaman 1 semua kitab di background agar tidak kosong saat diklik
-    HADIST_KITAB.forEach(k => {
-        _fetchHadistList(k.id, 1, 15).catch(() => {});
-    });
     overlay.innerHTML = `
         <div class="hadist-panel">
 
@@ -295,36 +317,33 @@ function openHadistPanel() {
                     <i class="fa-solid fa-scroll"></i>
                     <div>
                         <h2>Hadist</h2>
-                        <p id="hadist-panel-subtitle">Pilih kitab untuk mulai membaca</p>
+                        <p id="hadist-panel-subtitle">Memuat...</p>
                     </div>
                 </div>
-                <button class="hadist-panel-close" id="hadist-panel-close">
+                <button class="hadist-panel-close" id="hadist-panel-close" title="Tutup">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            {{-- Kitab selector --}}
             <div class="hadist-kitab-bar" id="hadist-kitab-bar">
                 ${HADIST_KITAB.map(k => `
                     <button class="hadist-kitab-btn ${k.id === _panelState.kitab.id ? 'active' : ''}"
-                        data-kitab="${k.id}">
+                        data-kitab="${k.id}" title="${k.nama}">
                         ${k.nama}
                     </button>
                 `).join('')}
             </div>
 
-            {{-- Search --}}
             <div class="hadist-search-bar">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="number" id="hadist-goto-input"
-                    placeholder="Ketik nomor hadist, lalu Enter..."
+                    placeholder="Nomor hadist, lalu Enter..."
                     min="1">
-                <button id="hadist-goto-btn">
-                    <i class="fa-solid fa-arrow-right"></i> Go
+                <button id="hadist-goto-btn" title="Cari">
+                    <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
 
-            {{-- Content area --}}
             <div class="hadist-panel-body" id="hadist-panel-body">
                 <div class="hadist-loading">
                     <i class="fa-solid fa-spinner fa-spin"></i>
@@ -332,13 +351,16 @@ function openHadistPanel() {
                 </div>
             </div>
 
-            {{-- Pagination --}}
-            <div class="hadist-pagination" id="hadist-pagination">
-                <button class="hadist-page-btn" id="hadist-prev-page">
+            <div class="hadist-nav-bar" id="hadist-nav-bar">
+                <button class="hadist-nav-btn" id="hadist-prev-btn" title="Hadist sebelumnya">
                     <i class="fa-solid fa-chevron-left"></i>
+                    <span>Sebelumnya</span>
                 </button>
-                <span class="hadist-page-info" id="hadist-page-info">—</span>
-                <button class="hadist-page-btn" id="hadist-next-page">
+                <button class="hadist-nav-btn hadist-nav-random" id="hadist-random-btn" title="Hadist acak">
+                    <i class="fa-solid fa-shuffle"></i>
+                </button>
+                <button class="hadist-nav-btn" id="hadist-next-btn" title="Hadist berikutnya">
+                    <span>Berikutnya</span>
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
@@ -355,16 +377,15 @@ function openHadistPanel() {
         if (e.target === overlay) overlay.classList.remove('open');
     });
 
-    // Kitab selector
+    // Kitab selector → fetch random dari kitab baru
     overlay.querySelector('#hadist-kitab-bar').addEventListener('click', e => {
         const btn = e.target.closest('.hadist-kitab-btn');
         if (!btn) return;
         _panelState.kitab = HADIST_KITAB.find(k => k.id === btn.dataset.kitab);
-        _panelState.page  = 1;
-        _panelState.view  = 'list';
+        _panelState.nomor = _randomNomor(_panelState.kitab);
         overlay.querySelectorAll('.hadist-kitab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        _renderHadistList();
+        _renderHadistDetail(_panelState.kitab.id, _panelState.nomor);
     });
 
     // Goto nomor
@@ -373,115 +394,90 @@ function openHadistPanel() {
         if (e.key === 'Enter') _gotoHadist();
     });
 
-    // Pagination
-    overlay.querySelector('#hadist-prev-page').addEventListener('click', () => {
-        if (_panelState.page > 1) { _panelState.page--; _renderHadistList(); }
+    // Nav: Prev / Next / Random
+    overlay.querySelector('#hadist-prev-btn').addEventListener('click', () => {
+        if (_panelState.nomor > 1) {
+            _panelState.nomor--;
+            _renderHadistDetail(_panelState.kitab.id, _panelState.nomor);
+        }
     });
-    overlay.querySelector('#hadist-next-page').addEventListener('click', () => {
-        _panelState.page++;
-        _renderHadistList();
+    overlay.querySelector('#hadist-next-btn').addEventListener('click', () => {
+        if (_panelState.nomor < _panelState.kitab.total) {
+            _panelState.nomor++;
+            _renderHadistDetail(_panelState.kitab.id, _panelState.nomor);
+        }
+    });
+    overlay.querySelector('#hadist-random-btn').addEventListener('click', () => {
+        _panelState.nomor = _randomNomor(_panelState.kitab);
+        _renderHadistDetail(_panelState.kitab.id, _panelState.nomor);
     });
 
     requestAnimationFrame(() => overlay.classList.add('open'));
-    _renderHadistList();
+
+    // Tampilkan hadist: dari widget jika ada target, atau random
+    if (target && target.kitabId && target.nomor) {
+        const kitab = HADIST_KITAB.find(k => k.id === target.kitabId);
+        if (kitab) {
+            _panelState.kitab = kitab;
+            overlay.querySelectorAll('.hadist-kitab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.kitab === kitab.id);
+            });
+        }
+        _panelState.nomor = target.nomor;
+        _renderHadistDetail(target.kitabId, target.nomor);
+    } else {
+        _panelState.nomor = _randomNomor(_panelState.kitab);
+        _renderHadistDetail(_panelState.kitab.id, _panelState.nomor);
+    }
 }
 
 function _gotoHadist() {
     const input = document.getElementById('hadist-goto-input');
     const nomor = parseInt(input?.value);
     if (!nomor || nomor < 1) return;
-    _renderHadistDetail(_panelState.kitab.id, nomor);
+    _panelState.nomor = nomor;
+    _renderHadistDetail(_panelState.kitab.id, _panelState.nomor);
     if (input) input.value = '';
 }
 
-function _renderHadistList() {
-    const body     = document.getElementById('hadist-panel-body');
-    const subtitle = document.getElementById('hadist-panel-subtitle');
-    const pageInfo = document.getElementById('hadist-page-info');
-    const paginationEl = document.getElementById('hadist-pagination');
-    if (!body) return;
-
-    _panelState.view = 'list';
-    if (subtitle) subtitle.textContent = _panelState.kitab.nama;
-    if (paginationEl) paginationEl.style.display = 'flex';
-
-    body.innerHTML = `<div class="hadist-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>Memuat...</span></div>`;
-
-    _fetchHadistList(_panelState.kitab.id, _panelState.page, _panelState.limit)
-        .then(res => {
-            const items     = res.data   ?? res.hadiths ?? res ?? [];
-            const totalPage = res.pagination?.totalPage ?? Math.ceil(_panelState.kitab.total / _panelState.limit);
-
-            if (pageInfo) pageInfo.textContent = `${_panelState.page} / ${totalPage}`;
-
-            const prevBtn = document.getElementById('hadist-prev-page');
-            const nextBtn = document.getElementById('hadist-next-page');
-            if (prevBtn) prevBtn.disabled = _panelState.page <= 1;
-            if (nextBtn) nextBtn.disabled = _panelState.page >= totalPage;
-
-            if (!items.length) {
-                body.innerHTML = `<div class="hadist-empty"><i class="fa-solid fa-inbox"></i><p>Tidak ada data.</p></div>`;
-                return;
-            }
-
-            body.innerHTML = items.map(h => {
-                const nomor = h.number ?? h.no ?? '?';
-                const arab  = (h.arab  ?? h.text_ar ?? '').slice(0, 120) + '...';
-                const idn   = (h.id    ?? h.text_id ?? h.Indonesia ?? '').slice(0, 100) + '...';
-                return `
-                    <div class="hadist-list-item" data-nomor="${nomor}">
-                        <div class="hli-nomor">${nomor}</div>
-                        <div class="hli-content">
-                            <p class="hli-arab" dir="rtl">${arab}</p>
-                            <p class="hli-idn">${idn}</p>
-                        </div>
-                        <i class="fa-solid fa-chevron-right hli-arrow"></i>
-                    </div>
-                `;
-            }).join('');
-
-            // Click item → detail
-            body.querySelectorAll('.hadist-list-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    _renderHadistDetail(_panelState.kitab.id, parseInt(item.dataset.nomor));
-                });
-            });
-        })
-        .catch(() => {
-            body.innerHTML = `<div class="hadist-empty"><i class="fa-solid fa-wifi"></i><p>Gagal memuat. Periksa koneksi.</p></div>`;
-        });
+function _updateNavButtons() {
+    const prevBtn = document.getElementById('hadist-prev-btn');
+    const nextBtn = document.getElementById('hadist-next-btn');
+    if (prevBtn) prevBtn.disabled = _panelState.nomor <= 1;
+    if (nextBtn) nextBtn.disabled = _panelState.nomor >= _panelState.kitab.total;
 }
 
 function _renderHadistDetail(kitabId, nomor) {
-    const body      = document.getElementById('hadist-panel-body');
-    const subtitle  = document.getElementById('hadist-panel-subtitle');
-    const paginationEl = document.getElementById('hadist-pagination');
+    const body     = document.getElementById('hadist-panel-body');
+    const subtitle = document.getElementById('hadist-panel-subtitle');
     if (!body) return;
 
-    _panelState.view = 'detail';
-    if (paginationEl) paginationEl.style.display = 'none';
+    _panelState.nomor = nomor;
+    _updateNavButtons();
 
     body.innerHTML = `<div class="hadist-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>Memuat hadist...</span></div>`;
 
     _fetchHadist(kitabId, nomor)
         .then(data => {
-            const h        = data.data ?? data;
-            const arab     = h.arab    ?? h.text_ar ?? '';
-            const idn      = h.id      ?? h.text_id ?? h.Indonesia ?? '';
-            const nomorH   = h.number  ?? h.no ?? nomor;
+            const h         = data.data ?? data;
+            const arab      = h.arab    ?? h.text_ar ?? '';
+            const idn       = h.id      ?? h.text_id ?? h.Indonesia ?? '';
+            const nomorH    = h.number  ?? h.no ?? nomor;
             const kitabNama = _getKitabNama(kitabId);
+            const kitabArab = _getKitabArab(kitabId);
+
+            // Sync state dengan nomor aktual dari API
+            _panelState.nomor = nomorH;
+            _updateNavButtons();
 
             if (subtitle) subtitle.textContent = `${kitabNama} · No. ${nomorH}`;
 
+            const isMarked = typeof isBookmarkedHadist === 'function' && isBookmarkedHadist(kitabId, nomorH);
+
             body.innerHTML = `
                 <div class="hadist-detail">
-                    <button class="hadist-back-btn" id="hadist-back-btn">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <span>Kembali ke daftar</span>
-                    </button>
-
                     <div class="hadist-detail-badge">
-                        <span class="hdb-arab">${_getKitabArab(kitabId)}</span>
+                        <span class="hdb-arab">${kitabArab}</span>
                         <span class="hdb-nama">${kitabNama}</span>
                         <span class="hdb-nomor">No. ${nomorH}</span>
                     </div>
@@ -496,56 +492,33 @@ function _renderHadistDetail(kitabId, nomor) {
                     </div>
 
                     <div class="hadist-detail-actions">
-                        <button class="hadist-action-btn" id="hadist-bookmark-btn"
-                            title="${isBookmarkedHadist(kitabId, nomorH) ? 'Hapus bookmark' : 'Simpan bookmark'}">
-                            <i class="${isBookmarkedHadist(kitabId, nomorH) ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
+                        <button class="hadist-action-btn ${isMarked ? 'bookmarked' : ''}" id="hadist-bookmark-btn"
+                            title="${isMarked ? 'Hapus bookmark' : 'Simpan bookmark'}">
+                            <i class="${isMarked ? 'fa-solid' : 'fa-regular'} fa-bookmark"></i>
                             Bookmark
                         </button>
                         <button class="hadist-action-btn" id="hadist-copy-btn">
                             <i class="fa-regular fa-copy"></i>
                             Salin
                         </button>
-                        <button class="hadist-action-btn" id="hadist-prev-hadist">
-                            <i class="fa-solid fa-chevron-left"></i>
-                            Sebelumnya
-                        </button>
-                        <button class="hadist-action-btn" id="hadist-next-hadist">
-                            Selanjutnya
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
                     </div>
                 </div>
             `;
 
-            document.getElementById('hadist-back-btn').addEventListener('click', () => {
-                _panelState.view = 'list';
-                if (subtitle) subtitle.textContent = _panelState.kitab.nama;
-                if (paginationEl) paginationEl.style.display = 'flex';
-                _renderHadistList();
-            });
-
             // Bookmark
             const bookmarkBtn = document.getElementById('hadist-bookmark-btn');
-            if (bookmarkBtn) {
+            if (bookmarkBtn && typeof toggleBookmarkHadist === 'function') {
                 bookmarkBtn.addEventListener('click', () => {
-                    if (typeof toggleBookmarkHadist === 'function') {
-                        toggleBookmarkHadist(
-                            kitabId,
-                            kitabNama,
-                            _getKitabArab(kitabId),
-                            nomorH,
-                            arab,
-                            idn
-                        );
-                        // Update button state
-                        const isOn = isBookmarkedHadist(kitabId, nomorH);
-                        bookmarkBtn.classList.toggle('bookmarked', isOn);
-                        const icon = bookmarkBtn.querySelector('i');
-                        if (icon) icon.className = isOn ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark';
-                    }
+                    toggleBookmarkHadist(kitabId, kitabNama, kitabArab, nomorH, arab, idn);
+                    const isOn = typeof isBookmarkedHadist === 'function' && isBookmarkedHadist(kitabId, nomorH);
+                    bookmarkBtn.classList.toggle('bookmarked', isOn);
+                    bookmarkBtn.title = isOn ? 'Hapus bookmark' : 'Simpan bookmark';
+                    const icon = bookmarkBtn.querySelector('i');
+                    if (icon) icon.className = isOn ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark';
                 });
             }
 
+            // Copy
             document.getElementById('hadist-copy-btn').addEventListener('click', () => {
                 const text = `${arab}\n\n"${idn}"\n\n(${kitabNama} No. ${nomorH})`;
                 navigator.clipboard.writeText(text).then(() => {
@@ -553,18 +526,6 @@ function _renderHadistDetail(kitabId, nomor) {
                         showToast({ type: 'success', message: 'Hadist berhasil disalin!', duration: 2000 });
                 });
             });
-
-            const maxNomor = _panelState.kitab.total;
-            const prevBtn2  = document.getElementById('hadist-prev-hadist');
-            const nextBtn2  = document.getElementById('hadist-next-hadist');
-            if (prevBtn2) {
-                prevBtn2.disabled = nomorH <= 1;
-                prevBtn2.addEventListener('click', () => _renderHadistDetail(kitabId, nomorH - 1));
-            }
-            if (nextBtn2) {
-                nextBtn2.disabled = nomorH >= maxNomor;
-                nextBtn2.addEventListener('click', () => _renderHadistDetail(kitabId, nomorH + 1));
-            }
         })
         .catch(() => {
             body.innerHTML = `<div class="hadist-empty"><i class="fa-solid fa-wifi"></i><p>Gagal memuat hadist ini.</p></div>`;

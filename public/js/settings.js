@@ -91,6 +91,12 @@ const I18N = {
         settings_arab_font:   'Jenis Font Arab',
         font_decrease:        'Perkecil',
         font_increase:        'Perbesar',
+        font_decrease_arab:   'Perkecil ukuran teks Arab',
+        font_increase_arab:   'Perbesar ukuran teks Arab',
+        font_decrease_latin:  'Perkecil ukuran teks Latin',
+        font_increase_latin:  'Perbesar ukuran teks Latin',
+        font_decrease_trans:  'Perkecil ukuran teks Terjemahan',
+        font_increase_trans:  'Perbesar ukuran teks Terjemahan',
         settings_bg_color:    'Tema Warna Latar',
         settings_selected:    'Dipilih:',
         settings_language:    'Bahasa Tampilan',
@@ -210,6 +216,12 @@ const I18N = {
         settings_arab_font:   'Arabic Font Style',
         font_decrease:        'Decrease',
         font_increase:        'Increase',
+        font_decrease_arab:   'Decrease Arabic text size',
+        font_increase_arab:   'Increase Arabic text size',
+        font_decrease_latin:  'Decrease Latin text size',
+        font_increase_latin:  'Increase Latin text size',
+        font_decrease_trans:  'Decrease Translation text size',
+        font_increase_trans:  'Increase Translation text size',
         settings_bg_color:    'Background Theme',
         settings_selected:    'Selected:',
         settings_language:    'Display Language',
@@ -528,6 +540,17 @@ function applySettings(s) {
         const topBtn = document.getElementById('topbar-darkmode-btn');
         if (topBtn) { topBtn.querySelector('i').className = 'fa-solid fa-moon'; topBtn.classList.remove('darkmode-active'); }
     }
+
+    // Disable / enable bg-option buttons saat dark mode aktif
+    document.querySelectorAll('.bg-option').forEach(btn => {
+        if (s.darkMode) {
+            btn.disabled = true;
+            btn.classList.add('bg-option-disabled');
+        } else {
+            btn.disabled = false;
+            btn.classList.remove('bg-option-disabled');
+        }
+    });
 }
 
 function initSettings() {
