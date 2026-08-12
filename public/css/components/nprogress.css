@@ -1,0 +1,12 @@
+/* ── NPROGRESS — override warna ke emas tema ── */
+#nprogress .bar {
+    background: var(--gold) !important;
+    height: 3px !important;
+}
+#nprogress .peg {
+    box-shadow: 0 0 10px var(--gold), 0 0 5px var(--gold) !important;
+}
+#nprogress .spinner-icon {
+    border-top-color: var(--gold) !important;
+    border-left-color: var(--gold) !important;
+}

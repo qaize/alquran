@@ -1,0 +1,28 @@
+/* ── 19. TERJEMAHAN ── */
+.terjemahan-ayat {
+    display: none;
+    margin-top: 8px;
+    animation: fadeIn 0.3s ease;
+}
+
+.tulisan-latin {
+    font-style: italic;
+    font-size: var(--latin-font-size, 13px);
+    color: var(--text-mid);
+    text-align: left;
+    direction: ltr;
+    margin-bottom: 4px;
+    line-height: 1.6;
+}
+
+.terjemahan {
+    font-size: var(--trans-font-size, 13px);
+    color: var(--text-dark);
+    text-align: justify;
+    direction: ltr;
+    line-height: 1.7;
+    background: var(--gold-pale);
+    border-left: 3px solid var(--gold-light);
+    padding: 8px 12px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}

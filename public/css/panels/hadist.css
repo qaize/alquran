@@ -1,0 +1,769 @@
+/* ══════════════════════════════════════════════
+   HADIST — Widget Harian + Panel Browser
+   ══════════════════════════════════════════════ */
+
+/* ── Widget Harian ── */
+.hadist-daily-widget {
+    margin: 12px 20px 4px;
+}
+
+.hdw-inner {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border: 1.5px solid rgba(201,168,76,0.35);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.hdw-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+
+.hdw-icon {
+    width: 28px;
+    height: 28px;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--gold);
+    flex-shrink: 0;
+}
+
+.hdw-title {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hdw-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hdw-refresh,
+.hdw-collapse-btn {
+    width: 24px;
+    height: 24px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 50%;
+    color: rgba(255,255,255,0.5);
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+}
+
+.hdw-refresh:hover,
+.hdw-collapse-btn:hover {
+    background: rgba(201,168,76,0.15);
+    color: var(--gold);
+    border-color: var(--gold);
+}
+
+.hdw-collapse-btn i {
+    transition: transform 0.3s ease;
+}
+
+/* Collapsible body */
+.hdw-collapsible {
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity    0.3s ease;
+    opacity: 1;
+    max-height: none;
+}
+
+.hdw-collapsible.hdw-collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+}
+
+.hdw-body {
+    padding: 12px 14px 10px;
+}
+
+.hdw-loading, .hdw-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+}
+
+.hdw-kitab-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.hdw-kitab-arab {
+    font-family: "Amiri", serif;
+    font-size: 15px;
+    color: var(--gold-light);
+    direction: rtl;
+}
+
+.hdw-kitab-nama {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: rgba(201,168,76,0.12);
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(201,168,76,0.2);
+}
+
+.hdw-arab {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    font-size: 20px;
+    color: var(--white);
+    line-height: 1.9;
+    text-align: right;
+    direction: rtl;
+    margin-bottom: 8px;
+    /* Max 2 baris di widget */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.hdw-idn {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    font-style: italic;
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.hdw-footer {
+    padding: 8px 14px 10px;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.hdw-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.hdw-bm-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.45);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    flex-shrink: 0;
+}
+
+.hdw-bm-btn:hover {
+    background: rgba(201,168,76,0.15);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.hdw-bm-btn.bookmarked {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.hdw-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 50px;
+    color: var(--gold-light);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 16px;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.hdw-more-btn:hover {
+    background: rgba(201,168,76,0.22);
+    border-color: var(--gold);
+}
+
+/* ── Panel Browser ── */
+.hadist-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13,33,55,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 5500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.hadist-panel-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.hadist-panel {
+    width: min(860px, 96vw);
+    max-height: 92vh;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(13,33,55,0.35);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hadist-panel-overlay.open .hadist-panel {
+    transform: translateY(0) scale(1);
+}
+
+/* Header */
+.hadist-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 14px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    border-bottom: 2px solid var(--gold);
+    flex-shrink: 0;
+}
+
+.hadist-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hadist-panel-title > i {
+    font-size: 20px;
+    color: var(--gold);
+}
+
+.hadist-panel-title h2 {
+    font-family: "Cinzel", serif;
+    font-size: 16px;
+    color: var(--white);
+    font-weight: 700;
+    margin: 0;
+}
+
+.hadist-panel-title p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    margin: 2px 0 0;
+}
+
+.hadist-panel-close {
+    width: 30px;
+    height: 30px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 50%;
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+}
+
+.hadist-panel-close:hover {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+/* Kitab bar */
+.hadist-kitab-bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    overflow-x: auto;
+    background: var(--navy);
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    flex-shrink: 0;
+    scrollbar-width: none;
+}
+
+.hadist-kitab-bar::-webkit-scrollbar { display: none; }
+
+.hadist-kitab-btn {
+    flex-shrink: 0;
+    padding: 5px 14px;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.hadist-kitab-btn:hover {
+    border-color: var(--gold-light);
+    color: var(--gold-light);
+    background: rgba(201,168,76,0.12);
+}
+
+.hadist-kitab-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+    font-weight: 700;
+}
+
+/* Search bar */
+.hadist-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+    flex-shrink: 0;
+}
+
+.hadist-search-bar i {
+    color: var(--text-light);
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.hadist-search-bar input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    outline: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: var(--blue-soft);
+    border-radius: var(--radius-sm);
+    padding: 7px 12px;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    /* number input: show spin arrows for UX */
+    -moz-appearance: textfield;
+}
+
+.hadist-search-bar input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+    background: var(--white);
+}
+
+.hadist-search-bar input::placeholder {
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+.hadist-search-bar button {
+    padding: 7px 18px;
+    background: var(--navy);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition);
+    white-space: nowrap;
+}
+
+.hadist-search-bar button:hover {
+    background: var(--gold);
+    color: var(--navy);
+}
+
+/* Body */
+.hadist-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.hadist-panel-body::-webkit-scrollbar { width: 6px; }
+.hadist-panel-body::-webkit-scrollbar-thumb {
+    background: var(--gold-light);
+    border-radius: 6px;
+}
+
+/* List item */
+.hadist-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(205,228,245,0.5);
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.hadist-list-item:hover {
+    background: var(--gold-pale);
+}
+
+.hli-nomor {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 60%, #b8943c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-top: 2px;
+}
+
+.hli-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.hli-arab {
+    font-family: "Amiri", serif;
+    font-size: 16px;
+    color: var(--navy);
+    line-height: 1.8;
+    text-align: right;
+    direction: rtl;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.hli-idn {
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-style: italic;
+}
+
+.hli-arrow {
+    color: var(--text-light);
+    font-size: 11px;
+    margin-top: 4px;
+    flex-shrink: 0;
+    transition: color var(--transition), transform var(--transition);
+}
+
+.hadist-list-item:hover .hli-arrow {
+    color: var(--gold);
+    transform: translateX(3px);
+}
+
+/* Bottom navigation bar */
+.hadist-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--blue-soft);
+    flex-shrink: 0;
+}
+
+.hadist-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    flex: 1;
+    justify-content: center;
+}
+
+.hadist-nav-btn:hover:not(:disabled) {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+}
+
+.hadist-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Random button — square, between prev/next */
+.hadist-nav-random {
+    flex: 0 0 40px;
+    width: 40px;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.hadist-nav-random:hover:not(:disabled) {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--white);
+}
+
+/* Detail view */
+.hadist-detail {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.hadist-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--blue-soft);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    color: var(--text-mid);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all var(--transition);
+    align-self: flex-start;
+}
+
+.hadist-back-btn:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+}
+
+.hadist-detail-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(201,168,76,0.3);
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.hdb-arab {
+    font-family: "Amiri", serif;
+    font-size: 20px;
+    color: var(--gold-light);
+    direction: rtl;
+}
+
+.hdb-nama {
+    font-family: "Cinzel", serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.hdb-nomor {
+    font-size: 11px;
+    background: rgba(201,168,76,0.2);
+    color: var(--gold-light);
+    padding: 2px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(201,168,76,0.3);
+}
+
+.hadist-detail-arab {
+    background: var(--gold-pale);
+    border: 1.5px solid rgba(201,168,76,0.25);
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+
+.hadist-detail-arab p {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    font-size: 24px;
+    color: var(--navy);
+    line-height: 2;
+    text-align: right;
+    direction: rtl;
+}
+
+.hadist-detail-idn {
+    background: var(--blue-soft);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--gold);
+    padding: 12px 14px;
+}
+
+.hdi-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.hadist-detail-idn p {
+    font-size: 13.5px;
+    color: var(--text-dark);
+    line-height: 1.8;
+}
+
+.hadist-detail-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.hadist-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    background: var(--white);
+    color: var(--text-mid);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.hadist-action-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-pale);
+}
+
+.hadist-action-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+/* Loading & empty */
+.hadist-loading, .hadist-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px 20px;
+    color: var(--text-light);
+    font-size: 13px;
+    text-align: center;
+}
+
+.hadist-loading i, .hadist-empty i {
+    font-size: 22px;
+    color: var(--gold);
+    opacity: 0.5;
+}
+
+/* Dark mode */
+.theme-dark .hdw-inner {
+    border-color: rgba(201,168,76,0.2);
+}
+
+.theme-dark .hadist-panel {
+    background: var(--navy-mid);
+}
+
+.theme-dark .hadist-list-item:hover {
+    background: rgba(201,168,76,0.07);
+}
+
+.theme-dark .hli-arab { color: var(--white); }
+.theme-dark .hli-idn  { color: rgba(255,255,255,0.55); }
+
+.theme-dark .hadist-detail-arab {
+    background: rgba(201,168,76,0.07);
+    border-color: rgba(201,168,76,0.2);
+}
+
+.theme-dark .hadist-detail-arab p { color: var(--white); }
+
+.theme-dark .hadist-detail-idn {
+    background: rgba(255,255,255,0.04);
+}
+
+.theme-dark .hadist-detail-idn p { color: rgba(255,255,255,0.85); }
+
+.theme-dark .hadist-action-btn {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.6);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .hadist-daily-widget {
+        margin: 8px 12px 4px;
+    }
+
+    .hadist-panel {
+        width: 100vw;
+        max-height: 95vh;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .hadist-panel-overlay {
+        align-items: flex-end;
+    }
+
+    .hadist-detail-arab p {
+        font-size: 20px;
+    }
+}

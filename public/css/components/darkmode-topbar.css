@@ -1,0 +1,9 @@
+/* ── TOPBAR DARK MODE BUTTON ── */
+#topbar-darkmode-btn.darkmode-active {
+    background: rgba(201, 168, 76, 0.25) !important;
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+}
+#topbar-darkmode-btn {
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}

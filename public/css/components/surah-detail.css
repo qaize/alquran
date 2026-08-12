@@ -1,0 +1,212 @@
+/* ── 16. SURAH DETAIL TITLE ── */
+#title-detail-surah {
+    text-align: center;
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 100%);
+    margin: 0 20px;
+    border-radius: var(--radius-md);
+    border: 3px solid var(--gold);
+    box-shadow:
+        0 6px 24px rgba(201, 168, 76, 0.18),
+        inset 0 1px 0 rgba(201, 168, 76, 0.15);
+    overflow: hidden;
+}
+
+#title-detail-surah:empty { display: none; }
+
+/* ── Header (selalu tampil, saat collapsed = satu-satunya yg terlihat) ── */
+.title-surah-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    position: relative;
+    gap: 10px;
+}
+
+.title-surah-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.title-surah-name {
+    font-family: "Cinzel", serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.5px;
+}
+
+.title-surah-arab {
+    font-family: "Amiri", serif;
+    font-size: 18px;
+    color: var(--gold-light);
+    direction: rtl;
+    line-height: 1.4;
+}
+
+.title-surah-collapse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 50%;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 10px;
+    flex-shrink: 0;
+    transition: background var(--transition), color var(--transition),
+                border-color var(--transition);
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.title-surah-collapse-btn:hover {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--gold);
+    color: var(--gold-light);
+}
+
+.title-surah-collapse-btn i {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Saat collapsed — flip icon */
+.title-surah-body.collapsed ~ * .title-surah-collapse-btn i,
+.title-surah-collapse-btn.is-collapsed i {
+    transform: rotate(180deg);
+}
+
+/* ── Body (collapsible) ── */
+.title-surah-body {
+    overflow: hidden;
+    transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity    0.3s ease,
+                padding    0.32s ease;
+    opacity: 1;
+    max-height: none;
+    padding: 12px 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.title-surah-body.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    pointer-events: none;
+}
+
+/* Arti surah */
+.title-surah-arti {
+    font-size: 13px;
+    color: var(--gold-light);
+    font-style: italic;
+    margin: 0;
+    opacity: 0.85;
+}
+
+.title-Surah h2,
+.title-surah-full { display: none; }
+
+.title-Surah h3   { display: none; }
+
+.title-Surah h3 {
+    font-size: 14px;
+    color: var(--gold-light);
+    font-style: italic;
+    margin-bottom: 14px;
+}
+
+/* ── Bismillah ornament di header surah ── */
+.surah-bismillah-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 auto 12px;
+    max-width: 320px;
+}
+
+.sbo-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5));
+}
+
+.surah-bismillah-ornament .sbo-line:last-child {
+    background: linear-gradient(90deg, rgba(201,168,76,0.5), transparent);
+}
+
+.sbo-text {
+    font-family: "Amiri", serif;
+    font-size: 22px;
+    color: var(--gold-light);
+    line-height: 1.5;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 8px rgba(201,168,76,0.3);
+    flex-shrink: 0;
+}
+
+.scroll-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 0 4px;
+}
+
+.scroll-navigation button {
+    padding: 8px 18px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50px;
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        background var(--transition),
+        border-color var(--transition);
+}
+
+.scroll-navigation button:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+}
+
+.scroll-navigation label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#scroll-input {
+    width: 64px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    text-align: center;
+    padding: 0 8px;
+    font-size: 13px;
+}
+
+#scroll-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(255, 255, 255, 0.18);
+}

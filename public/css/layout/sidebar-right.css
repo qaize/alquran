@@ -1,0 +1,307 @@
+/* ── 8. RIGHT SIDEBAR — FAVORITES ── */
+.sidebar-right {
+    background: var(--white);
+    border-left: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    width: var(--sidebar-r-w);
+    min-width: 0;
+    transition:
+        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.25s ease,
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Collapsed state */
+.sidebar-right.collapsed {
+    width: 0;
+    overflow: hidden;
+    opacity: 0;
+    border-left: none;
+    transform: translateX(20px);
+    pointer-events: none;
+}
+
+/* Grid adjustment when collapsed */
+.app-wrapper.sidebar-collapsed {
+    grid-template-columns: var(--sidebar-w) 1fr 0px;
+}
+
+/* Toggle button (inside sidebar, top strip) */
+.sidebar-right-toggle {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color: var(--gold);
+    border: none;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    z-index: 11;
+    transition:
+        background 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.15s ease;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
+}
+/* Ripple effect */
+.sidebar-right-toggle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(201, 168, 76, 0.12);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.sidebar-right-toggle:hover::before {
+    opacity: 1;
+}
+.sidebar-right-toggle:active {
+    transform: scale(0.97);
+}
+.sidebar-right-toggle::after {
+    content: "Sembunyikan";
+    font-size: 11px;
+    color: var(--white);
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+.sidebar-right-toggle:hover {
+    background: var(--navy-mid);
+}
+.sidebar-right-toggle:hover::after {
+    opacity: 1;
+}
+/* Icon rotation saat hover */
+.sidebar-right-toggle .fa-chevron-right {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sidebar-right-toggle:hover .fa-chevron-right {
+    transform: translateX(3px);
+}
+
+/* Expand button (visible when collapsed) */
+.sidebar-right-expand {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 60px;
+    border-radius: 8px 0 0 8px;
+    background: var(--navy);
+    color: var(--gold);
+    border: 1px solid var(--navy-mid);
+    border-right: none;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    z-index: 200;
+    transition:
+        background 0.2s ease,
+        width 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    box-shadow: -3px 0 16px rgba(13, 33, 55, 0.2);
+    opacity: 0;
+    animation: expandBtnAppear 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes expandBtnAppear {
+    from { opacity: 0; transform: translateY(-50%) translateX(12px); }
+    to   { opacity: 1; transform: translateY(-50%) translateX(0);    }
+}
+.sidebar-right-expand:hover {
+    background: var(--navy-light);
+    width: 36px;
+    box-shadow: -4px 0 20px rgba(13, 33, 55, 0.35);
+}
+.sidebar-right-expand:active {
+    transform: translateY(-50%) scale(0.95);
+}
+/* Icon bounce saat hover */
+.sidebar-right-expand .fa-chevron-left {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sidebar-right-expand:hover .fa-chevron-left {
+    transform: translateX(-2px);
+}
+
+/* Show expand button when sidebar is collapsed */
+.app-wrapper.sidebar-collapsed .sidebar-right-expand {
+    display: flex;
+}
+/* Hide toggle button when collapsed */
+.sidebar-right.collapsed .sidebar-right-toggle {
+    display: none;
+}
+
+.sidebar-right-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 16px 14px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border-bottom: 2px solid var(--gold);
+}
+
+.sidebar-right-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    font-family: "Inter", sans-serif;
+}
+
+.star-icon {
+    font-size: 16px;
+}
+
+.favorites-list {
+    padding: 10px 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    align-content: start;
+    flex: 1;
+}
+
+.favorites-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--text-light);
+    grid-column: 1 / -1;
+}
+
+.empty-star-icon {
+    font-size: 30px;
+    color: var(--gold-light);
+    opacity: 0.5;
+}
+
+.favorites-empty p {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.favorites-empty small {
+    font-size: 11px;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+/* Favorite item — compact grid card */
+.fav-item {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition:
+        background var(--transition),
+        border-color var(--transition),
+        transform 0.15s ease,
+        box-shadow var(--transition);
+    cursor: pointer;
+    position: relative;
+}
+
+.fav-item:hover {
+    background: var(--navy);
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.fav-item:hover .fav-name  { color: var(--white); }
+.fav-item:hover .fav-arti  { color: rgba(255,255,255,0.55); }
+.fav-item:hover .fav-nomor { color: var(--gold); }
+.fav-item:hover .fav-remove-btn { opacity: 1; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); }
+.fav-item:hover .fav-remove-btn:hover { color: #ff6b6b; }
+
+.fav-read-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 10px 10px 6px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    min-width: 0;
+}
+
+.fav-nomor {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    font-family: "Cinzel", serif;
+    line-height: 1;
+    transition: color var(--transition);
+}
+
+.fav-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    transition: color var(--transition);
+}
+
+.fav-arti {
+    font-size: 10px;
+    color: var(--text-mid);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: block;
+    transition: color var(--transition);
+}
+
+.fav-remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    background: rgba(13,33,55,0.06);
+    border: none;
+    border-radius: 50%;
+    color: var(--text-light);
+    font-size: 9px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition), color var(--transition), background var(--transition);
+}
+
+.fav-item:hover .fav-remove-btn {
+    opacity: 1;
+}

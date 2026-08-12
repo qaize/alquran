@@ -1,0 +1,111 @@
+/* ── 25. AYAT FULL-WIDTH ARABIC MODE ── */
+
+/* .detailSurah dalam fullwidth mode */
+.detailSurah.fullwidth-mode {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px 20px;
+}
+
+/* Fallback :has() untuk browser modern */
+.detailSurah:has(.ayat.ayat-fullwidth) {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px 20px;
+}
+
+/* #main-body:has(.detailSurah) sudah diset ke flex column di atas */
+
+.ayat.ayat-fullwidth {
+    flex: unset;
+    width: 100%;
+    max-width: 100%;
+    height: calc(100vh - 322px);
+    min-height: 300px;
+    text-align: right;
+    padding: 20px 60px 32px 48px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border: 3px solid var(--gold-light);
+    border-radius: var(--radius-sm);
+}
+
+.ayat.ayat-fullwidth::-webkit-scrollbar { width: 10px; }
+.ayat.ayat-fullwidth::-webkit-scrollbar-track {
+    background: var(--blue-soft);
+    border-radius: 10px;
+}
+.ayat.ayat-fullwidth::-webkit-scrollbar-thumb {
+    background: var(--gold-light);
+    border-radius: 10px;
+    border: 2px solid var(--blue-soft);
+}
+.ayat.ayat-fullwidth::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+}
+
+/* fullwidth mode — barisSurah tetap single column seperti normal */
+.ayat.ayat-fullwidth .barisSurah {
+    flex-direction: column;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+    justify-content: unset;
+    align-items: unset;
+    gap: unset;
+}
+
+.ayat.ayat-fullwidth .barisSurah:last-child {
+    border-bottom: none;
+}
+
+.ayat.ayat-fullwidth .isi-ayat {
+    text-align: right;
+    direction: rtl;
+    flex: 1;
+    width: 100%;
+}
+
+.ayat.ayat-fullwidth .ayat-nav {
+    text-align: right;
+    direction: rtl;
+    width: 100%;
+}
+
+.ayat.ayat-fullwidth .arabic {
+    font-size: var(--arabic-font-size, 40px);
+    line-height: 2;
+    color: var(--navy);
+    text-align: right;
+    direction: rtl;
+    display: block;
+    width: 100%;
+}
+
+/* Dark mode override untuk fullwidth — harus setelah rule di atas agar menang */
+.theme-dark .ayat.ayat-fullwidth .arabic {
+    color: #ffffff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.ayat.ayat-fullwidth .urutan-ayat {
+    border-color: var(--gold);
+    background: var(--gold-pale);
+}
+
+/* Terjemahan dalam fullwidth — lebar proporsional & center */
+.ayat.ayat-fullwidth .terjemahan-ayat {
+    text-align: left;
+    direction: ltr;
+    max-width: 75%;
+    margin: 4px 0 0 auto;
+}
+
+/* Responsif: kurangi padding horizontal di layar kecil */
+@media (max-width: 900px) {
+    .ayat.ayat-fullwidth {
+        padding: 16px 20px 24px 16px;
+        /* Mobile: topbar(50px) + search(60px) + title(100px) + padding(32px) = ~242px */
+        height: calc(100vh - 242px);
+    }
+}

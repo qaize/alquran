@@ -1,0 +1,279 @@
+/* ── TAJWEED TOGGLE & LEGEND ── */
+.tajweed-toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+    flex-shrink: 0;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ccc;
+    border-radius: 22px;
+    transition: background 0.25s ease;
+}
+.toggle-slider::before {
+    content: "";
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background: var(--white);
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--gold);
+}
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+
+.tajweed-toggle-label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-mid);
+}
+
+.settings-hint {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.tajweed-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--blue-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-top: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.tajweed-legend-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+.tajweed-legend-title i {
+    color: var(--gold);
+    font-size: 13px;
+}
+
+.tajweed-legend-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tajweed-group-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-mid);
+    padding: 4px 0 2px;
+}
+
+.tajweed-legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: var(--white);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.tj-swatch {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tj-legend-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+.tj-legend-text strong {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+.tj-legend-text small {
+    font-size: 10px;
+    color: var(--text-mid);
+    line-height: 1.35;
+}
+
+/* ── TAJWEED COLORS (applied to Arabic text) ── */
+.tj-ham_wasl {
+    color: #aaaaaa;
+}
+.tj-slnt {
+    color: #aaaaaa;
+}
+.tj-madda_normal {
+    color: #537fff;
+}
+.tj-madda_permissible {
+    color: #4050ff;
+}
+.tj-madda_necessary {
+    color: #000ebc;
+}
+.tj-madda_obligatory {
+    color: #2144c1;
+}
+.tj-qlq {
+    color: #dd0008;
+}
+.tj-ikhf_shfw {
+    color: #d500b7;
+}
+.tj-ikhf {
+    color: #9400a8;
+}
+.tj-idghm_shfw {
+    color: #58b800;
+}
+.tj-iqlb {
+    color: #26bffd;
+}
+.tj-idgh_ghn {
+    color: #169777;
+}
+.tj-idgh_w_ghn {
+    color: #169200;
+}
+.tj-idgh_mus {
+    color: #a1a1a1;
+}
+.tj-idgh_mut {
+    color: #a1a1a1;
+}
+.tj-ghn {
+    color: #ff7e1e;
+}
+[class^="tj-"] {
+    font-family: var(--arabic-font-family, "Amiri", serif);
+    position: relative;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.15s ease;
+}
+[class^="tj-"]:hover {
+    cursor: pointer;
+}
+
+/* Tajweed tooltip — handled by JS (appended to body) */
+[class^="tj-"]::after,
+[class^="tj-"]::before {
+    display: none;
+}
+
+/* Tajweed tooltip element (JS-created, appended to body) */
+.tj-tooltip {
+    position: fixed;
+    background: #0d2137;
+    color: #fff;
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    padding: 6px 12px;
+    border-radius: 6px;
+    width: max-content;
+    max-width: 200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 99999;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    text-align: center;
+    direction: ltr;
+}
+.tj-tooltip.visible {
+    opacity: 1 !important;
+    transform: translateY(0);
+}
+.tj-tooltip-name {
+    color: #e8c97a;
+    display: block;
+}
+
+/* Harakat indicator di tooltip */
+.tj-tooltip-harakaat {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 5px;
+    justify-content: center;
+}
+
+.tj-hk-wrap {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.tj-hk-bar {
+    display: inline-block;
+    width: 6px;
+    height: 14px;
+    background: rgba(201, 168, 76, 0.5);
+    border-radius: 2px;
+    border: 1px solid var(--gold, #c9a84c);
+}
+
+.tj-hk-num {
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    margin-left: 2px;
+    font-weight: 400;
+}
+.tj-tooltip-arrow {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: #0d2137;
+}

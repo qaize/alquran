@@ -1,0 +1,11 @@
+/* ── OVERSCROLL — sidebar & panel tidak trigger page scroll ── */
+.sidebar-left,
+.sidebar-right,
+.nav-dropdown-body,
+.settings-panel-body,
+.juz-panel-list,
+.bookmark-panel-list,
+.favorites-panel-list,
+.lr-popup-list {
+    overscroll-behavior: contain;
+}

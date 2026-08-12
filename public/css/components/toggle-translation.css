@@ -1,0 +1,92 @@
+/* ── 24. SHOW/HIDE TRANSLATION BUTTON ── */
+.btn-toggle-translation {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    background: rgba(201, 168, 76, 0.15);
+    border: 1.5px solid var(--gold);
+    border-radius: 50px;
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background var(--transition),
+        color var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.btn-toggle-translation i {
+    font-size: 12px;
+}
+
+.btn-toggle-translation:hover {
+    background: var(--gold);
+    color: var(--navy);
+    box-shadow: 0 0 12px rgba(201, 168, 76, 0.35);
+}
+
+/* When translation is shown, button turns active (gold filled) */
+.btn-toggle-translation.active {
+    background: var(--gold);
+    color: var(--navy);
+    border-color: var(--gold);
+}
+
+.btn-toggle-translation.active:hover {
+    background: rgba(201, 168, 76, 0.15);
+    color: var(--gold-light);
+}
+
+/* Jump group label + input inline */
+.jump-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jump-group label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+}
+
+/* ── Translation toggle di navbar surah ── */
+.surah-trans-toggle-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 6px 0 2px;
+}
+
+.surah-trans-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.surah-trans-btn i { font-size: 11px; }
+
+.surah-trans-btn.active {
+    background: rgba(201,168,76,0.15);
+    border-color: rgba(201,168,76,0.5);
+    color: var(--gold-light);
+}
+
+.surah-trans-btn:hover {
+    background: rgba(201,168,76,0.2);
+    border-color: var(--gold);
+    color: var(--gold-light);
+}
