@@ -15,7 +15,22 @@ Route::get('/manifest.json', function () {
 });
 
 Route::get('/service-worker.js', function () {
-    return Response::file(public_path('service-worker.js'), [
+    // Generate versi dinamis berdasarkan waktu modifikasi file CSS/JS
+    $latestMtime = max(array_map('filemtime', array_merge(
+        glob(public_path('css/*.css')),
+        glob(public_path('js/*.js'))
+    )));
+    $version = 'v1.0.1-' . $latestMtime;
+
+    $content = file_get_contents(public_path('service-worker.js'));
+    // Ganti SW_VERSION secara dinamis
+    $content = preg_replace(
+        "/const SW_VERSION\s*=\s*'[^']*'/",
+        "const SW_VERSION   = '{$version}'",
+        $content
+    );
+
+    return Response::make($content, 200, [
         'Content-Type' => 'application/javascript',
         'Cache-Control' => 'no-cache, no-store, must-revalidate',
         'Service-Worker-Allowed' => '/',

@@ -3,7 +3,7 @@
    Fase 2: Local notifications (waktu shalat, hadist harian, reminder)
    ──────────────────────────────────────────────────────────────────── */
 
-const SW_VERSION   = 'v1.0.0';
+const SW_VERSION   = 'v1.0.1-1723470000';
 const CACHE_NAME   = `alquran-${SW_VERSION}`;
 const CACHE_STATIC = `alquran-static-${SW_VERSION}`;
 
@@ -81,18 +81,19 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // Static assets & app shell → Cache First, fallback network
+    // Static assets & app shell → Network First, fallback cache
     event.respondWith(
-        caches.match(event.request).then(cached => {
-            if (cached) return cached;
-            return fetch(event.request).then(response => {
-                // Cache response baru untuk request berikutnya
-                if (response && response.status === 200) {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-                }
-                return response;
-            }).catch(() => {
+        fetch(event.request).then(response => {
+            // Update cache dengan response terbaru
+            if (response && response.status === 200) {
+                const clone = response.clone();
+                caches.open(CACHE_STATIC).then(cache => cache.put(event.request, clone));
+            }
+            return response;
+        }).catch(() => {
+            // Offline → serve dari cache
+            return caches.match(event.request).then(cached => {
+                if (cached) return cached;
                 // Offline fallback untuk navigasi
                 if (event.request.mode === 'navigate') {
                     return caches.match('/');
