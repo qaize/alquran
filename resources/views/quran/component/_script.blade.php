@@ -1,38 +1,11 @@
 {{-- ============================================================
    _script.blade.php
-   Entry point JS — load order matters:
-   1. toast.js      (showToast)
-   2. settings.js   (t, getSettings, getCurrentLang, applySettings)
-   3. favorites.js  (toggleFavorite, isFavorite, renderFavorites)
-   4. bookmarks.js  (toggleBookmarkAyat, renderBookmarks)
-   5. last-read.js  (saveToCategory, showSaveLastReadSlide, jumpToLastRead)
-   6. audio.js      (playAyatAudio, setActiveAyatData)
-   7. tajweed.js    (applyTajweed, openTajwidGuide)
-   8. modals.js     (openTafsir, openAsbabunNuzul, initDataSourceModal)
-   9. navigation.js (initJuz, initMobileDrawer)
+   Semua modul JS sudah di-bundle oleh Vite menjadi satu file.
+   Urutan load diatur di resources/js/app.js
    ============================================================ --}}
 
-{{-- External libs --}}
-
-{{-- App modules (load order: dependencies first) --}}
-<script src="{{asset('js/toast.js')}}?v={{filemtime(public_path('js/toast.js'))}}"></script>
-<script src="{{asset('js/settings.js')}}?v={{filemtime(public_path('js/settings.js'))}}"></script>
-<script src="{{asset('js/favorites.js')}}?v={{filemtime(public_path('js/favorites.js'))}}"></script>
-<script src="{{asset('js/bookmarks.js')}}?v={{filemtime(public_path('js/bookmarks.js'))}}"></script>
-<script src="{{asset('js/last-read.js')}}?v={{filemtime(public_path('js/last-read.js'))}}"></script>
-<script src="{{asset('js/audio.js')}}?v={{filemtime(public_path('js/audio.js'))}}"></script>
-<script src="{{asset('js/tajweed.js')}}?v={{filemtime(public_path('js/tajweed.js'))}}"></script>
-<script src="{{asset('js/modals.js')}}?v={{filemtime(public_path('js/modals.js'))}}"></script>
-<script src="{{asset('js/navigation.js')}}?v={{filemtime(public_path('js/navigation.js'))}}"></script>
-
-{{-- Core app — dimuat terakhir karena memanggil fungsi dari semua modul di atas --}}
-<script src="{{asset('js/script.js')}}?v={{filemtime(public_path('js/script.js'))}}"></script>
-<script src="{{asset('js/usage.js')}}?v={{filemtime(public_path('js/usage.js'))}}"></script>
-<script src="{{asset('js/backup.js')}}?v={{filemtime(public_path('js/backup.js'))}}"></script>
-<script src="{{asset('js/janji-allah.js')}}?v={{filemtime(public_path('js/janji-allah.js'))}}"></script>
-<script src="{{asset('js/hadist.js')}}?v={{filemtime(public_path('js/hadist.js'))}}"></script>
-<script src="{{asset('js/prayer-time.js')}}?v={{filemtime(public_path('js/prayer-time.js'))}}"></script>
-<script src="{{asset('js/pwa.js')}}?v={{filemtime(public_path('js/pwa.js'))}}"></script>
+{{-- Vite bundled JS (menggantikan 16 script tags manual) --}}
+@vite(['resources/js/app.js'])
 
 <script>
 

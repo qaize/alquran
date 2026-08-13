@@ -3,11 +3,13 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build:css": "vite build",
+        "build:js": "node build-js.mjs",
+        "build": "npm run build:css && npm run build:js"
     },
     "devDependencies": {
-        "axios": "^1.1.2",
-        "laravel-vite-plugin": "^0.8.0",
-        "vite": "^4.0.0"
+        "axios": "^1.6.0",
+        "laravel-vite-plugin": "^1.0.0",
+        "vite": "^5.0.0"
     }
 }

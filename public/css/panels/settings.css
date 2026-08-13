@@ -94,7 +94,6 @@
     grid-column: unset;
     border-bottom: 1px solid var(--border);
 }
-}
 
 @keyframes slideUp {
     from {
