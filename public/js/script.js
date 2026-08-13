@@ -267,26 +267,20 @@ function loadAllSurah() {
 
     // Deduplication: gunakan satu promise in-flight
     if (!allDataSurahPromise) {
-        allDataSurahPromise = new Promise((resolve, reject) => {
-            const xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function () {
-                if (xhttp.readyState === 4 && xhttp.status === 200) {
-                    const responses = JSON.parse(xhttp.responseText);
-                    rawSurahListCache = Array.isArray(responses) ? responses : responses.data;
-                    isDataLoaded = true;
-                    if (typeof trackApiCall === 'function') trackApiCall('surat_list');
-                    resolve(filterAndMapSurah(rawSurahListCache));
-                } else if (xhttp.readyState === 4) {
-                    reject("Gagal memuat data surah");
-                }
-            };
-            xhttp.open("GET", urlAllSurah);
-            xhttp.send();
-        });
-
-        allDataSurahPromise
-            .then(() => { allDataSurahPromise = null; })
-            .catch(() => { allDataSurahPromise = null; });
+        allDataSurahPromise = fetch(urlAllSurah)
+            .then(response => {
+                if (!response.ok) throw new Error('Gagal memuat data surah: ' + response.status);
+                return response.json();
+            })
+            .then(responses => {
+                rawSurahListCache = Array.isArray(responses) ? responses : responses.data;
+                isDataLoaded = true;
+                if (typeof trackApiCall === 'function') trackApiCall('surat_list');
+                return filterAndMapSurah(rawSurahListCache);
+            })
+            .finally(() => {
+                allDataSurahPromise = null;
+            });
     }
     return allDataSurahPromise;
 }
@@ -315,12 +309,7 @@ function surahCard(surah) {
     _cardAnimIndex++;
 
     const favClass =
-        (function() {
-            try {
-                const favs = JSON.parse(localStorage.getItem('quran_favorites')) || [];
-                return favs.some(f => f.nomor === surah.nomor);
-            } catch(e) { return false; }
-        })()
+        (typeof isFavorite === 'function' && isFavorite(surah.nomor))
             ? "favorited"
             : "";
     const favTitle = favClass
@@ -336,12 +325,21 @@ function surahCard(surah) {
   </div>
   <div class="card-arab">${surah.nama}</div>
   <div class="card-actions">
-    <button id="star-${surah.nomor}" class="btn-star ${favClass}" title="${favTitle}"
-      onclick="event.stopPropagation(); toggleFavorite(${surah.nomor}, '${surah.nama_latin.replace(/'/g, "\\'")}', '${surah.arti.replace(/'/g, "\\'")}')">
+    <button id="star-${surah.nomor}" class="btn-star ${favClass}" title="${favTitle}">
       <i class="fa-solid fa-star"></i>
     </button>
   </div>
   `;
+
+    // Bind star button via addEventListener — tidak pakai inline onclick
+    const starBtn = card.querySelector(`#star-${surah.nomor}`);
+    if (starBtn) {
+        starBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFavorite(surah.nomor, surah.nama_latin, surah.arti);
+        });
+    }
+
     card.style.cursor = 'pointer';
     card.addEventListener('click', () => {
         loadSurahDetails(surah.nomor);
@@ -859,40 +857,34 @@ function componentDetailSurah(surah) {
             <div class="ayat-btns">
                 <button class="btn-audio-ayat btn-hover-only"
                     id="audio-btn-${nomorAyat}"
-                    title="${__("play_audio", "Putar murottal ayat ini")}"
-                    onclick="playAyatAudio(${surah.nomor}, ${nomorAyat}, this)">
+                    title="${__("play_audio", "Putar murottal ayat ini")}">
                     <i class="fa-solid fa-play"></i>
                 </button>
                 <button class="btn-bookmark-ayat"
                     id="bookmark-btn-${nomorAyat}"
-                    title="${__("save_bookmark", "Simpan bookmark ayat ini")}"
-                    onclick="toggleBookmarkAyat(${surah.nomor}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', ${nomorAyat})">
+                    title="${__("save_bookmark", "Simpan bookmark ayat ini")}">
                     <i class="fa-solid fa-bookmark"></i>
                 </button>
                 <button class="btn-lastread-ayat btn-hover-only"
                     id="lastread-btn-${nomorAyat}"
-                    title="${__("save_lastread", "Simpan terakhir dibaca")}"
-                    onclick="showSaveLastReadSlide(${surah.nomor}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', ${nomorAyat})">
+                    title="${__("save_lastread", "Simpan terakhir dibaca")}">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                 </button>
                 <button class="btn-asbab-ayat btn-hover-only"
                     id="asbab-btn-${nomorAyat}"
                     title="Asbabun Nuzul"
                     data-surah="${surah.nomor}"
-                    data-ayat="${nomorAyat}"
-                    onclick="openAsbabunNuzul(${surah.nomor}, ${nomorAyat})">
+                    data-ayat="${nomorAyat}">
                     <i class="fa-solid fa-scroll"></i>
                 </button>
                 <button class="btn-tafsir-ayat btn-hover-only"
                     id="tafsir-btn-${nomorAyat}"
-                    title="Tafsir"
-                    onclick="openTafsir(${surah.nomor}, ${nomorAyat})">
+                    title="Tafsir">
                     <i class="fa-solid fa-book"></i>
                 </button>
                 <button class="btn-copy-ayat btn-hover-only"
                     id="copy-btn-${nomorAyat}"
-                    title="${__("copy_ayat", "Salin ayat")}"
-                    onclick="copyAyat(${surah.nomor}, ${nomorAyat}, '${(surah.namaLatin ?? surah.nama_latin).replace(/'/g, "\\'")}', this)">
+                    title="${__("copy_ayat", "Salin ayat")}">
                     <i class="fa-regular fa-copy"></i>
                 </button>
             </div>
@@ -902,6 +894,33 @@ function componentDetailSurah(surah) {
         });
 
         ayat.innerHTML = isiAyat;
+
+        // ── Bind event listeners setelah HTML di-render ──
+        // Lebih aman dari inline onclick: tidak ada string interpolation ke handler
+        const namaLatin = surah.namaLatin ?? surah.nama_latin;
+        surah.ayat.forEach((ayatItem) => {
+            const nomorAyat = ayatItem.nomorAyat ?? ayatItem.nomor;
+
+            const audioBtn    = ayat.querySelector(`#audio-btn-${nomorAyat}`);
+            const bookmarkBtn = ayat.querySelector(`#bookmark-btn-${nomorAyat}`);
+            const lastreadBtn = ayat.querySelector(`#lastread-btn-${nomorAyat}`);
+            const asbabBtn    = ayat.querySelector(`#asbab-btn-${nomorAyat}`);
+            const tafsirBtn   = ayat.querySelector(`#tafsir-btn-${nomorAyat}`);
+            const copyBtn     = ayat.querySelector(`#copy-btn-${nomorAyat}`);
+
+            if (audioBtn)    audioBtn.addEventListener('click', () =>
+                playAyatAudio(surah.nomor, nomorAyat, audioBtn));
+            if (bookmarkBtn) bookmarkBtn.addEventListener('click', () =>
+                toggleBookmarkAyat(surah.nomor, namaLatin, nomorAyat));
+            if (lastreadBtn) lastreadBtn.addEventListener('click', () =>
+                showSaveLastReadSlide(surah.nomor, namaLatin, nomorAyat));
+            if (asbabBtn)    asbabBtn.addEventListener('click', () =>
+                openAsbabunNuzul(surah.nomor, nomorAyat));
+            if (tafsirBtn)   tafsirBtn.addEventListener('click', () =>
+                openTafsir(surah.nomor, nomorAyat));
+            if (copyBtn)     copyBtn.addEventListener('click', () =>
+                copyAyat(surah.nomor, nomorAyat, namaLatin, copyBtn));
+        });
         detailSurah.appendChild(ayat);
 
         // ── Bottom navigation prev/next ──
