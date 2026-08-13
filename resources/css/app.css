@@ -1,0 +1,64 @@
+/**
+ * app.css — Vite entry point (resources/css/app.css)
+ *
+ * Import semua CSS dari public/css/ dalam urutan yang benar.
+ * Vite akan bundle + minify semua ini jadi satu file output.
+ */
+
+/* ── BASE ── */
+@import '../../public/css/base/fonts.css';
+@import '../../public/css/base/variables.css';
+@import '../../public/css/base/reset.css';
+
+/* ── LAYOUT ── */
+@import '../../public/css/layout/app-wrapper.css';
+@import '../../public/css/layout/sidebar-left.css';
+@import '../../public/css/layout/main-content.css';
+@import '../../public/css/layout/sidebar-right.css';
+@import '../../public/css/layout/footer.css';
+
+/* ── COMPONENTS ── */
+@import '../../public/css/components/banner.css';
+@import '../../public/css/components/search.css';
+@import '../../public/css/components/info.css';
+@import '../../public/css/components/surah-grid.css';
+@import '../../public/css/components/surah-card.css';
+@import '../../public/css/components/data-empty.css';
+@import '../../public/css/components/pagination.css';
+@import '../../public/css/components/surah-detail.css';
+@import '../../public/css/components/detail-layout.css';
+@import '../../public/css/components/ayat.css';
+@import '../../public/css/components/terjemahan.css';
+@import '../../public/css/components/loading.css';
+@import '../../public/css/components/suggestion.css';
+@import '../../public/css/components/toggle-translation.css';
+@import '../../public/css/components/ayat-fullwidth.css';
+@import '../../public/css/components/tajwid-modal.css';
+@import '../../public/css/components/tajwid-colors.css';
+@import '../../public/css/components/data-source.css';
+@import '../../public/css/components/audio-player.css';
+@import '../../public/css/components/nprogress.css';
+@import '../../public/css/components/toast.css';
+@import '../../public/css/components/overscroll.css';
+@import '../../public/css/components/darkmode-topbar.css';
+@import '../../public/css/components/scrollbar.css';
+@import '../../public/css/components/settings-group.css';
+@import '../../public/css/components/longpress.css';
+@import '../../public/css/components/sidebar-animation.css';
+@import '../../public/css/components/pwa.css';
+
+/* ── PANELS ── */
+@import '../../public/css/panels/settings.css';
+@import '../../public/css/panels/bookmark.css';
+@import '../../public/css/panels/juz.css';
+@import '../../public/css/panels/favorites.css';
+@import '../../public/css/panels/last-read.css';
+@import '../../public/css/panels/save-lastread.css';
+@import '../../public/css/panels/backup.css';
+@import '../../public/css/panels/tajwid-guide.css';
+@import '../../public/css/panels/janji-allah.css';
+@import '../../public/css/panels/hadist.css';
+@import '../../public/css/panels/prayer-time.css';
+
+/* ── RESPONSIVE ── */
+@import '../../public/css/responsive.css';
