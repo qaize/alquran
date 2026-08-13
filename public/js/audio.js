@@ -95,6 +95,7 @@ function playAyatAudio(nomorSurah, nomorAyat, btnEl) {
     stopAudio();
 
     __audioObj    = new Audio(url);
+    __audioObj.preload = 'auto';
     __audioAyat   = { surah: nomorSurah, ayat: nomorAyat, btn: btnEl };
     __audioPlaying = false;
 
@@ -109,19 +110,23 @@ function playAyatAudio(nomorSurah, nomorAyat, btnEl) {
         setAudioBtnState(btnEl, 'playing');
         updateMiniPlayerState('playing');
         highlightPlayingAyat(nomorAyat);
+        _updateMediaSession(nomorSurah, nomorAyat);
+        _requestWakeLock();
     });
     __audioObj.addEventListener('pause', () => {
         __audioPlaying = false;
         setAudioBtnState(btnEl, 'paused');
         updateMiniPlayerState('paused');
-        // Tetap tampilkan highlight saat pause (biar user tahu posisi)
+        _releaseWakeLock();
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = 'paused';
+        }
     });
     __audioObj.addEventListener('ended', () => {
         __audioPlaying = false;
         setAudioBtnState(btnEl, 'idle');
         updateMiniPlayerState('ended');
         clearPlayingHighlight();
-        // Capture durasi sebelum __audioObj di-null-kan oleh stopAudio/autoNextAyat
         const playedDuration = __audioObj ? (__audioObj.duration || 0) : 0;
         if (typeof trackAudio === 'function' && playedDuration > 0) {
             trackAudio(playedDuration);
@@ -136,6 +141,7 @@ function playAyatAudio(nomorSurah, nomorAyat, btnEl) {
             hideMiniPlayer();
             showToast({ type: 'error', message: t('audio_error') || 'Gagal memuat audio', duration: 3000 });
         }
+        _releaseWakeLock();
     });
     __audioObj.addEventListener('timeupdate', () => {
         const bar = document.getElementById('mini-player-progress-bar');
@@ -147,6 +153,79 @@ function playAyatAudio(nomorSurah, nomorAyat, btnEl) {
     __audioObj.load();
 }
 
+/* ── Wake Lock: cegah layar/browser di-suspend saat audio jalan ── */
+let __wakeLock = null;
+
+async function _requestWakeLock() {
+    // Screen Wake Lock API — cegah layar mati saat audio aktif
+    if ('wakeLock' in navigator) {
+        try {
+            __wakeLock = await navigator.wakeLock.request('screen');
+        } catch (e) {
+            // Tidak semua browser/device support, abaikan error
+        }
+    }
+}
+
+function _releaseWakeLock() {
+    if (__wakeLock) {
+        __wakeLock.release().catch(() => {});
+        __wakeLock = null;
+    }
+}
+
+// Re-acquire wake lock kalau tab jadi visible lagi (user unlock layar)
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && __audioPlaying) {
+        _requestWakeLock();
+    }
+});
+
+/* ── MediaSession API: kontrol audio di lock screen Android/iOS ── */
+function _updateMediaSession(nomorSurah, nomorAyat) {
+    if (!('mediaSession' in navigator)) return;
+
+    const qoriKey   = getQoriKey();
+    const qoriLabel = QORI_LABELS[qoriKey] || 'Qori';
+
+    // Set metadata — muncul di lock screen dan notification
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title:  `Surah ${nomorSurah} · Ayat ${nomorAyat}`,
+        artist: qoriLabel,
+        album:  'Al Quran Digital',
+        artwork: [
+            { src: '/img/icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: '/img/quran.png',    sizes: '512x512', type: 'image/png' },
+        ],
+    });
+
+    // Handler tombol di lock screen / headset
+    navigator.mediaSession.setActionHandler('play', () => {
+        if (__audioObj) __audioObj.play();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+        if (__audioObj) __audioObj.pause();
+    });
+    navigator.mediaSession.setActionHandler('stop', () => {
+        stopAudio();
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+        if (!__audioAyat) return;
+        const prev = __audioAyat.ayat - 1;
+        if (prev < 1) return;
+        const btn = document.getElementById(`audio-btn-${prev}`);
+        if (btn) playAyatAudio(__audioAyat.surah, prev, btn);
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+        if (!__audioAyat) return;
+        const next = __audioAyat.ayat + 1;
+        const btn  = document.getElementById(`audio-btn-${next}`);
+        if (btn) playAyatAudio(__audioAyat.surah, next, btn);
+    });
+
+    navigator.mediaSession.playbackState = 'playing';
+}
+
 function isAutoPlay() {
     const s = getSettings();
     return s.autoPlay === true; // default false
@@ -154,16 +233,27 @@ function isAutoPlay() {
 
 function autoNextAyat(nomorSurah, nomorAyat) {
     if (!isAutoPlay()) {
-        // Tidak auto-play — update state tombol jadi play, tapi tetap tampilkan player
         updateMiniPlayerState('ended');
         return;
     }
-    const nextBtn = document.getElementById(`audio-btn-${nomorAyat + 1}`);
-    if (nextBtn) {
-        setTimeout(() => playAyatAudio(nomorSurah, nomorAyat + 1, nextBtn), 400);
-    } else {
+    const nextAyat = nomorAyat + 1;
+    const nextBtn  = document.getElementById(`audio-btn-${nextAyat}`);
+
+    if (!nextBtn && !__audioData) {
         hideMiniPlayer();
+        return;
     }
+
+    // Cek apakah ayat berikutnya ada di data (tidak perlu btn di DOM)
+    const nextAyatData = getAyatData(nextAyat);
+    if (!nextAyatData) {
+        hideMiniPlayer();
+        return;
+    }
+
+    // Langsung play tanpa setTimeout — setTimeout tidak reliable saat layar mati
+    // Kalau btn tidak ada di DOM (layar mati), kita tetap bisa play via data langsung
+    playAyatAudio(nomorSurah, nextAyat, nextBtn || null);
 }
 
 function stopAudio() {
@@ -177,6 +267,16 @@ function stopAudio() {
     __audioPlaying = false;
     clearPlayingHighlight();
     hideMiniPlayer();
+    _releaseWakeLock();
+
+    // Clear MediaSession state
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'none';
+        navigator.mediaSession.metadata = null;
+        ['play','pause','stop','previoustrack','nexttrack'].forEach(action => {
+            try { navigator.mediaSession.setActionHandler(action, null); } catch(e) {}
+        });
+    }
 }
 
 function setAudioBtnState(btn, state) {
