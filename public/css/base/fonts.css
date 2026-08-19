@@ -63,3 +63,37 @@
     font-style: normal;
     font-display: swap;
 }
+
+@font-face {
+    font-family: "Al Mushaf";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/almushaf.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/almushaf.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Al Qalam Quran Majeed";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/al-qalam-quran-majeed.woff2")
+            format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/al-qalam-quran-majeed.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Lateef";
+    src:
+        url("https://fonts.gstatic.com/s/lateef/v35/hESw6XVnNCxEvkbMpg.ttf")
+            format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
