@@ -681,10 +681,14 @@ function applySettings(s) {
     // Background & warna teks — pakai CSS variable di :root
     root.style.setProperty('--ayat-bg', s.bgColor);
 
-    if (s.bgColor === '#1a2e45') {
+    const DARK_COLORS = ['#1a2e45', '#0a0a0a'];
+    if (DARK_COLORS.includes(s.bgColor)) {
         root.classList.add('theme-dark');
+        // Set --dark-bg agar panel/footer dark mengikuti warna yang dipilih
+        root.style.setProperty('--dark-bg', s.bgColor);
     } else {
         root.classList.remove('theme-dark');
+        root.style.removeProperty('--dark-bg');
     }
     // expose qori globally for audio player
     const prevQori = window.__activeQori;
@@ -740,13 +744,17 @@ function applySettings(s) {
         if (topBtn) { topBtn.querySelector('i').className = 'fa-solid fa-moon'; topBtn.classList.remove('darkmode-active'); }
     }
 
-    // Disable / enable bg-option buttons saat dark mode aktif
+    // Dark mode: hanya tampilkan opsi gelap, sembunyikan yang terang
+    // Light mode: hanya tampilkan opsi terang, sembunyikan yang gelap
     document.querySelectorAll('.bg-option').forEach(btn => {
+        const isDark = btn.classList.contains('bg-option-dark');
         if (s.darkMode) {
-            btn.disabled = true;
-            btn.classList.add('bg-option-disabled');
+            btn.style.display = isDark ? '' : 'none';
+            btn.disabled      = false;
+            btn.classList.remove('bg-option-disabled');
         } else {
-            btn.disabled = false;
+            btn.style.display = isDark ? 'none' : '';
+            btn.disabled      = false;
             btn.classList.remove('bg-option-disabled');
         }
     });
@@ -899,17 +907,28 @@ function initSettings() {
     }
 
     // Background color
+    const DARK_COLORS = ['#1a2e45', '#0a0a0a'];
     bgOptions.forEach(btn => {
         btn.addEventListener('click', () => {
             const color = btn.dataset.color;
             const lang  = getCurrentLang();
             const name  = (lang === 'en' ? btn.dataset.nameEn : btn.dataset.nameId) || btn.dataset.nameId || btn.dataset.name || '';
             const cur = getSettings();
-            cur.bgColor = color;
-            cur.bgName  = name;
+            cur.bgColor  = color;
+            cur.bgName   = name;
+            cur.darkMode = DARK_COLORS.includes(color);
             saveSettings(cur);
             applySettings(cur);
             markBgSelected(color, name, bgOptions, selectedLbl);
+            // Sync dark mode toggle
+            if (darkModeToggle) darkModeToggle.checked = cur.darkMode;
+            const dmLabel = document.getElementById('dark-mode-toggle-label');
+            if (dmLabel) {
+                dmLabel.setAttribute('data-i18n', cur.darkMode ? 'dark_mode_on' : 'dark_mode_off');
+                dmLabel.textContent = cur.darkMode
+                    ? (lang === 'en' ? 'Active' : 'Aktif')
+                    : (lang === 'en' ? 'Inactive' : 'Nonaktif');
+            }
         });
     });
 
@@ -944,10 +963,13 @@ function initSettings() {
         darkModeToggle.addEventListener('change', () => {
             const cur = getSettings();
             cur.darkMode = darkModeToggle.checked;
-            // If dark mode on, also set bgColor to dark navy
+            const DARK_COLORS = ['#1a2e45', '#0a0a0a'];
+            // If dark mode on, pakai warna gelap yang sudah dipilih atau default dark navy
             if (cur.darkMode) {
-                cur.bgColor = '#1a2e45';
-                cur.bgName  = getCurrentLang() === 'en' ? 'Dark Navy' : 'Biru Gelap';
+                if (!DARK_COLORS.includes(cur.bgColor)) {
+                    cur.bgColor = '#1a2e45';
+                    cur.bgName  = getCurrentLang() === 'en' ? 'Dark Navy' : 'Biru Gelap';
+                }
             } else {
                 cur.bgColor = '#ffffff';
                 cur.bgName  = getCurrentLang() === 'en' ? 'White' : 'Putih';
@@ -1037,10 +1059,17 @@ function initDarkModeTopbar() {
     btn.addEventListener('click', () => {
         const cur = getSettings();
         cur.darkMode = !cur.darkMode;
-        cur.bgColor  = cur.darkMode ? '#1a2e45' : '#ffffff';
-        cur.bgName   = cur.darkMode
-            ? (getCurrentLang() === 'en' ? 'Dark Navy' : 'Biru Gelap')
-            : (getCurrentLang() === 'en' ? 'White'     : 'Putih');
+        const DARK_COLORS = ['#1a2e45', '#0a0a0a'];
+        if (cur.darkMode) {
+            // Pertahankan warna gelap yang sudah dipilih, atau default dark navy
+            if (!DARK_COLORS.includes(cur.bgColor)) {
+                cur.bgColor = '#1a2e45';
+                cur.bgName  = getCurrentLang() === 'en' ? 'Dark Navy' : 'Biru Gelap';
+            }
+        } else {
+            cur.bgColor = '#ffffff';
+            cur.bgName  = getCurrentLang() === 'en' ? 'White' : 'Putih';
+        }
         saveSettings(cur);
         applySettings(cur);
 

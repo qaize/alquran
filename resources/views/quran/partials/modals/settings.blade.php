@@ -39,6 +39,9 @@
           <button class="bg-option bg-option-dark" data-color="#1a2e45" data-name-id="Biru Gelap" data-name-en="Dark Navy" style="background:#1a2e45;" title="Biru Gelap">
             <span class="bg-check"><i class="fa-solid fa-check"></i></span>
           </button>
+          <button class="bg-option bg-option-dark" data-color="#0a0a0a" data-name-id="Hitam Pekat" data-name-en="Pure Black" style="background:#0a0a0a;" title="Hitam Pekat">
+            <span class="bg-check"><i class="fa-solid fa-check"></i></span>
+          </button>
         </div>
         <p class="settings-selected-label"><span data-i18n="settings_selected">Dipilih:</span> <span id="bg-selected-name">Putih</span></p>
       </div>
@@ -129,6 +132,9 @@
               <option value="Noorehuda">Noorehuda</option>
               <option value="KFGQPC Hafs">KFGQPC Hafs (Uthmani)</option>
               <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
+              <option value="Al Mushaf">Al Mushaf (Mushaf Indonesia)</option>
+              <option value="Al Qalam Quran Majeed">Al Qalam Quran Majeed</option>
+              <option value="Lateef">Lateef (SIL)</option>
             </select>
             <p class="settings-preview settings-preview-arab" id="arab-font-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
           </div>

@@ -386,9 +386,19 @@
 .bg-option[data-color="#1a2e45"] .bg-check {
     color: #e8c97a;
 }
+/* Pure Black — centang emas terang */
+.bg-option[data-color="#0a0a0a"] .bg-check {
+    color: #e8c97a;
+}
 
 .bg-option.selected .bg-check {
     display: flex;
+}
+
+/* Pure Black selected — border emas */
+.bg-option[data-color="#0a0a0a"].selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.3);
 }
 
 .settings-selected-label {

@@ -149,18 +149,22 @@ function _ptFetchTimings(lat, lng) {
    SIDEBAR WIDGET — compact, satu baris
    ══════════════════════════════════════════ */
 function initPrayerWidget() {
-    const widget = document.getElementById('prayer-time-widget');
-    if (!widget) return;
+    const widget       = document.getElementById('prayer-time-widget');
+    const widgetMobile = document.getElementById('prayer-time-widget-mobile');
+    if (!widget && !widgetMobile) return;
 
-    widget.innerHTML = `<div class="ptw-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>`;
+    const loading = `<div class="ptw-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>`;
+    if (widget)       widget.innerHTML       = loading;
+    if (widgetMobile) widgetMobile.innerHTML = loading;
 
     _ptGetLocation()
         .then(loc => { _ptLocation = loc; return _ptFetchTimings(loc.lat, loc.lng); })
         .then(timings => {
             _ptTimings    = timings;
             _ptNextPrayer = _ptGetNextPrayer(timings);
-            _renderPrayerWidget(widget);
-            _startCountdown(widget);
+            if (widget)       _renderPrayerWidget(widget);
+            if (widgetMobile) _renderPrayerWidgetMobile(widgetMobile);
+            _startCountdown(widget, widgetMobile);
             // Fetch qibla di background (non-blocking)
             if (!_ptQibla) {
                 _ptFetchQibla(_ptLocation.lat, _ptLocation.lng)
@@ -169,16 +173,26 @@ function initPrayerWidget() {
             }
         })
         .catch(() => {
-            widget.innerHTML = `
+            const allowBtn = `
                 <button class="ptw-allow-btn" id="ptw-allow-btn">
                     <i class="fa-solid fa-location-dot"></i>
                     <span>${t('pt_allow_location')}</span>
                 </button>
             `;
-            widget.querySelector('#ptw-allow-btn')?.addEventListener('click', () => {
-                localStorage.removeItem(PT_LOC_KEY);
-                initPrayerWidget();
-            });
+            if (widget) {
+                widget.innerHTML = allowBtn;
+                widget.querySelector('#ptw-allow-btn')?.addEventListener('click', () => {
+                    localStorage.removeItem(PT_LOC_KEY);
+                    initPrayerWidget();
+                });
+            }
+            if (widgetMobile) {
+                widgetMobile.innerHTML = allowBtn.replace('id="ptw-allow-btn"', 'id="ptw-allow-btn-mobile"');
+                widgetMobile.querySelector('#ptw-allow-btn-mobile')?.addEventListener('click', () => {
+                    localStorage.removeItem(PT_LOC_KEY);
+                    initPrayerWidget();
+                });
+            }
         });
 }
 
@@ -207,23 +221,53 @@ function _renderPrayerWidget(widget) {
     widget.querySelector('.ptw-loc-pin').addEventListener('click', openPrayerModal);
 }
 
-function _startCountdown(widget) {
+function _renderPrayerWidgetMobile(widget) {
+    if (!_ptNextPrayer || !_ptLocation) return;
+
+    const { name, time } = _ptNextPrayer;
+    const icon  = PRAYER_ICONS[name];
+    const label = _ptPrayerName(name);
+
+    widget.innerHTML = `
+        <button class="ptw-mobile-bar" id="ptw-mobile-bar" title="${t('pt_title')}">
+            <span class="ptw-mobile-prayer">
+                <span class="ptw-mobile-icon"><i class="fa-solid ${icon}"></i></span>
+                <span class="ptw-mobile-label">${label}</span>
+                <span class="ptw-mobile-time">${time}</span>
+            </span>
+            <span class="ptw-mobile-sep">·</span>
+            <span class="ptw-mobile-loc">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>${_ptLocation.city}</span>
+            </span>
+            <span class="ptw-cd ptw-cd-mobile" id="ptw-countdown-mobile">--:--:--</span>
+        </button>
+    `;
+    widget.querySelector('#ptw-mobile-bar').addEventListener('click', openPrayerModal);
+}
+
+function _startCountdown(widget, widgetMobile) {
     if (_ptCountdown) clearInterval(_ptCountdown);
     _ptCountdown = setInterval(() => {
-        const el = document.getElementById('ptw-countdown');
-        if (!el) { clearInterval(_ptCountdown); return; }
+        const el       = document.getElementById('ptw-countdown');
+        const elMobile = document.getElementById('ptw-countdown-mobile');
 
-        const nowMs    = _ptNowMs();
+        if (!el && !elMobile) { clearInterval(_ptCountdown); return; }
+
+        const nowMs = _ptNowMs();
         let diff = _ptNextPrayer.timeMs > 86400000
             ? (_ptNextPrayer.timeMs - 86400000) + (86400000 - nowMs)
             : _ptNextPrayer.timeMs - nowMs;
 
         if (diff < 0) {
             _ptNextPrayer = _ptGetNextPrayer(_ptTimings);
-            _renderPrayerWidget(widget);
+            if (widget)       _renderPrayerWidget(widget);
+            if (widgetMobile) _renderPrayerWidgetMobile(widgetMobile);
             return;
         }
-        el.textContent = _ptFormatCountdown(diff);
+        const cdText = _ptFormatCountdown(diff);
+        if (el)       el.textContent       = cdText;
+        if (elMobile) elMobile.textContent = cdText;
     }, 1000);
 }
 
