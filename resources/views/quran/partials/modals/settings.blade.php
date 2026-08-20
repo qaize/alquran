@@ -61,6 +61,24 @@
         <p class="settings-selected-label"><span data-i18n="settings_selected">Dipilih:</span> <span id="bg-selected-name">Putih</span></p>
       </div>
 
+      {{-- FONT GROUP dipindah ke bawah Dark Mode --}}
+
+      {{-- Dark Mode --}}
+      <div class="settings-section">
+        <label class="settings-label">
+          <i class="fa-solid fa-moon"></i>
+          <span data-i18n="settings_dark_mode">Mode Gelap</span>
+        </label>
+        <div class="tajweed-toggle-wrap">
+          <label class="toggle-switch">
+            <input type="checkbox" id="dark-mode-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="dark-mode-toggle-label" id="dark-mode-toggle-label" data-i18n="dark_mode_off">Nonaktif</span>
+        </div>
+        <p class="settings-hint" data-i18n="settings_dark_mode_hint">Tampilan latar gelap, nyaman untuk membaca di malam hari.</p>
+      </div>
+
       {{-- FONT GROUP — expandable --}}
       <div class="settings-group" id="settings-group-font">
         <button class="settings-group-trigger" id="settings-group-font-btn">
@@ -193,22 +211,6 @@
 
         </div>{{-- .settings-group-body --}}
       </div>{{-- .settings-group --}}
-
-      {{-- Dark Mode --}}
-      <div class="settings-section">
-        <label class="settings-label">
-          <i class="fa-solid fa-moon"></i>
-          <span data-i18n="settings_dark_mode">Mode Gelap</span>
-        </label>
-        <div class="tajweed-toggle-wrap">
-          <label class="toggle-switch">
-            <input type="checkbox" id="dark-mode-toggle">
-            <span class="toggle-slider"></span>
-          </label>
-          <span class="dark-mode-toggle-label" id="dark-mode-toggle-label" data-i18n="dark_mode_off">Nonaktif</span>
-        </div>
-        <p class="settings-hint" data-i18n="settings_dark_mode_hint">Tampilan latar gelap, nyaman untuk membaca di malam hari.</p>
-      </div>
 
       {{-- Bahasa --}}
       <div class="settings-section">

@@ -1134,15 +1134,28 @@ function initDarkModeTopbar() {
 }
 
 function initSettingsGroups() {
-    // Wire semua .settings-group-trigger ke toggle expand/collapse
     document.querySelectorAll('.settings-group-trigger').forEach(trigger => {
         const group = trigger.closest('.settings-group');
         if (!group) return;
+
+        // ── Tooltip hint: muncul sebentar lalu hilang ──
+        const hint = document.createElement('span');
+        hint.className = 'settings-group-hint';
+        hint.textContent = 'Tap untuk buka';
+        trigger.appendChild(hint);
+
+        setTimeout(() => hint.classList.add('hint-show'), 600);
+        setTimeout(() => {
+            hint.classList.remove('hint-show');
+            setTimeout(() => hint.remove(), 300);
+        }, 3000);
+
         trigger.addEventListener('click', () => {
+            // Hapus hint kalau masih ada
+            trigger.querySelector('.settings-group-hint')?.remove();
+
             const isOpen = group.classList.contains('open');
-            // Tutup semua group dulu (accordion behavior)
             document.querySelectorAll('.settings-group').forEach(g => g.classList.remove('open'));
-            // Toggle yang diklik
             if (!isOpen) group.classList.add('open');
         });
     });

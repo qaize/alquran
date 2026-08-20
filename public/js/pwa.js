@@ -28,6 +28,70 @@ function savePwaSettings(obj) {
 }
 
 /* ══════════════════════════════════════════
+   SPLASH SCREEN
+   ══════════════════════════════════════════ */
+
+const SPLASH_QUOTES = [
+    'اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ — Bacalah dengan nama Tuhanmu yang menciptakan',
+    'إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ — Al Quran memberi petunjuk ke jalan yang paling lurus',
+    'وَنَزَّلْنَا عَلَيْكَ الْكِتَابَ تِبْيَانًا لِّكُلِّ شَيْءٍ — Kitab ini penjelas segala sesuatu',
+    'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ — Sebaik-baik kalian adalah yang belajar Al Quran dan mengajarkannya',
+    'الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ — Hanya dengan mengingat Allah, hati menjadi tenang',
+    'وَإِذَا قُرِئَ الْقُرْآنُ فَاسْتَمِعُوا لَهُ — Apabila dibacakan Al Quran, dengarkanlah dengan sungguh-sungguh',
+    'إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ — Sesungguhnya orang-orang beriman itu bersaudara',
+    'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً — Ya Rabb, berilah kami kebaikan di dunia dan akhirat',
+];
+
+const SPLASH_SHOWN_KEY = 'quran_splash_last_shown';
+const SPLASH_DURATION  = 3200; // ms — total tampil sebelum fade out
+
+function initSplash() {
+    const splash = document.getElementById('splash-screen');
+    if (!splash) return;
+
+    // Set quote acak
+    const quoteEl = document.getElementById('splash-quote');
+    if (quoteEl) {
+        quoteEl.textContent = SPLASH_QUOTES[Math.floor(Math.random() * SPLASH_QUOTES.length)];
+    }
+
+    // Cek apakah perlu tampil:
+    // - Selalu tampil saat PWA (standalone)
+    // - Di browser biasa, hanya tampil sekali per sesi
+    const isPWA      = window.matchMedia('(display-mode: standalone)').matches
+                    || window.navigator.standalone === true;
+    const lastShown  = sessionStorage.getItem(SPLASH_SHOWN_KEY);
+    const shouldShow = isPWA || !lastShown;
+
+    if (!shouldShow || window.__splashSkip) {
+        // Skip — langsung sembunyikan tanpa animasi
+        splash.classList.add('splash-hidden');
+        return;
+    }
+
+    // Tandai sudah ditampilkan di sesi ini
+    sessionStorage.setItem(SPLASH_SHOWN_KEY, Date.now());
+
+    // Splice quote setiap ~1.5 detik (opsional: ganti quote di tengah)
+    // Dismiss setelah SPLASH_DURATION
+    const dismissTimer = setTimeout(() => dismissSplash(splash), SPLASH_DURATION);
+
+    // Tap/klik untuk skip
+    splash.addEventListener('click', () => {
+        clearTimeout(dismissTimer);
+        dismissSplash(splash);
+    }, { once: true });
+}
+
+function dismissSplash(splash) {
+    if (!splash || splash.classList.contains('splash-hiding')) return;
+    splash.classList.add('splash-hiding');
+    splash.addEventListener('transitionend', () => {
+        splash.classList.add('splash-hidden');
+    }, { once: true });
+}
+
+/* ══════════════════════════════════════════
    SERVICE WORKER REGISTRATION
    ══════════════════════════════════════════ */
 let _swRegistration = null;
@@ -423,6 +487,7 @@ function renderPwaNotifSettings(container) {
    INIT
    ══════════════════════════════════════════ */
 function initPwa() {
+    initSplash(); // splash screen pertama kali
     registerServiceWorker();
 
     const installBtn = document.getElementById('pwa-install-btn');

@@ -4,10 +4,8 @@
     background: linear-gradient(180deg, var(--navy) 0%, var(--navy-light) 100%);
     margin: 0 20px;
     border-radius: var(--radius-md);
-    border: 3px solid var(--gold);
-    box-shadow:
-        0 6px 24px rgba(201, 168, 76, 0.18),
-        inset 0 1px 0 rgba(201, 168, 76, 0.15);
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    box-shadow: 0 2px 12px rgba(201, 168, 76, 0.08);
     overflow: hidden;
 }
 
@@ -83,6 +81,40 @@
 .title-surah-body.collapsed ~ * .title-surah-collapse-btn i,
 .title-surah-collapse-btn.is-collapsed i {
     transform: rotate(180deg);
+}
+
+/* ── Tooltip hint ── */
+.title-collapse-hint {
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%) translateX(4px);
+    background: rgba(13, 33, 55, 0.92);
+    color: rgba(255,255,255,0.9);
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 4px 9px;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    font-family: inherit;
+    border: 1px solid rgba(201,168,76,0.3);
+}
+/* Arrow kanan */
+.title-collapse-hint::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-left-color: rgba(13, 33, 55, 0.92);
+}
+.title-collapse-hint.hint-show {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
 }
 
 /* ── Body (collapsible) ── */
