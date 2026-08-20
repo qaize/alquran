@@ -2,8 +2,75 @@
 <html lang="id">
   <head>
     @include('quran.partials.head')
+    {{-- Init splash secepat mungkin sebelum bundle JS load --}}
+    <script>
+    (function() {
+        // Jika bukan PWA standalone dan sudah pernah tampil di sesi ini, skip
+        var isPWA = window.matchMedia('(display-mode: standalone)').matches
+                 || window.navigator.standalone === true;
+        var shown = sessionStorage.getItem('quran_splash_last_shown');
+        if (!isPWA && shown) {
+            // Tandai untuk JS bundle agar langsung skip
+            window.__splashSkip = true;
+        }
+    })();
+    </script>
   </head>
   <body>
+
+    {{-- ══════════════════════════════════════
+         SPLASH SCREEN — muncul saat app dibuka
+         ══════════════════════════════════════ --}}
+    <div id="splash-screen" aria-hidden="true">
+      <div class="splash-bg"></div>
+
+      {{-- Ornamen atas --}}
+      <div class="splash-ornament-top">
+        <span class="splash-star">✦</span>
+        <span class="splash-line"></span>
+        <span class="splash-star">✦</span>
+      </div>
+
+      {{-- Konten utama --}}
+      <div class="splash-content">
+
+        {{-- Ikon --}}
+        <div class="splash-icon-wrap">
+          <img src="{{ asset('img/icon-192.png') }}" alt="Al Quran Digital" class="splash-icon">
+          <div class="splash-icon-ring"></div>
+        </div>
+
+        {{-- Bismillah --}}
+        <div class="splash-bismillah">﷽</div>
+
+        {{-- Salam --}}
+        <div class="splash-salam">
+          <p class="splash-salam-arab">اَلسَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ</p>
+          <p class="splash-salam-latin">Assalamu'alaikum Warahmatullahi Wabarakatuh</p>
+        </div>
+
+        {{-- Nama app --}}
+        <h1 class="splash-title">Al Quran Digital</h1>
+
+        {{-- Kalimat baik (berganti-ganti) --}}
+        <div class="splash-quote-wrap">
+          <p class="splash-quote" id="splash-quote"></p>
+        </div>
+
+      </div>
+
+      {{-- Ornamen bawah --}}
+      <div class="splash-ornament-bottom">
+        <span class="splash-star">✦</span>
+        <span class="splash-line"></span>
+        <span class="splash-star">✦</span>
+      </div>
+
+      {{-- Loading dots --}}
+      <div class="splash-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>{{-- #splash-screen --}}
 
     {{-- Three-column layout wrapper --}}
     <div class="app-wrapper">

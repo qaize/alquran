@@ -1,0 +1,246 @@
+/* ══════════════════════════════════════════════
+   SPLASH SCREEN
+   Muncul saat app pertama kali dibuka (PWA / cold start)
+   ══════════════════════════════════════════════ */
+
+#splash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    /* Transition untuk fade out */
+    opacity: 1;
+    transition: opacity 0.6s ease;
+    pointer-events: auto;
+}
+
+/* Sudah dismiss */
+#splash-screen.splash-hiding {
+    opacity: 0;
+    pointer-events: none;
+}
+#splash-screen.splash-hidden {
+    display: none;
+}
+
+/* ── Background gradient ── */
+.splash-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg,
+        #071525 0%,
+        #0d2137 35%,
+        #0f2d50 65%,
+        #071525 100%
+    );
+    z-index: 0;
+}
+
+/* Subtle radial glow di tengah */
+.splash-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse 70% 50% at 50% 50%,
+        rgba(201, 168, 76, 0.08) 0%,
+        transparent 70%
+    );
+}
+
+/* Semua konten di atas bg */
+#splash-screen > *:not(.splash-bg) {
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Ornamen atas & bawah ── */
+.splash-ornament-top,
+.splash-ornament-bottom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: splashFadeIn 0.8s ease forwards;
+}
+.splash-ornament-top  { animation-delay: 0.1s; margin-bottom: 24px; }
+.splash-ornament-bottom { animation-delay: 0.3s; margin-top: 24px; }
+
+.splash-star {
+    color: var(--gold);
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.splash-line {
+    display: block;
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(201, 168, 76, 0.6),
+        transparent
+    );
+}
+
+/* ── Konten utama ── */
+.splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    padding: 0 32px;
+    max-width: 380px;
+}
+
+/* ── Icon ── */
+.splash-icon-wrap {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: splashScaleIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+}
+
+.splash-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 24px rgba(201, 168, 76, 0.25);
+}
+
+/* Ring berputar di sekeliling icon */
+.splash-icon-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1.5px solid transparent;
+    border-top-color: rgba(201, 168, 76, 0.7);
+    border-right-color: rgba(201, 168, 76, 0.3);
+    animation: splashSpin 2s linear infinite;
+}
+
+/* ── Bismillah ── */
+.splash-bismillah {
+    font-family: "Amiri", serif;
+    font-size: 32px;
+    color: rgba(255, 255, 248, 0.92);
+    line-height: 1.6;
+    direction: rtl;
+    text-shadow: 0 2px 16px rgba(201, 168, 76, 0.2);
+    opacity: 0;
+    animation: splashFadeUp 0.7s ease 0.4s forwards;
+}
+
+/* ── Salam ── */
+.splash-salam {
+    opacity: 0;
+    animation: splashFadeUp 0.7s ease 0.65s forwards;
+}
+
+.splash-salam-arab {
+    font-family: "Amiri", serif;
+    font-size: 20px;
+    color: var(--gold-light);
+    direction: rtl;
+    line-height: 1.7;
+    margin: 0 0 6px;
+    text-shadow: 0 1px 8px rgba(201, 168, 76, 0.2);
+}
+
+.splash-salam-latin {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.65);
+    font-style: italic;
+    letter-spacing: 0.3px;
+    margin: 0;
+}
+
+/* ── Nama app ── */
+.splash-title {
+    font-family: "Cinzel", serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 2px;
+    margin: 0;
+    opacity: 0;
+    animation: splashFadeUp 0.7s ease 0.85s forwards;
+}
+
+/* ── Quote ── */
+.splash-quote-wrap {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: splashFadeUp 0.7s ease 1.05s forwards;
+}
+
+.splash-quote {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.55);
+    font-style: italic;
+    line-height: 1.6;
+    margin: 0;
+    text-align: center;
+    max-width: 300px;
+    transition: opacity 0.4s ease;
+}
+
+/* ── Loading dots ── */
+.splash-dots {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+    opacity: 0;
+    animation: splashFadeIn 0.5s ease 1.3s forwards;
+}
+
+.splash-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(201, 168, 76, 0.5);
+    animation: splashDotPulse 1.2s ease-in-out infinite;
+}
+.splash-dots span:nth-child(2) { animation-delay: 0.2s; }
+.splash-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Keyframes ── */
+@keyframes splashFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes splashFadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splashScaleIn {
+    from { opacity: 0; transform: scale(0.6) rotate(-10deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes splashSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes splashDotPulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50%       { opacity: 1;   transform: scale(1.2); }
+}

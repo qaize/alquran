@@ -426,6 +426,17 @@ function openHadistPanel(target = null) {
 
     requestAnimationFrame(() => overlay.classList.add('open'));
 
+    // Intercept browser back button
+    history.pushState({ panel: 'hadist' }, '');
+    window.addEventListener('popstate', function _hadistPopstate() {
+        if (!overlay.classList.contains('open')) {
+            window.removeEventListener('popstate', _hadistPopstate);
+            return;
+        }
+        overlay.classList.remove('open');
+        window.removeEventListener('popstate', _hadistPopstate);
+    });
+
     // Tampilkan hadist: dari widget jika ada target, atau random
     if (target && target.kitabId && target.nomor) {
         const kitab = HADIST_KITAB.find(k => k.id === target.kitabId);

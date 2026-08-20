@@ -8,10 +8,8 @@
     padding: 10px 18px 20px;
     text-align: right;
     transition: background 0.3s ease;
-    border: 3px solid var(--gold-light);
-    box-shadow:
-        0 4px 24px rgba(201, 168, 76, 0.12),
-        inset 0 0 0 1px rgba(201, 168, 76, 0.08);
+    border: 1px solid rgba(201, 168, 76, 0.25);
+    box-shadow: 0 2px 12px rgba(201, 168, 76, 0.06);
     position: relative;
 }
 
@@ -149,6 +147,8 @@
 .isi-ayat {
     flex: 1;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* tombol bookmark + lastread + asbab — bookmark selalu tampil, sisanya hover */
@@ -163,10 +163,148 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
-    padding-top: 4px;
+    gap: 5px;
+    padding-top: 8px;
     direction: ltr;
+    order: 10;
 }
+
+/* ── Base style semua tombol ayat ── */
+.ayat-btns button {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--text-light);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition);
+    position: relative;
+}
+
+/* ── Tombol Audio ── */
+.btn-audio-ayat {
+    background: var(--white) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-light) !important;
+}
+.btn-audio-ayat:hover {
+    background: rgba(201, 168, 76, 0.1) !important;
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    transform: scale(1.1) !important;
+    box-shadow: none !important;
+}
+.btn-audio-ayat.audio-playing {
+    color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.15) !important;
+    border-color: var(--gold) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+.btn-audio-ayat.audio-paused {
+    color: var(--text-mid) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+.btn-audio-ayat.audio-loading {
+    color: var(--gold-light) !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+}
+
+/* ── Tombol Bookmark ── */
+.btn-bookmark-ayat {
+    background: var(--white);
+    border-color: var(--border);
+    color: var(--text-light);
+}
+.btn-bookmark-ayat:hover {
+    background: rgba(201, 168, 76, 0.1);
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: scale(1.1);
+}
+.btn-bookmark-ayat.bookmarked {
+    color: var(--gold) !important;
+    border-color: var(--gold) !important;
+    background: rgba(201, 168, 76, 0.12) !important;
+}
+
+/* ── Tombol Last Read ── */
+.btn-lastread-ayat {
+    background: var(--white) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-light) !important;
+    width: 28px !important;
+    height: 28px !important;
+}
+.btn-lastread-ayat:hover {
+    background: #e6f7f7 !important;
+    border-color: #14a3a8 !important;
+    color: #0d7377 !important;
+    transform: scale(1.1) !important;
+    box-shadow: none !important;
+}
+.btn-lastread-ayat.saved {
+    background: #e6f7f7 !important;
+    border-color: #14a3a8 !important;
+    color: #0d7377 !important;
+}
+
+/* ── Tombol Asbabun Nuzul ── */
+.btn-asbab-ayat {
+    background: var(--white) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-light) !important;
+    width: 28px !important;
+    height: 28px !important;
+}
+.btn-asbab-ayat:hover {
+    background: rgba(201, 168, 76, 0.1) !important;
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    transform: scale(1.1) !important;
+    box-shadow: none !important;
+}
+
+/* ── Tombol Tafsir ── */
+.btn-tafsir-ayat {
+    background: var(--white) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-light) !important;
+    width: 28px !important;
+    height: 28px !important;
+}
+.btn-tafsir-ayat:hover {
+    background: rgba(30, 73, 118, 0.08) !important;
+    border-color: var(--navy-light) !important;
+    color: var(--navy-light) !important;
+    transform: scale(1.1) !important;
+    box-shadow: none !important;
+}
+
+/* ── Tombol Copy ── */
+.btn-copy-ayat {
+    background: var(--white) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-light) !important;
+    width: 28px !important;
+    height: 28px !important;
+}
+.btn-copy-ayat:hover {
+    background: rgba(30, 73, 118, 0.08) !important;
+    border-color: var(--navy-light) !important;
+    color: var(--navy-light) !important;
+    transform: scale(1.1) !important;
+    box-shadow: none !important;
+}
+.btn-copy-ayat .fa-check { color: #27ae60 !important; }
 
 /* Hover-only buttons: hidden by default, show on row hover */
 .btn-hover-only {
@@ -218,10 +356,9 @@
 .theme-dark .ayat .btn-asbab-ayat,
 .theme-dark .ayat .btn-tafsir-ayat {
     background: rgba(255,255,255,0.05);
-    border-color: rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.5);
+    border-color: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.45);
 }
-
 .arabic {
     font-family: var(--arabic-font-family, "Amiri", serif);
     font-size: var(--arabic-font-size, 36px);
@@ -259,19 +396,20 @@
     color: #ffffff;
 }
 .theme-dark .ayat .btn-bookmark-ayat {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.45);
 }
 .theme-dark .ayat .btn-bookmark-ayat.bookmarked {
-    color: #e8c97a;
-    border-color: #e8c97a;
+    color: var(--gold) !important;
+    border-color: var(--gold) !important;
+    background: rgba(201,168,76,0.15) !important;
 }
 .theme-dark .ayat .btn-audio-ayat,
 .theme-dark .ayat .btn-copy-ayat {
     background: rgba(255,255,255,0.05);
-    border-color: rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.5);
+    border-color: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.45);
 }
 
 .ayat-action {

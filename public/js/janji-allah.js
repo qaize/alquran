@@ -187,6 +187,26 @@ function openJanjiAllahPanel() {
     });
 
     requestAnimationFrame(() => overlay.classList.add('open'));
+
+    // Intercept browser back button
+    history.pushState({ panel: 'janji-allah' }, '');
+    window.addEventListener('popstate', function _janjiPopstate(e) {
+        if (!overlay.classList.contains('open')) {
+            window.removeEventListener('popstate', _janjiPopstate);
+            return;
+        }
+        // Kalau sub-panel ayat terbuka, back ke list dulu
+        const ayatPanel = document.getElementById('janji-ayat-panel');
+        const panelBody = document.getElementById('janji-panel-body');
+        if (ayatPanel && ayatPanel.style.display !== 'none') {
+            history.pushState({ panel: 'janji-allah' }, '');
+            panelBody.style.display = '';
+            ayatPanel.style.display = 'none';
+        } else {
+            overlay.classList.remove('open');
+            window.removeEventListener('popstate', _janjiPopstate);
+        }
+    });
 }
 
 function _renderKategoriList(data) {
@@ -264,6 +284,9 @@ function openJanjiAyat(nomorSurah, ayatArr, kondisi) {
     panelBody.style.display = 'none';
     ayatPanel.style.display = 'flex';
     ayatTitle.textContent   = kondisi;
+
+    // Push state agar back button browser bisa menutup sub-panel
+    history.pushState({ panel: 'janji-ayat', kondisi }, '');
 
     ayatBody.innerHTML = `
         <div class="janji-loading">

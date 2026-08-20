@@ -776,15 +776,30 @@ function componentTitleSurah(surah) {
     const body        = title.querySelector('#title-surah-body');
     const icon        = collapseBtn.querySelector('i');
 
-    // Set max-height awal
-    requestAnimationFrame(() => {
-        body.style.maxHeight = body.scrollHeight + 'px';
-    });
+    // ── Default: langsung collapsed saat pertama render ──
+    body.classList.add('collapsed');
+    body.style.maxHeight = '0px';
+    collapseBtn.classList.add('is-collapsed');
+    collapseBtn.title = 'Tampilkan detail';
+
+    // ── Tooltip hint: muncul 1 detik setelah render, hilang setelah 3 detik ──
+    const hint = document.createElement('div');
+    hint.className = 'title-collapse-hint';
+    hint.textContent = 'Tap untuk buka detail';
+    collapseBtn.appendChild(hint);
+
+    setTimeout(() => hint.classList.add('hint-show'), 800);
+    setTimeout(() => {
+        hint.classList.remove('hint-show');
+        setTimeout(() => hint.remove(), 400);
+    }, 3500);
 
     collapseBtn.addEventListener('click', () => {
+        // Hapus hint kalau masih ada saat diklik
+        collapseBtn.querySelector('.title-collapse-hint')?.remove();
+
         const isCollapsed = body.classList.contains('collapsed');
         if (isCollapsed) {
-            // Expand — pakai nilai besar, lalu setelah transisi selesai set ke 'none'
             body.classList.remove('collapsed');
             body.style.maxHeight = '600px';
             body.addEventListener('transitionend', () => {
@@ -793,9 +808,8 @@ function componentTitleSurah(surah) {
                 }
             }, { once: true });
             collapseBtn.classList.remove('is-collapsed');
-            collapseBtn.title = 'Sembunyikan';
+            collapseBtn.title = 'Sembunyikan detail';
         } else {
-            // Collapse — set eksplisit dulu baru animate ke 0
             body.style.maxHeight = body.scrollHeight + 'px';
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
@@ -804,7 +818,7 @@ function componentTitleSurah(surah) {
                 });
             });
             collapseBtn.classList.add('is-collapsed');
-            collapseBtn.title = 'Tampilkan';
+            collapseBtn.title = 'Tampilkan detail';
         }
     });
 

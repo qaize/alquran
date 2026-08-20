@@ -309,10 +309,26 @@ function openPrayerModal() {
     `;
     document.body.appendChild(modal);
 
-    modal.querySelector('#prayer-modal-close').addEventListener('click', () => modal.classList.remove('open'));
-    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+    modal.querySelector('#prayer-modal-close').addEventListener('click', () => {
+        modal.classList.remove('open');
+        _stopLiveCompass();
+    });
+    modal.addEventListener('click', e => {
+        if (e.target === modal) { modal.classList.remove('open'); _stopLiveCompass(); }
+    });
 
     requestAnimationFrame(() => modal.classList.add('open'));
+
+    // Intercept browser back button
+    history.pushState({ panel: 'prayer-time' }, '');
+    window.addEventListener('popstate', function _ptPopstate() {
+        if (!modal.classList.contains('open')) {
+            window.removeEventListener('popstate', _ptPopstate);
+            return;
+        }
+        modal.classList.remove('open');
+        window.removeEventListener('popstate', _ptPopstate);
+    });
 
     if (_ptTimings && _ptLocation) {
         _renderPrayerModal(modal);
@@ -380,40 +396,127 @@ function _renderPrayerModal(modal) {
                 _ptQibla = deg;
                 const qiblaEl = modal.querySelector('.pt-qibla-loading');
                 if (qiblaEl) qiblaEl.outerHTML = _renderQiblaSection();
+                setTimeout(() => _startLiveCompass(deg), 100);
             })
             .catch(() => {
                 const qiblaEl = modal.querySelector('.pt-qibla-loading');
                 if (qiblaEl) qiblaEl.remove();
             });
+    } else if (_ptQibla !== null) {
+        setTimeout(() => _startLiveCompass(_ptQibla), 100);
     }
 
     _startModalCountdown(modal);
 }
 
 function _renderQiblaSection() {
-    const deg      = _ptQibla;
-    const cardinal = _ptCardinal(deg);
-    const lang     = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
-    const label    = lang === 'en' ? 'Qibla Direction' : 'Arah Kiblat';
+    const deg       = _ptQibla;
+    const cardinal  = _ptCardinal(deg);
+    const lang      = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
+    const label     = lang === 'en' ? 'Qibla Direction' : 'Arah Kiblat';
     const fromNorth = lang === 'en' ? 'from North' : 'dari Utara';
+    const liveLabel = lang === 'en' ? 'Point your phone forward' : 'Arahkan hp ke depan';
+    const staticNote = lang === 'en' ? 'Live compass not available' : 'Kompas tidak tersedia';
+
+    const supportsCompass = !!(window.DeviceOrientationEvent);
 
     return `
-        <div class="pt-qibla">
+        <div class="pt-qibla" id="pt-qibla-wrap">
             <div class="pt-qibla-left">
-                <div class="pt-qibla-compass">
-                    <div class="pt-qibla-needle" style="transform: rotate(${deg}deg)">
+                <div class="pt-qibla-compass" id="pt-qibla-compass">
+                    <div class="pt-compass-ring">
+                        <span class="pt-compass-dir pt-dir-n">N</span>
+                        <span class="pt-compass-dir pt-dir-e">E</span>
+                        <span class="pt-compass-dir pt-dir-s">S</span>
+                        <span class="pt-compass-dir pt-dir-w">W</span>
+                    </div>
+                    <div class="pt-qibla-needle" id="pt-qibla-needle">
                         <i class="fa-solid fa-kaaba"></i>
                     </div>
-                    <span class="pt-qibla-n">N</span>
                 </div>
             </div>
             <div class="pt-qibla-right">
                 <span class="pt-qibla-title">${label}</span>
-                <span class="pt-qibla-deg">${deg.toFixed(1)}°</span>
-                <span class="pt-qibla-cardinal">${cardinal} · ${fromNorth}</span>
+                <span class="pt-qibla-deg">${deg.toFixed(1)}° <small>${cardinal}</small></span>
+                <span class="pt-qibla-cardinal">${fromNorth}</span>
+                <span class="pt-compass-status" id="pt-compass-status">
+                    ${supportsCompass
+                        ? `<i class="fa-solid fa-compass"></i> ${liveLabel}`
+                        : `<i class="fa-solid fa-compass-drafting"></i> ${staticNote}`}
+                </span>
             </div>
         </div>
     `;
+}
+
+/* ── Live compass dengan DeviceOrientationEvent ── */
+let _compassHandler = null;
+
+function _startLiveCompass(qiblaDeg) {
+    // Bersihkan handler lama
+    _stopLiveCompass();
+
+    if (!window.DeviceOrientationEvent) return;
+
+    const requestPermission = () => {
+        const needle = document.getElementById('pt-qibla-needle');
+        const status = document.getElementById('pt-compass-status');
+        if (!needle) return;
+
+        _compassHandler = (evt) => {
+            const needle = document.getElementById('pt-qibla-needle');
+            if (!needle) { _stopLiveCompass(); return; }
+
+            // webkitCompassHeading = heading dari North (iOS)
+            // alpha = rotation around Z axis (Android, 0 = North saat dikalibrasi)
+            let heading = null;
+            if (evt.webkitCompassHeading !== undefined && evt.webkitCompassHeading !== null) {
+                heading = evt.webkitCompassHeading; // iOS: langsung heading dari North
+            } else if (evt.alpha !== null) {
+                heading = 360 - evt.alpha; // Android: konversi dari alpha
+            }
+
+            if (heading === null) return;
+
+            // Rotasi needle = arah kiblat - heading device
+            const needleRot = qiblaDeg - heading;
+            needle.style.transform = `rotate(${needleRot}deg)`;
+
+            // Update status jadi aktif
+            if (status) {
+                const lang = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
+                status.innerHTML = `<i class="fa-solid fa-compass pt-compass-live"></i> ${lang === 'en' ? 'Live compass active' : 'Kompas aktif'}`;
+            }
+        };
+
+        window.addEventListener('deviceorientation', _compassHandler, true);
+    };
+
+    // iOS 13+ butuh permission request
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        const status = document.getElementById('pt-compass-status');
+        const lang   = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
+        if (status) {
+            status.innerHTML = `<button class="pt-compass-allow-btn" id="pt-compass-allow">
+                <i class="fa-solid fa-compass"></i>
+                ${lang === 'en' ? 'Allow compass' : 'Izinkan kompas'}
+            </button>`;
+            document.getElementById('pt-compass-allow')?.addEventListener('click', () => {
+                DeviceOrientationEvent.requestPermission().then(r => {
+                    if (r === 'granted') requestPermission();
+                });
+            });
+        }
+    } else {
+        requestPermission();
+    }
+}
+
+function _stopLiveCompass() {
+    if (_compassHandler) {
+        window.removeEventListener('deviceorientation', _compassHandler, true);
+        _compassHandler = null;
+    }
 }
 
 function _startModalCountdown(modal) {
