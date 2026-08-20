@@ -649,7 +649,23 @@ const SETTINGS_DEFAULT = {
 
 function getSettings() {
     try {
-        return Object.assign({}, SETTINGS_DEFAULT, JSON.parse(localStorage.getItem(SETTINGS_KEY)));
+        const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+        // Validasi: harus object biasa, bukan array/null/primitive
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+            return Object.assign({}, SETTINGS_DEFAULT);
+        }
+        const merged = Object.assign({}, SETTINGS_DEFAULT, raw);
+        // Validasi tipe per field — reset ke default kalau tipe salah
+        if (typeof merged.fontSize        !== 'number')  merged.fontSize        = SETTINGS_DEFAULT.fontSize;
+        if (typeof merged.latinFontSize   !== 'number')  merged.latinFontSize   = SETTINGS_DEFAULT.latinFontSize;
+        if (typeof merged.transFontSize   !== 'number')  merged.transFontSize   = SETTINGS_DEFAULT.transFontSize;
+        if (typeof merged.bgColor         !== 'string')  merged.bgColor         = SETTINGS_DEFAULT.bgColor;
+        if (typeof merged.arabFont        !== 'string')  merged.arabFont        = SETTINGS_DEFAULT.arabFont;
+        if (typeof merged.qori            !== 'string')  merged.qori            = SETTINGS_DEFAULT.qori;
+        if (typeof merged.darkMode        !== 'boolean') merged.darkMode        = SETTINGS_DEFAULT.darkMode;
+        if (typeof merged.showTranslation !== 'boolean') merged.showTranslation = SETTINGS_DEFAULT.showTranslation;
+        if (typeof merged.autoPlay        !== 'boolean') merged.autoPlay        = SETTINGS_DEFAULT.autoPlay;
+        return merged;
     } catch (e) {
         return Object.assign({}, SETTINGS_DEFAULT);
     }

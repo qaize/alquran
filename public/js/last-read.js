@@ -13,8 +13,15 @@ function saveLastRead(nomorSurah, namaLatin, nomorAyat) {
 }
 
 function getLastRead() {
-    try { return JSON.parse(localStorage.getItem(LAST_READ_KEY)); }
-    catch (e) { return null; }
+    try {
+        const raw = JSON.parse(localStorage.getItem(LAST_READ_KEY));
+        // Harus object dengan field wajib
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+        if (typeof raw.nomorSurah !== 'number') return null;
+        if (typeof raw.nomorAyat  !== 'number') return null;
+        if (typeof raw.namaLatin  !== 'string') return null;
+        return raw;
+    } catch (e) { return null; }
 }
 
 function showLastReadToast(namaLatin, nomorAyat) {
