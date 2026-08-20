@@ -460,6 +460,13 @@
     color: var(--navy);
 }
 
+.theme-dark .settings-selected-label {
+    color: var(--dark-text-mid);
+}
+.theme-dark .settings-selected-label span {
+    color: var(--dark-text);
+}
+
 /* Language toggle buttons */
 .lang-options {
     display: flex;

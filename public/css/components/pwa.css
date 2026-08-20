@@ -13,16 +13,17 @@
     50% { opacity: 0.7; }
 }
 
-/* Notification settings in settings panel */
+/* ── Notification settings in settings panel ── */
 .pwa-notif-section {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
+/* Permission request banner */
 .pwa-notif-banner {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
     padding: 10px 12px;
     background: rgba(201,168,76,0.1);
@@ -30,22 +31,24 @@
     border-radius: var(--radius-sm);
     margin-bottom: 8px;
 }
-.pwa-notif-banner i {
+.pwa-notif-banner > i {
     font-size: 16px;
     color: var(--gold);
     flex-shrink: 0;
+    margin-top: 2px;
 }
-.pwa-notif-banner div { flex: 1; min-width: 0; }
-.pwa-notif-banner strong {
+.pwa-notif-banner-text { flex: 1; min-width: 0; }
+.pwa-notif-banner-text strong {
     font-size: 12px;
     font-weight: 700;
     color: var(--navy);
     display: block;
 }
-.pwa-notif-banner p {
+.pwa-notif-banner-text p {
     font-size: 11px;
     color: var(--text-mid);
     margin: 2px 0 0;
+    line-height: 1.4;
 }
 .pwa-notif-allow-btn {
     padding: 5px 12px;
@@ -59,31 +62,62 @@
     white-space: nowrap;
     flex-shrink: 0;
     transition: background var(--transition);
+    align-self: flex-start;
 }
-.pwa-notif-allow-btn:hover { background: var(--gold); }
+.pwa-notif-allow-btn:hover { background: var(--gold); color: var(--navy); }
 
+/* Granted badge */
+.pwa-notif-granted-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #27ae60;
+    background: rgba(39,174,96,0.1);
+    border: 1px solid rgba(39,174,96,0.25);
+    border-radius: 20px;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+    align-self: flex-start;
+}
+.pwa-notif-granted-badge i { font-size: 11px; }
+
+/* Notif row */
 .pwa-notif-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 0;
+    padding: 10px 0;
     border-bottom: 1px solid var(--border);
     gap: 10px;
 }
-.pwa-notif-row:last-child { border-bottom: none; }
+.pwa-notif-row:last-of-type { border-bottom: none; }
 .pwa-notif-disabled { opacity: 0.4; pointer-events: none; }
 
-.pwa-notif-label {
+.pwa-notif-row-left {
     display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--navy);
+    align-items: flex-start;
+    gap: 8px;
     flex: 1;
     min-width: 0;
 }
-.pwa-notif-label i { font-size: 12px; color: var(--gold); width: 14px; }
+.pwa-notif-row-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+.pwa-notif-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.2;
+}
+.pwa-notif-hint {
+    font-size: 11px;
+    color: var(--text-mid);
+    margin-top: 2px;
+}
 
 .pwa-notif-right {
     display: flex;
@@ -100,7 +134,12 @@
     color: var(--navy);
     background: var(--blue-soft);
     cursor: pointer;
-    width: 80px;
+    width: 84px;
+    transition: border-color var(--transition);
+}
+.pwa-time-input:focus {
+    outline: none;
+    border-color: var(--gold);
 }
 
 .pwa-delay-label {
@@ -109,10 +148,217 @@
     background: var(--blue-soft);
     padding: 2px 7px;
     border-radius: 4px;
+    white-space: nowrap;
+}
+
+/* Test notif button */
+.pwa-test-notif-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 7px 14px;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: inherit;
+    align-self: flex-start;
+}
+.pwa-test-notif-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(201,168,76,0.06);
+}
+.pwa-test-notif-btn i { font-size: 11px; }
+
+/* Dark mode — settings panel */
+.theme-dark .pwa-notif-banner { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.2); }
+.theme-dark .pwa-notif-banner-text strong { color: rgba(255,255,255,0.9); }
+.theme-dark .pwa-notif-banner-text p { color: rgba(255,255,255,0.55); }
+.theme-dark .pwa-notif-label { color: var(--dark-text); }
+.theme-dark .pwa-notif-hint { color: var(--dark-text-mid); }
+.theme-dark .pwa-notif-row { border-bottom-color: var(--dark-border); }
+.theme-dark .pwa-time-input {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.8);
+}
+.theme-dark .pwa-delay-label {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.5);
+}
+.theme-dark .pwa-test-notif-btn {
+    border-color: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.5);
+}
+.theme-dark .pwa-test-notif-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(255,255,255,0.04);
+}
+
+
+/* ══════════════════════════════════════════════
+   IN-APP NOTIFICATION BANNER
+   Muncul di pojok kanan atas halaman
+   ══════════════════════════════════════════════ */
+
+.in-app-notif-banner {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 99999;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 380px;
+    padding: 14px 16px 18px;
+    background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.18),
+        0 2px 8px rgba(0,0,0,0.1),
+        inset 0 0 0 1px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--notif-accent, var(--gold));
+    overflow: hidden;
+    /* State awal: tersembunyi di kanan */
+    opacity: 0;
+    transform: translateX(calc(100% + 32px));
+    transition: none;
+    pointer-events: none;
+}
+
+/* Enter animation */
+.in-app-notif-banner.in-app-notif-enter {
+    opacity: 1;
+    transform: translateX(0);
+    transition:
+        opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: auto;
+}
+
+/* Exit animation */
+.in-app-notif-banner.in-app-notif-exit {
+    opacity: 0;
+    transform: translateX(calc(100% + 32px));
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+    pointer-events: none;
+}
+
+/* Icon */
+.in-app-notif-icon {
+    font-size: 28px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* Content */
+.in-app-notif-content {
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+}
+.in-app-notif-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+.in-app-notif-body {
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.5;
+    /* max 2 baris */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Close button */
+.in-app-notif-close {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: rgba(0,0,0,0.05);
+    border: none;
+    border-radius: 50%;
+    color: var(--text-light);
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition), color var(--transition);
+    margin-top: 1px;
+}
+.in-app-notif-close:hover {
+    background: rgba(0,0,0,0.12);
+    color: var(--text-dark);
+}
+
+/* Progress bar (auto-dismiss countdown) */
+.in-app-notif-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--notif-accent, var(--gold));
+    opacity: 0.5;
+    transform-origin: left center;
+    transform: scaleX(1);
+}
+.in-app-notif-progress.in-app-notif-progress-run {
+    animation: notifProgress linear forwards;
+}
+@keyframes notifProgress {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
+/* Hover — pause progress */
+.in-app-notif-banner:hover .in-app-notif-progress {
+    animation-play-state: paused;
 }
 
 /* Dark mode */
-.theme-dark .pwa-notif-banner { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.2); }
-.theme-dark .pwa-notif-banner strong { color: rgba(255,255,255,0.9); }
-.theme-dark .pwa-notif-label { color: rgba(255,255,255,0.8); }
-.theme-dark .pwa-time-input { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+.theme-dark .in-app-notif-banner {
+    background: var(--dark-surface2);
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.4),
+        0 2px 8px rgba(0,0,0,0.3),
+        inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+.theme-dark .in-app-notif-title { color: rgba(255,255,255,0.92); }
+.theme-dark .in-app-notif-body  { color: rgba(255,255,255,0.6); }
+.theme-dark .in-app-notif-close {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.4);
+}
+.theme-dark .in-app-notif-close:hover {
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.9);
+}
+
+/* Responsive — mobile lebih kecil */
+@media (max-width: 480px) {
+    .in-app-notif-banner {
+        top: 8px;
+        right: 8px;
+        left: 8px;
+        max-width: unset;
+        min-width: unset;
+    }
+}

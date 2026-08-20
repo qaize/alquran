@@ -1,16 +1,85 @@
 /* ============================================================
-   AL-QUR'AN DIGITAL — styles.css
+   AL-QUR'AN DIGITAL — fonts.css
    Palet: biru dongker (#0d2137) + biru muda (#e8f4fd) + emas (#c9a84c)
+   CDN: https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/
    ============================================================ */
 
 /* ── 0. ARABIC FONT FACES (CDN) ── */
+
+/* ────────────────────────────────────
+   KATEGORI: Mushaf Uthmani (KFGQPC)
+   King Fahd Glorious Quran Printing Complex
+   ──────────────────────────────────── */
+
+@font-face {
+    font-family: "KFGQPC Hafs";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/uthmanic-hafs1-ver14.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/uthmanic-hafs1-ver14.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "KFGQPC Hafs Smart";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/hafs-smart-07.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/hafs-smart-07.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "KFGQPC Hafs Uthmanic";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/hafs-uthmanic-v14-full.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/hafs-uthmanic-v14-full.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "KFGQPC BAZZI";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/bazzi-v7-full.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/bazzi-v7-full.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "KFGQPC Doori";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/doori-v8-full.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/doori-v8-full.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "KFGQPC Nastaleeq";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/hafs-nastaleeq-ver10.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/hafs-nastaleeq-ver10.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ────────────────────────────────────
+   KATEGORI: Naskh Klasik
+   ──────────────────────────────────── */
+
 @font-face {
     font-family: "Amiri Quran";
     src:
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/amiri-quran.woff2")
-            format("woff2"),
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/amiri-quran.woff")
-            format("woff");
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/amiri-quran.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/amiri-quran.woff") format("woff");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -19,70 +88,18 @@
 @font-face {
     font-family: "Scheherazade";
     src:
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/scheherazade-regular.woff2")
-            format("woff2"),
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/scheherazade-regular.woff")
-            format("woff");
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/scheherazade-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/scheherazade-regular.woff") format("woff");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
 
 @font-face {
-    font-family: "Noorehuda";
+    font-family: "Kitab";
     src:
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehuda.woff2")
-            format("woff2"),
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehuda.woff")
-            format("woff");
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "KFGQPC Hafs";
-    src:
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/uthmanic-hafs1-ver14.woff2")
-            format("woff2"),
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/uthmanic-hafs1-ver14.woff")
-            format("woff");
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Noto Naskh Arabic";
-    src:
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-naskh-arabic-regular.woff2")
-            format("woff2"),
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-naskh-arabic-regular.woff")
-            format("woff");
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Al Mushaf";
-    src:
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/almushaf.woff2")
-            format("woff2"),
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/almushaf.woff")
-            format("woff");
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Al Qalam Quran Majeed";
-    src:
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/al-qalam-quran-majeed.woff2")
-            format("woff2"),
-        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/al-qalam-quran-majeed.woff")
-            format("woff");
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/kitab-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/kitab-regular.woff") format("woff");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -91,8 +108,238 @@
 @font-face {
     font-family: "Lateef";
     src:
-        url("https://fonts.gstatic.com/s/lateef/v35/hESw6XVnNCxEvkbMpg.ttf")
-            format("truetype");
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/lateef-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/lateef-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Markazi Text";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/markazi-text-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/markazi-text-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Harmattan";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/harmattan.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/harmattan.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ────────────────────────────────────
+   KATEGORI: Naskh Modern
+   ──────────────────────────────────── */
+
+@font-face {
+    font-family: "Noto Naskh Arabic";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-naskh-arabic-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-naskh-arabic-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Noto Kufi Arabic";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-kufi-arabic-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-kufi-arabic-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "El Messiri";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/el-messiri-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/el-messiri-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Mada";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/mada-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/mada-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Droid Arabic Naskh";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/droid-naskh-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/droid-naskh-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ────────────────────────────────────
+   KATEGORI: Mushaf Indonesia / Pakistan
+   ──────────────────────────────────── */
+
+@font-face {
+    font-family: "Al Mushaf";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/almushaf.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/almushaf.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Al Qalam Quran Majeed";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/al-qalam-quran-majeed.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/al-qalam-quran-majeed.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Al Qalam Quran Majeed 2";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/al-qalam-quran-majeed-2.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/al-qalam-quran-majeed-2.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ────────────────────────────────────
+   KATEGORI: Noore (Pakistan/India)
+   ──────────────────────────────────── */
+
+@font-face {
+    font-family: "Noorehuda";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehuda.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehuda.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Noorehidayat";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehidayat.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehidayat.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Noorehira";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehira-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noorehira-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ────────────────────────────────────
+   KATEGORI: Nastaleeq / me_quran
+   ──────────────────────────────────── */
+
+@font-face {
+    font-family: "me_quran2";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/me-quran2.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/me-quran2.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "me_quran Volt";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/me-quran-volt-newmet.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/me-quran-volt-newmet.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Noto Nastaliq Urdu";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-nastaliq-urdu-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/noto-nastaliq-urdu-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ────────────────────────────────────
+   KATEGORI: Kufic / Dekoratif
+   ──────────────────────────────────── */
+
+@font-face {
+    font-family: "Aref Ruqaa";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/arefruqaa-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/arefruqaa-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Mirza";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/mirza-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/mirza-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Katibeh";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/katibeh.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/katibeh.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Jomhuria";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/jomhuria-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/jomhuria-regular.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Lalezar";
+    src:
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/lalezar-regular.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/fonts/lalezar-regular.woff") format("woff");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
