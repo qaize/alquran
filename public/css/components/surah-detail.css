@@ -159,6 +159,11 @@
     flex-shrink: 0;
 }
 
+.theme-dark .sbo-text {
+    color: rgba(255, 255, 248, 0.92);
+    text-shadow: 0 1px 10px rgba(201, 168, 76, 0.15);
+}
+
 .scroll-navigation {
     display: flex;
     justify-content: center;

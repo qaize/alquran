@@ -697,14 +697,38 @@ function applySettings(s) {
     // Background & warna teks — pakai CSS variable di :root
     root.style.setProperty('--ayat-bg', s.bgColor);
 
-    const DARK_COLORS = ['#1a2e45', '#0a0a0a'];
+    const DARK_COLORS = ['#1a2e45', '#0d1b2a', '#1e1e1e', '#1a1a2e', '#0d2418', '#1c1410', '#0a0a0a'];
+
+    // Mapping warna → class tema
+    const THEME_CLASSES = {
+        // Gelap
+        '#1a2e45': 'theme-dark-navy',
+        '#0d1b2a': 'theme-dark-midnight',
+        '#1e1e1e': 'theme-dark-gray',
+        '#1a1a2e': 'theme-dark-purple',
+        '#0d2418': 'theme-dark-forest',
+        '#1c1410': 'theme-dark-espresso',
+        '#0a0a0a': 'theme-dark-black',
+        // Terang
+        '#ffffff': '',                      // default — tidak perlu class
+        '#fdf6e3': 'theme-light-cream',
+        '#f5f0e8': 'theme-light-antique',
+        '#eef4f8': 'theme-light-blue',
+        '#f0ede6': 'theme-light-sand',
+    };
+
+    // Hapus semua class tema sebelumnya
+    Object.values(THEME_CLASSES).filter(Boolean).forEach(cls => root.classList.remove(cls));
+
     if (DARK_COLORS.includes(s.bgColor)) {
         root.classList.add('theme-dark');
-        // Set --dark-bg agar panel/footer dark mengikuti warna yang dipilih
-        root.style.setProperty('--dark-bg', s.bgColor);
+        const themeClass = THEME_CLASSES[s.bgColor];
+        if (themeClass) root.classList.add(themeClass);
     } else {
         root.classList.remove('theme-dark');
-        root.style.removeProperty('--dark-bg');
+        // Apply class tema terang (kecuali putih default yang tidak punya class)
+        const themeClass = THEME_CLASSES[s.bgColor];
+        if (themeClass) root.classList.add(themeClass);
     }
     // expose qori globally for audio player
     const prevQori = window.__activeQori;
@@ -741,8 +765,9 @@ function applySettings(s) {
     });
     window.__showTranslation = showTrans;
 
-    // Dark mode toggle (independent of bgColor)
-    if (s.darkMode) {
+    // Dark mode UI sync (toggle, icon) — class tema sudah di-set di atas via bgColor
+    const isDark = DARK_COLORS.includes(s.bgColor) || s.darkMode;
+    if (isDark) {
         document.documentElement.classList.add('theme-dark');
         const toggle = document.getElementById('dark-mode-toggle');
         if (toggle) toggle.checked = true;
@@ -923,7 +948,7 @@ function initSettings() {
     }
 
     // Background color
-    const DARK_COLORS = ['#1a2e45', '#0a0a0a'];
+    const DARK_COLORS = ['#1a2e45', '#0d1b2a', '#1e1e1e', '#1a1a2e', '#0d2418', '#1c1410', '#0a0a0a'];
     bgOptions.forEach(btn => {
         btn.addEventListener('click', () => {
             const color = btn.dataset.color;
@@ -979,7 +1004,7 @@ function initSettings() {
         darkModeToggle.addEventListener('change', () => {
             const cur = getSettings();
             cur.darkMode = darkModeToggle.checked;
-            const DARK_COLORS = ['#1a2e45', '#0a0a0a'];
+            const DARK_COLORS = ['#1a2e45', '#0d1b2a', '#1e1e1e', '#1a1a2e', '#0d2418', '#1c1410', '#0a0a0a'];
             // If dark mode on, pakai warna gelap yang sudah dipilih atau default dark navy
             if (cur.darkMode) {
                 if (!DARK_COLORS.includes(cur.bgColor)) {
@@ -1075,7 +1100,7 @@ function initDarkModeTopbar() {
     btn.addEventListener('click', () => {
         const cur = getSettings();
         cur.darkMode = !cur.darkMode;
-        const DARK_COLORS = ['#1a2e45', '#0a0a0a'];
+        const DARK_COLORS = ['#1a2e45', '#0d1b2a', '#1e1e1e', '#1a1a2e', '#0d2418', '#1c1410', '#0a0a0a'];
         if (cur.darkMode) {
             // Pertahankan warna gelap yang sudah dipilih, atau default dark navy
             if (!DARK_COLORS.includes(cur.bgColor)) {

@@ -56,7 +56,7 @@
 
 /* Dark mode cards */
 .theme-dark .surah-card {
-    background: linear-gradient(135deg, #1a2e45 0%, #0d2137 100%);
+    background: linear-gradient(135deg, var(--dark-surface) 0%, var(--navy) 100%);
     border-color: rgba(232,201,122,0.15);
     box-shadow:
         0 2px 8px rgba(0,0,0,0.3),
