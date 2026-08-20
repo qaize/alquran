@@ -22,4 +22,301 @@
     --sidebar-w: 220px;
     --sidebar-r-w: 240px;
     --transition: 0.22s ease;
+
+    /* Dark mode surface variables — dioverride per tema */
+    --dark-bg:        #0f1923;
+    --dark-surface:   #1a2e45;
+    --dark-surface2:  #163352;
+    --dark-surface3:  #1e4976;
+    --dark-border:    rgba(255,255,255,0.08);
+    --dark-text:      rgba(255,255,255,0.87);
+    --dark-text-mid:  rgba(255,255,255,0.55);
+    --dark-text-dim:  rgba(255,255,255,0.35);
+    --dark-hover:     rgba(255,255,255,0.06);
+    --dark-card:      rgba(255,255,255,0.04);
+    --accent:         var(--gold);
+    --accent-light:   var(--gold-light);
 }
+
+/* ──────────────────────────────────────────────
+   TEMA GELAP — Override CSS variables per tema
+   Setiap tema overrides --navy/mid/light (sidebar, header)
+   dan --dark-* (panel, card, ayat area)
+   ────────────────────────────────────────────── */
+
+/* Biru Gelap (default dark navy) */
+.theme-dark-navy {
+    --navy:           #0d2137;
+    --navy-mid:       #163352;
+    --navy-light:     #1e4976;
+    --dark-bg:        #0f1923;
+    --dark-surface:   #1a2e45;
+    --dark-surface2:  #163352;
+    --dark-surface3:  #1e4976;
+    --text-mid:       #4a6580;
+    --text-light:     #8aa5bf;
+    --border:         #cde4f5;
+    --accent:         var(--gold);
+    --accent-light:   var(--gold-light);
+}
+
+/* Biru Tengah Malam */
+.theme-dark-midnight {
+    --navy:           #0a1628;
+    --navy-mid:       #0f2040;
+    --navy-light:     #163054;
+    --dark-bg:        #0d1b2a;
+    --dark-surface:   #0f2238;
+    --dark-surface2:  #122840;
+    --dark-surface3:  #1a3a5c;
+    --text-mid:       #4a6a8a;
+    --text-light:     #7a9abf;
+    --border:         #1a3a5c;
+    --dark-border:    rgba(100,160,220,0.12);
+    --accent:         #60a0d8;
+    --accent-light:   #80c0f0;
+}
+
+/* Abu Gelap */
+.theme-dark-gray {
+    --navy:           #1a1a1a;
+    --navy-mid:       #252525;
+    --navy-light:     #323232;
+    --dark-bg:        #1e1e1e;
+    --dark-surface:   #252525;
+    --dark-surface2:  #2d2d2d;
+    --dark-surface3:  #3a3a3a;
+    --text-mid:       #6a6a6a;
+    --text-light:     #909090;
+    --border:         #3a3a3a;
+    --dark-border:    rgba(255,255,255,0.1);
+    --accent:         #c9a84c;
+    --accent-light:   #e8c97a;
+}
+
+/* Ungu Tua */
+.theme-dark-purple {
+    --navy:           #130d26;
+    --navy-mid:       #1f1540;
+    --navy-light:     #2e1f5e;
+    --dark-bg:        #1a1a2e;
+    --dark-surface:   #1f1a38;
+    --dark-surface2:  #271f48;
+    --dark-surface3:  #362a60;
+    --text-mid:       #7060a0;
+    --text-light:     #a090c8;
+    --border:         #2e2060;
+    --dark-border:    rgba(160,130,240,0.12);
+    --accent:         #9f7fe8;
+    --accent-light:   #c9a8f5;
+    --gold:           #9f7fe8;
+    --gold-light:     #c9a8f5;
+}
+
+/* Hijau Hutan */
+.theme-dark-forest {
+    --navy:           #081a10;
+    --navy-mid:       #0f2a18;
+    --navy-light:     #183d24;
+    --dark-bg:        #0d2418;
+    --dark-surface:   #102e1e;
+    --dark-surface2:  #143a26;
+    --dark-surface3:  #1e5234;
+    --text-mid:       #40785a;
+    --text-light:     #6aac88;
+    --border:         #1a4028;
+    --dark-border:    rgba(80,200,130,0.12);
+    --accent:         #4caf82;
+    --accent-light:   #7de8a0;
+    --gold:           #4caf82;
+    --gold-light:     #7de8a0;
+}
+
+/* Coklat Espresso */
+.theme-dark-espresso {
+    --navy:           #130e08;
+    --navy-mid:       #221808;
+    --navy-light:     #32240e;
+    --dark-bg:        #1c1410;
+    --dark-surface:   #241a12;
+    --dark-surface2:  #2e2018;
+    --dark-surface3:  #402e20;
+    --text-mid:       #806040;
+    --text-light:     #b08060;
+    --border:         #382818;
+    --dark-border:    rgba(200,150,80,0.12);
+    --accent:         #c9883c;
+    --accent-light:   #e8b870;
+    --gold:           #c9883c;
+    --gold-light:     #e8b870;
+}
+
+/* Hitam Pekat */
+.theme-dark-black {
+    --navy:           #080808;
+    --navy-mid:       #101010;
+    --navy-light:     #1a1a1a;
+    --dark-bg:        #0a0a0a;
+    --dark-surface:   #111111;
+    --dark-surface2:  #181818;
+    --dark-surface3:  #222222;
+    --text-mid:       #555555;
+    --text-light:     #777777;
+    --border:         #222222;
+    --dark-border:    rgba(255,255,255,0.08);
+    --accent:         #c9a84c;
+    --accent-light:   #e8c97a;
+}
+
+/* ──────────────────────────────────────────────
+   TEMA TERANG — Override CSS variables per tema
+   ────────────────────────────────────────────── */
+
+/* Putih (default — mengikuti :root, tidak perlu override) */
+
+/* Krem Hangat — nuansa sepia/coklat hangat */
+.theme-light-cream {
+    --navy:           #4a2e1a;
+    --navy-mid:       #6b4226;
+    --navy-light:     #8c5c36;
+    --blue-soft:      #fdf6e3;
+    --blue-card:      #fef9f0;
+    --gold:           #b8860b;
+    --gold-light:     #d4a843;
+    --gold-pale:      #fff8e7;
+    --text-dark:      #3a2010;
+    --text-mid:       #7a5540;
+    --text-light:     #a88060;
+    --border:         #e8d5b0;
+    --shadow-sm:      0 2px 8px rgba(74, 46, 26, 0.08);
+    --shadow-md:      0 4px 20px rgba(74, 46, 26, 0.13);
+    --shadow-lg:      0 8px 32px rgba(74, 46, 26, 0.18);
+}
+
+/* Putih Antik — nuansa perkamen/antik */
+.theme-light-antique {
+    --navy:           #3d2b1a;
+    --navy-mid:       #5a3e28;
+    --navy-light:     #7a5638;
+    --blue-soft:      #f5f0e8;
+    --blue-card:      #faf6ef;
+    --gold:           #a0722a;
+    --gold-light:     #c49040;
+    --gold-pale:      #fdf4e3;
+    --text-dark:      #2d1e0f;
+    --text-mid:       #6e5040;
+    --text-light:     #9e7860;
+    --border:         #ddd0b8;
+    --shadow-sm:      0 2px 8px rgba(61, 43, 26, 0.08);
+    --shadow-md:      0 4px 20px rgba(61, 43, 26, 0.13);
+    --shadow-lg:      0 8px 32px rgba(61, 43, 26, 0.18);
+}
+
+/* Biru Muda — nuansa biru steel/langit */
+.theme-light-blue {
+    --navy:           #1a3a5c;
+    --navy-mid:       #245080;
+    --navy-light:     #2e68a8;
+    --blue-soft:      #eef4f8;
+    --blue-card:      #f4f9fc;
+    --gold:           #2e86c1;
+    --gold-light:     #4aa3d8;
+    --gold-pale:      #e8f4fc;
+    --text-dark:      #0f2540;
+    --text-mid:       #3a5878;
+    --text-light:     #6a90b0;
+    --border:         #c0d8ec;
+    --shadow-sm:      0 2px 8px rgba(26, 58, 92, 0.08);
+    --shadow-md:      0 4px 20px rgba(26, 58, 92, 0.13);
+    --shadow-lg:      0 8px 32px rgba(26, 58, 92, 0.18);
+}
+
+/* Krem Pasir — nuansa pasir/tanah */
+.theme-light-sand {
+    --navy:           #4a3820;
+    --navy-mid:       #6a5030;
+    --navy-light:     #8a6a42;
+    --blue-soft:      #f0ede6;
+    --blue-card:      #f7f4ef;
+    --gold:           #a08040;
+    --gold-light:     #c0a060;
+    --gold-pale:      #fdf0d8;
+    --text-dark:      #352810;
+    --text-mid:       #705840;
+    --text-light:     #a08868;
+    --border:         #ddd0b8;
+    --shadow-sm:      0 2px 8px rgba(74, 56, 32, 0.08);
+    --shadow-md:      0 4px 20px rgba(74, 56, 32, 0.13);
+    --shadow-lg:      0 8px 32px rgba(74, 56, 32, 0.18);
+}
+
+/* ──────────────────────────────────────────────
+   DARK MODE GLOBAL OVERRIDES
+   Berlaku untuk semua .theme-dark-* via .theme-dark
+   ────────────────────────────────────────────── */
+.theme-dark body {
+    background: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+.theme-dark .main-content {
+    background: var(--dark-bg);
+}
+
+.theme-dark .sidebar-right {
+    background: var(--dark-surface);
+    border-left-color: var(--dark-border);
+}
+
+.theme-dark .fav-item {
+    background: var(--dark-surface2);
+    border-color: var(--dark-border);
+}
+.theme-dark .fav-item:hover {
+    background: var(--navy-light);
+    border-color: var(--accent);
+}
+.theme-dark .fav-name  { color: var(--dark-text); }
+.theme-dark .fav-arti  { color: var(--dark-text-mid); }
+
+.theme-dark .barisSurah {
+    background-color: var(--dark-surface);
+    background-image: none;
+    border-bottom-color: var(--dark-border);
+}
+.theme-dark .barisSurah:hover {
+    background: var(--dark-hover);
+    background-image: none;
+}
+
+.theme-dark .ayat {
+    background: var(--dark-surface);
+}
+
+/* Settings label */
+.theme-dark .settings-label { color: var(--dark-text); }
+.theme-dark .settings-panel { background: var(--dark-surface); }
+.theme-dark .settings-section { border-bottom-color: var(--dark-border); }
+.theme-dark .settings-select {
+    background: var(--dark-surface2);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+.theme-dark .settings-font-preview,
+.theme-dark .settings-preview {
+    background: var(--dark-surface2);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+.theme-dark .font-btn {
+    background: var(--dark-surface2);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+.theme-dark .font-btn:hover {
+    background: var(--navy-light);
+    border-color: var(--accent);
+    color: var(--dark-text);
+}
+.theme-dark .font-size-display { color: var(--dark-text); }
+.theme-dark .settings-hint { color: var(--dark-text-mid); }

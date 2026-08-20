@@ -39,6 +39,21 @@
           <button class="bg-option bg-option-dark" data-color="#1a2e45" data-name-id="Biru Gelap" data-name-en="Dark Navy" style="background:#1a2e45;" title="Biru Gelap">
             <span class="bg-check"><i class="fa-solid fa-check"></i></span>
           </button>
+          <button class="bg-option bg-option-dark" data-color="#0d1b2a" data-name-id="Biru Tengah Malam" data-name-en="Midnight Blue" style="background:#0d1b2a;" title="Biru Tengah Malam">
+            <span class="bg-check"><i class="fa-solid fa-check"></i></span>
+          </button>
+          <button class="bg-option bg-option-dark" data-color="#1e1e1e" data-name-id="Abu Gelap" data-name-en="Dark Gray" style="background:#1e1e1e;" title="Abu Gelap">
+            <span class="bg-check"><i class="fa-solid fa-check"></i></span>
+          </button>
+          <button class="bg-option bg-option-dark" data-color="#1a1a2e" data-name-id="Ungu Tua" data-name-en="Deep Purple" style="background:#1a1a2e;" title="Ungu Tua">
+            <span class="bg-check"><i class="fa-solid fa-check"></i></span>
+          </button>
+          <button class="bg-option bg-option-dark" data-color="#0d2418" data-name-id="Hijau Hutan" data-name-en="Dark Forest" style="background:#0d2418;" title="Hijau Hutan">
+            <span class="bg-check"><i class="fa-solid fa-check"></i></span>
+          </button>
+          <button class="bg-option bg-option-dark" data-color="#1c1410" data-name-id="Coklat Espresso" data-name-en="Dark Espresso" style="background:#1c1410;" title="Coklat Espresso">
+            <span class="bg-check"><i class="fa-solid fa-check"></i></span>
+          </button>
           <button class="bg-option bg-option-dark" data-color="#0a0a0a" data-name-id="Hitam Pekat" data-name-en="Pure Black" style="background:#0a0a0a;" title="Hitam Pekat">
             <span class="bg-check"><i class="fa-solid fa-check"></i></span>
           </button>

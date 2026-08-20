@@ -40,6 +40,11 @@
     text-shadow: 0 2px 12px rgba(201, 168, 76, 0.25);
 }
 
+.theme-dark .info-ornament {
+    color: rgba(255, 255, 248, 0.92);
+    text-shadow: 0 2px 16px rgba(201, 168, 76, 0.2);
+}
+
 .info-subtitle {
     font-size: 12px;
     color: var(--text-dark);
@@ -47,4 +52,8 @@
     margin-top: 6px;
     letter-spacing: 0.3px;
     opacity: 0.8;
+}
+
+.theme-dark .info-subtitle {
+    color: rgba(255, 255, 255, 0.65);
 }

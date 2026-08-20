@@ -35,9 +35,9 @@
 }
 
 .theme-dark .btn-pagination {
-    background: #0d2137;
+    background: var(--navy-mid);
     border-color: rgba(232,201,122,0.3);
-    color: var(--gold-light);
+    color: var(--accent-light);
 }
 
 .theme-dark .btn-pagination:hover {

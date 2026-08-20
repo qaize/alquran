@@ -269,7 +269,7 @@
 /* Dark mode */
 .theme-dark .ptw-compact { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
 .theme-dark .ptw-compact:hover { background: rgba(255,255,255,0.1); }
-.theme-dark .prayer-modal { background: #0f1923; }
+.theme-dark .prayer-modal { background: var(--dark-bg); }
 .theme-dark .pt-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
 .theme-dark .pt-card-name,
 .theme-dark .pt-card-time { color: rgba(255,255,255,0.8); }

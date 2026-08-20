@@ -50,8 +50,8 @@
 
 /* Dark mode */
 .theme-dark .settings-footer-row {
-    background: var(--dark-bg, #0f1923);
-    border-top-color: rgba(255,255,255,0.08);
+    background: var(--dark-bg);
+    border-top-color: var(--dark-border);
 }
 .theme-dark .settings-reset-btn {
     border-color: rgba(255,255,255,0.15);
@@ -385,6 +385,26 @@
 .bg-option[data-color="#1a2e45"] .bg-check {
     color: #e8c97a;
 }
+/* Biru Tengah Malam — centang emas terang */
+.bg-option[data-color="#0d1b2a"] .bg-check {
+    color: #e8c97a;
+}
+/* Abu Gelap — centang putih */
+.bg-option[data-color="#1e1e1e"] .bg-check {
+    color: #e0e0e0;
+}
+/* Ungu Tua — centang ungu muda */
+.bg-option[data-color="#1a1a2e"] .bg-check {
+    color: #c9a8f5;
+}
+/* Hijau Hutan — centang hijau muda */
+.bg-option[data-color="#0d2418"] .bg-check {
+    color: #7de8a0;
+}
+/* Coklat Espresso — centang krem hangat */
+.bg-option[data-color="#1c1410"] .bg-check {
+    color: #e8c97a;
+}
 /* Pure Black — centang emas terang */
 .bg-option[data-color="#0a0a0a"] .bg-check {
     color: #e8c97a;
@@ -396,6 +416,36 @@
 
 /* Pure Black selected — border emas */
 .bg-option[data-color="#0a0a0a"].selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.3);
+}
+
+/* Biru Tengah Malam selected — border emas */
+.bg-option[data-color="#0d1b2a"].selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.3);
+}
+
+/* Abu Gelap selected — border abu muda */
+.bg-option[data-color="#1e1e1e"].selected {
+    border-color: #aaaaaa;
+    box-shadow: 0 0 0 3px rgba(170, 170, 170, 0.3);
+}
+
+/* Ungu Tua selected — border ungu */
+.bg-option[data-color="#1a1a2e"].selected {
+    border-color: #c9a8f5;
+    box-shadow: 0 0 0 3px rgba(201, 168, 245, 0.3);
+}
+
+/* Hijau Hutan selected — border hijau */
+.bg-option[data-color="#0d2418"].selected {
+    border-color: #7de8a0;
+    box-shadow: 0 0 0 3px rgba(125, 232, 160, 0.3);
+}
+
+/* Coklat Espresso selected — border emas */
+.bg-option[data-color="#1c1410"].selected {
     border-color: var(--gold);
     box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.3);
 }
