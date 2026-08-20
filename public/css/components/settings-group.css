@@ -60,3 +60,14 @@
     border-bottom: none;
     padding-bottom: 20px;
 }
+
+/* Dark mode */
+.theme-dark .settings-group {
+    border-color: var(--dark-border);
+}
+.theme-dark .settings-group-body {
+    background: var(--dark-surface);
+}
+.theme-dark .settings-group-body .settings-section {
+    border-bottom-color: var(--dark-border);
+}

@@ -142,14 +142,51 @@
               <span data-i18n="settings_arab_font">Jenis Font Arab</span>
             </label>
             <select id="arab-font-select" class="settings-select">
-              <option value="Amiri Quran">Amiri Quran</option>
-              <option value="Scheherazade">Scheherazade</option>
-              <option value="Noorehuda">Noorehuda</option>
-              <option value="KFGQPC Hafs">KFGQPC Hafs (Uthmani)</option>
-              <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
-              <option value="Al Mushaf">Al Mushaf (Mushaf Indonesia)</option>
-              <option value="Al Qalam Quran Majeed">Al Qalam Quran Majeed</option>
-              <option value="Lateef">Lateef (SIL)</option>
+              <optgroup label="── Mushaf Uthmani (KFGQPC) ──">
+                <option value="KFGQPC Hafs">⭐ KFGQPC Hafs (Uthmani v14)</option>
+                <option value="KFGQPC Hafs Smart">KFGQPC Hafs Smart</option>
+                <option value="KFGQPC Hafs Uthmanic">KFGQPC Hafs Uthmanic (Full)</option>
+                <option value="KFGQPC BAZZI">KFGQPC BAZZI</option>
+                <option value="KFGQPC Doori">KFGQPC Doori</option>
+                <option value="KFGQPC Nastaleeq">KFGQPC Nastaleeq</option>
+              </optgroup>
+              <optgroup label="── Naskh Klasik ──">
+                <option value="Amiri Quran">⭐ Amiri Quran</option>
+                <option value="Scheherazade">⭐ Scheherazade New (SIL)</option>
+                <option value="Kitab">Kitab (SIL)</option>
+                <option value="Lateef">Lateef (SIL)</option>
+                <option value="Markazi Text">Markazi Text</option>
+                <option value="Harmattan">Harmattan (SIL)</option>
+              </optgroup>
+              <optgroup label="── Naskh Modern ──">
+                <option value="Noto Naskh Arabic">⭐ Noto Naskh Arabic</option>
+                <option value="Noto Kufi Arabic">Noto Kufi Arabic</option>
+                <option value="El Messiri">El Messiri</option>
+                <option value="Mada">Mada</option>
+                <option value="Droid Arabic Naskh">Droid Arabic Naskh</option>
+              </optgroup>
+              <optgroup label="── Mushaf Indonesia / Pakistan ──">
+                <option value="Al Mushaf">⭐ Al Mushaf (Alvi)</option>
+                <option value="Al Qalam Quran Majeed">⭐ Al Qalam Quran Majeed</option>
+                <option value="Al Qalam Quran Majeed 2">Al Qalam Quran Majeed 2</option>
+              </optgroup>
+              <optgroup label="── Noore (Pakistan / India) ──">
+                <option value="Noorehuda">⭐ Noorehuda</option>
+                <option value="Noorehidayat">Noorehidayat</option>
+                <option value="Noorehira">Noorehira</option>
+              </optgroup>
+              <optgroup label="── Nastaleeq / me_quran ──">
+                <option value="me_quran2">me_quran 2</option>
+                <option value="me_quran Volt">me_quran Volt</option>
+                <option value="Noto Nastaliq Urdu">Noto Nastaliq Urdu</option>
+              </optgroup>
+              <optgroup label="── Kufic / Dekoratif ──">
+                <option value="Aref Ruqaa">Aref Ruqaa</option>
+                <option value="Mirza">Mirza</option>
+                <option value="Katibeh">Katibeh</option>
+                <option value="Jomhuria">Jomhuria</option>
+                <option value="Lalezar">Lalezar</option>
+              </optgroup>
             </select>
             <p class="settings-preview settings-preview-arab" id="arab-font-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
           </div>
