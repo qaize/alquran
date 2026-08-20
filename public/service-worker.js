@@ -11,25 +11,10 @@ const CACHE_STATIC = `alquran-static-${SW_VERSION}`;
 const APP_ORIGIN = self.location.origin;
 
 // File yang di-cache saat install (app shell)
+// ⚠️  List ini di-inject secara dinamis oleh routes/web.php
+//     berdasarkan Vite manifest — jangan edit manual di sini
 const STATIC_ASSETS = [
     '/',
-    '/css/styles.css',
-    '/js/toast.js',
-    '/js/settings.js',
-    '/js/favorites.js',
-    '/js/bookmarks.js',
-    '/js/last-read.js',
-    '/js/audio.js',
-    '/js/tajweed.js',
-    '/js/modals.js',
-    '/js/navigation.js',
-    '/js/script.js',
-    '/js/usage.js',
-    '/js/backup.js',
-    '/js/janji-allah.js',
-    '/js/hadist.js',
-    '/js/prayer-time.js',
-    '/js/pwa.js',
     '/img/quran.png',
     '/img/icon-192.png',
     '/manifest.json',

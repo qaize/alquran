@@ -3,15 +3,32 @@
 /* ── FAVORITES — localStorage ── */
 const FAVORITES_KEY = 'quran_favorites';
 
+// Memory cache — agar tidak baca localStorage setiap render card
+let _favoritesCache = null;
+
 function getFavorites() {
+    if (_favoritesCache !== null) return _favoritesCache;
     try {
-        return JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
+        const raw = JSON.parse(localStorage.getItem(FAVORITES_KEY));
+        // Harus array, tiap item harus punya nomor (number) dan namaLatin (string)
+        if (!Array.isArray(raw)) {
+            _favoritesCache = [];
+            return _favoritesCache;
+        }
+        _favoritesCache = raw.filter(f =>
+            f && typeof f === 'object' &&
+            typeof f.nomor     === 'number' &&
+            typeof f.namaLatin === 'string'
+        );
+        return _favoritesCache;
     } catch (e) {
-        return [];
+        _favoritesCache = [];
+        return _favoritesCache;
     }
 }
 
 function saveFavorites(list) {
+    _favoritesCache = null; // invalidate cache
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
 }
 

@@ -7,8 +7,16 @@ const BOOKMARKS_KEY        = 'quran_bookmarks';
 const BOOKMARKS_HADIST_KEY = 'quran_bookmarks_hadist';
 
 function getBookmarks() {
-    try { return JSON.parse(localStorage.getItem(BOOKMARKS_KEY)) || []; }
-    catch (e) { return []; }
+    try {
+        const raw = JSON.parse(localStorage.getItem(BOOKMARKS_KEY));
+        // Harus array, tiap item harus punya nomorSurah & nomorAyat
+        if (!Array.isArray(raw)) return [];
+        return raw.filter(b =>
+            b && typeof b === 'object' &&
+            typeof b.nomorSurah === 'number' &&
+            typeof b.nomorAyat  === 'number'
+        );
+    } catch (e) { return []; }
 }
 
 function saveBookmarks(list) {
