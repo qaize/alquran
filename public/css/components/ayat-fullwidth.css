@@ -4,14 +4,14 @@
 .detailSurah.fullwidth-mode {
     display: flex;
     flex-direction: column;
-    padding: 16px 24px 20px;
+    padding: 4px 12px 8px;
 }
 
 /* Fallback :has() untuk browser modern */
 .detailSurah:has(.ayat.ayat-fullwidth) {
     display: flex;
     flex-direction: column;
-    padding: 16px 24px 20px;
+    padding: 4px 12px 8px;
 }
 
 /* #main-body:has(.detailSurah) sudah diset ke flex column di atas */
@@ -20,10 +20,10 @@
     flex: unset;
     width: 100%;
     max-width: 100%;
-    height: calc(100vh - 322px);
-    min-height: 300px;
+    height: calc(100vh - 200px);
+    min-height: 400px;
     text-align: right;
-    padding: 20px 60px 32px 48px;
+    padding: 16px 48px 24px 48px;
     box-sizing: border-box;
     overflow-y: auto;
     border: 1px solid rgba(201, 168, 76, 0.25);
@@ -44,48 +44,60 @@
     background: var(--gold);
 }
 
-/* fullwidth mode — barisSurah tetap single column seperti normal */
+/* fullwidth mode — barisSurah single column, full width */
 .ayat.ayat-fullwidth .barisSurah {
     flex-direction: column;
-    padding: 12px 0;
+    padding: 16px 0;
     border-bottom: 1px solid var(--border);
     width: 100%;
     justify-content: unset;
     align-items: unset;
     gap: unset;
+    /* reset background gradient agar tidak tumpang tindih */
+    background-image: none;
+    border-bottom-color: rgba(201, 168, 76, 0.2);
 }
 
 .ayat.ayat-fullwidth .barisSurah:last-child {
     border-bottom: none;
 }
 
+/* isi-ayat: arah LTR agar terjemahan bisa rata kiri */
 .ayat.ayat-fullwidth .isi-ayat {
     text-align: right;
-    direction: rtl;
+    direction: ltr; /* biarkan LTR agar child bisa kita atur manual */
     flex: 1;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
+/* ayat-nav: Arabic text + nomor, tetap RTL */
 .ayat.ayat-fullwidth .ayat-nav {
-    text-align: right;
     direction: rtl;
     width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
 }
 
+/* Teks Arab: penuh lebar, ukuran lebih besar di fullwidth */
 .ayat.ayat-fullwidth .arabic {
     font-size: var(--arabic-font-size, 40px);
-    line-height: 2;
+    line-height: 2.4;
     color: var(--navy);
     text-align: right;
     direction: rtl;
     display: block;
     width: 100%;
+    flex: 1;
 }
 
-/* Dark mode override untuk fullwidth — harus setelah rule di atas agar menang */
+/* Dark mode override untuk fullwidth */
 .theme-dark .ayat.ayat-fullwidth .arabic {
-    color: #ffffff;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+    color: rgba(255, 255, 248, 0.95);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    -webkit-font-smoothing: antialiased;
 }
 
 .ayat.ayat-fullwidth .urutan-ayat {
@@ -93,19 +105,40 @@
     background: var(--gold-pale);
 }
 
-/* Terjemahan dalam fullwidth — lebar proporsional & center */
+/* Terjemahan dalam fullwidth — rata kiri, full width */
 .ayat.ayat-fullwidth .terjemahan-ayat {
+    direction: ltr;
+    text-align: left;
+    width: 100%;
+    max-width: 100%;
+    margin: 8px 0 0 0;
+}
+
+.ayat.ayat-fullwidth .tulisan-latin {
     text-align: left;
     direction: ltr;
-    max-width: 75%;
-    margin: 4px 0 0 auto;
+    width: 100%;
+}
+
+.ayat.ayat-fullwidth .terjemahan {
+    text-align: left;
+    direction: ltr;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Tombol ayat: rata kiri */
+.ayat.ayat-fullwidth .ayat-btns {
+    direction: ltr;
+    justify-content: flex-start;
+    padding-top: 10px;
 }
 
 /* Responsif: kurangi padding horizontal di layar kecil */
 @media (max-width: 900px) {
     .ayat.ayat-fullwidth {
-        padding: 16px 20px 24px 16px;
-        /* Mobile: topbar(50px) + search(60px) + title(100px) + padding(32px) = ~242px */
-        height: calc(100vh - 242px);
+        padding: 12px 20px 20px 20px;
+        /* Mobile: topbar(50px) + search(60px) + title(60px) + padding(20px) = ~190px */
+        height: calc(100vh - 190px);
     }
 }

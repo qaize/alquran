@@ -4,8 +4,31 @@
    TAJWEED — Colored Tajwid from alquran.cloud API
    ────────────────────────────────────────────── */
 const TAJWEED_KEY = 'quran_tajweed_enabled';
+const TAJWEED_RULES_KEY = 'quran_tajweed_rules';
 const tajweedCache = new Map();
 let lastRenderedSurah = null;
+
+// Default semua rule aktif, kecuali ham_wasl dan slnt
+// (huruf tidak dibaca — banyak pengguna tidak nyaman melihat warnanya)
+const TAJWEED_RULES_DEFAULT = {
+    'h': false, // Hamzat Wasl — default nonaktif
+    's': true,
+    'l': true,
+    'n': true,
+    'p': true,
+    'm': true,
+    'q': true,
+    'o': true,
+    'c': true,
+    'f': true,
+    'w': true,
+    'i': true,
+    'a': true,
+    'u': true,
+    'd': true,
+    'b': true,
+    'g': true,
+};
 
 function isTajweedEnabled() {
     return localStorage.getItem(TAJWEED_KEY) === 'true';
@@ -13,6 +36,24 @@ function isTajweedEnabled() {
 
 function setTajweedEnabled(val) {
     localStorage.setItem(TAJWEED_KEY, val ? 'true' : 'false');
+}
+
+function getTajweedRules() {
+    try {
+        const raw = JSON.parse(localStorage.getItem(TAJWEED_RULES_KEY));
+        if (!raw || typeof raw !== 'object') return { ...TAJWEED_RULES_DEFAULT };
+        return Object.assign({}, TAJWEED_RULES_DEFAULT, raw);
+    } catch (e) {
+        return { ...TAJWEED_RULES_DEFAULT };
+    }
+}
+
+function setTajweedRule(identifier, enabled) {
+    const rules = getTajweedRules();
+    rules[identifier] = enabled;
+    localStorage.setItem(TAJWEED_RULES_KEY, JSON.stringify(rules));
+    // Invalidate cache agar re-render ulang dengan rule baru
+    tajweedCache.clear();
 }
 
 // Mapping dari identifier tag ke CSS class
@@ -61,9 +102,14 @@ const TAJWEED_INFO = {
  * Parse raw tajweed text from API ke HTML berwarna.
  * Format tag: [X:NUM[TEXT] atau [X[TEXT]
  * Contoh: [h:1[ٱ] atau [n[مَٰ]
+ *
+ * Rule yang dinonaktifkan di settings akan dirender sebagai teks biasa
+ * tanpa span warna. Untuk ham_wasl ('h'), karakter alef wasla ٱ (U+0671)
+ * tetap ditampilkan apa adanya — hanya pewarnaan yang dihilangkan.
  */
 function parseTajweedText(rawText) {
     if (!rawText) return '';
+    const activeRules = getTajweedRules();
     let result = '';
     let i = 0;
     while (i < rawText.length) {
@@ -95,16 +141,73 @@ function parseTajweedText(rawText) {
                         textContent += rawText[j];
                         j++;
                     }
-                    const info = TAJWEED_INFO[identifier] || {};
-                    const tjName     = (info.name  || '').replace(/"/g, '&quot;');
-                    const tjDesc     = (info.desc  || '').replace(/"/g, '&quot;');
-                    const tjLabel    = (info.label || '').replace(/"/g, '&quot;');
-                    const tjHarakaat = info.harakaat !== null && info.harakaat !== undefined
-                        ? (Array.isArray(info.harakaat)
-                            ? info.harakaat.join('/')
-                            : String(info.harakaat))
-                        : '';
-                    result += `<span class="tj-${cssClass}" data-tj-name="${tjName}" data-tj-desc="${tjDesc}" data-tj-label="${tjLabel}" data-tj-harakaat="${tjHarakaat}">${textContent}</span>`;
+
+                    // Cek apakah rule ini aktif
+                    const ruleEnabled = activeRules[identifier] !== false;
+                    if (ruleEnabled) {
+                        const info = TAJWEED_INFO[identifier] || {};
+                        const tjName     = (info.name  || '').replace(/"/g, '&quot;');
+                        const tjDesc     = (info.desc  || '').replace(/"/g, '&quot;');
+                        const tjLabel    = (info.label || '').replace(/"/g, '&quot;');
+                        const tjHarakaat = info.harakaat !== null && info.harakaat !== undefined
+                            ? (Array.isArray(info.harakaat)
+                                ? info.harakaat.join('/')
+                                : String(info.harakaat))
+                            : '';
+
+                        // ── Mad Thabii (n): ganti fattah + tatwil → superscript alef berdiri ──
+                        // Data API: huruf mad punya fattah (U+064E) di akhir teks sebelumnya,
+                        // lalu span [n] berisi tatwil (U+0640) + superscript alef (U+0670).
+                        // Tujuan: tampilkan sebagai mad berdiri (ٰ di atas huruf tanpa fattah).
+                        // CATATAN: hanya strip fattah, bukan harakat lain (kasrah, dammah, dll).
+                        // Jika Mad Thabii berisi karakter lain (ٲ, ۥ, dll), cukup append saja.
+                        if (identifier === 'n') {
+                            // Strip tatwil, sisa adalah huruf mad (superscript alef ٰ, atau ٲ, ۥ, dll)
+                            const madChar = textContent.replace(/\u0640/g, '');
+                            const FATHAH  = '\u064E'; // َ
+                            // Hanya strip fattah jika karakter mad adalah superscript alef (U+0670)
+                            // Kasus lain (ٲ U+0672, ۥ U+06E5, dll) — append langsung tanpa strip
+                            if (madChar === '\u0670') {
+                                if (result.endsWith('</span>')) {
+                                    const inner = result.slice(0, -7);
+                                    result = (inner.endsWith(FATHAH) ? inner.slice(0, -1) : inner)
+                                             + '\u0670</span>';
+                                } else {
+                                    if (result.endsWith(FATHAH)) result = result.slice(0, -1);
+                                    result += '\u0670';
+                                }
+                            } else {
+                                // Mad Thabii dengan karakter lain: gabungkan ke span sebelumnya
+                                if (result.endsWith('</span>')) {
+                                    result = result.slice(0, -7) + madChar + '</span>';
+                                } else {
+                                    result += madChar;
+                                }
+                            }
+                        } else {
+                            result += `<span class="tj-${cssClass}" data-tj-name="${tjName}" data-tj-desc="${tjDesc}" data-tj-label="${tjLabel}" data-tj-harakaat="${tjHarakaat}">${textContent}</span>`;
+                        }
+                    } else {
+                        // Rule dinonaktifkan — render teks mentah tanpa warna
+                        if (identifier === 'h') {
+                            // Hamzat Wasl nonaktif: ganti ٱ (U+0671 Alef Wasla)
+                            // dengan ا (U+0627 Alef biasa) agar kata tetap utuh
+                            result += textContent.replace(/ٱ/g, 'ا');
+                        } else if (identifier === 'n') {
+                            // Mad Thabii nonaktif: sama seperti aktif tapi tanpa warna
+                            const madChar = textContent.replace(/\u0640/g, '');
+                            const FATHAH  = '\u064E';
+                            if (madChar === '\u0670') {
+                                if (result.endsWith(FATHAH)) result = result.slice(0, -1);
+                                result += '\u0670';
+                            } else {
+                                result += madChar;
+                            }
+                        } else {
+                            result += textContent;
+                        }
+                    }
+
                     i = j + 1; // Skip ']' penutup
                 } else {
                     result += rawText[i];
@@ -160,9 +263,10 @@ function applyTajweedToRendered(nomorSurah) {
         tajweedMap.forEach((html, nomorAyat) => {
             const el = document.querySelector(`#isi-ayat${nomorAyat} .arabic`);
             if (el && html) {
-                // Simpan teks asli jika belum
-                if (!el.dataset.originalText) {
-                    el.dataset.originalText = el.textContent;
+                // Simpan teks asli (rasm Kemenag) jika belum — pakai innerHTML
+                // agar semua karakter Unicode terjaga
+                if (!el.dataset.originalHtml) {
+                    el.dataset.originalHtml = el.innerHTML;
                 }
                 el.innerHTML = html;
                 el.classList.add('tajweed-active');
@@ -172,14 +276,18 @@ function applyTajweedToRendered(nomorSurah) {
 }
 
 /**
- * Kembalikan teks Arab ke versi non-tajwid.
+ * Kembalikan teks Arab ke versi non-tajwid (rasm Kemenag).
  */
 function removeTajweedFromRendered() {
     document.querySelectorAll('.arabic.tajweed-active').forEach(el => {
-        if (el.dataset.originalText) {
+        if (el.dataset.originalHtml) {
+            el.innerHTML = el.dataset.originalHtml;
+            delete el.dataset.originalHtml;
+        } else if (el.dataset.originalText) {
+            // fallback lama
             el.textContent = el.dataset.originalText;
-            el.classList.remove('tajweed-active');
         }
+        el.classList.remove('tajweed-active');
     });
 }
 
@@ -197,12 +305,15 @@ function initTajweedToggle() {
     toggle.checked = enabled;
     if (label) label.textContent = enabled ? (typeof t === 'function' ? t('tajweed_on') : 'Aktif') : (typeof t === 'function' ? t('tajweed_off') : 'Nonaktif');
     if (legend) legend.style.display = enabled ? 'flex' : 'none';
+    const rulesSection = document.getElementById('tajweed-rules-section');
+    if (rulesSection) rulesSection.style.display = enabled ? 'block' : 'none';
 
     toggle.addEventListener('change', () => {
         const isOn = toggle.checked;
         setTajweedEnabled(isOn);
         if (label) label.textContent = isOn ? (typeof t === 'function' ? t('tajweed_on') : 'Aktif') : (typeof t === 'function' ? t('tajweed_off') : 'Nonaktif');
         if (legend) legend.style.display = isOn ? 'flex' : 'none';
+        if (rulesSection) rulesSection.style.display = isOn ? 'block' : 'none';
 
         if (isOn) {
             // Apply ke ayat yang sedang ditampilkan
@@ -222,6 +333,30 @@ function initTajweedToggle() {
             setTimeout(() => applyTajweedToRendered(ns), 150);
         }
     });
+
+    // ── Inisialisasi checkbox per-rule tajwid ──
+    const ruleSection = document.getElementById('tajweed-rules-section');
+    if (ruleSection) {
+        const rules = getTajweedRules();
+        // Set state awal tiap checkbox
+        ruleSection.querySelectorAll('.tajweed-rule-cb').forEach(cb => {
+            const id = cb.dataset.rule;
+            if (id !== undefined) cb.checked = rules[id] !== false;
+        });
+
+        // Listen perubahan
+        ruleSection.addEventListener('change', (e) => {
+            const cb = e.target.closest('.tajweed-rule-cb');
+            if (!cb) return;
+            const id = cb.dataset.rule;
+            if (id === undefined) return;
+            setTajweedRule(id, cb.checked);
+            // Re-apply jika tajweed aktif
+            if (isTajweedEnabled() && lastRenderedSurah) {
+                applyTajweedToRendered(lastRenderedSurah);
+            }
+        });
+    }
 }
 
 

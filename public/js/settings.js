@@ -1,4 +1,4 @@
-/* settings.js — i18n + Settings + Dark mode + Sidebar groups */
+﻿/* settings.js — i18n + Settings + Dark mode + Sidebar groups */
 
 /* ──────────────────────────────────────────────
    SIDEBAR RIGHT — Collapse / Expand
@@ -193,14 +193,14 @@ const I18N = {
         // Sidebar nav
         nav_konten_islam:     'Konten Islam',
         nav_janji_allah:      'Janji Allah',
-        nav_hadist:           'Hadist',
+        nav_hadist:           'Hadits',
         // Bookmark panel tabs
         bm_tab_ayat:          'Ayat',
-        bm_tab_hadist:        'Hadist',
+        bm_tab_hadist:        'Hadits',
         bm_ayat_empty:        'Belum ada ayat yang disimpan.',
         bm_ayat_empty_hint:   'Buka surah → arahkan ke ayat → klik 🔖',
-        bm_hadist_empty:      'Belum ada hadist yang disimpan.',
-        bm_hadist_empty_hint: 'Buka panel Hadist → detail → klik 🔖',
+        bm_hadist_empty:      'Belum ada hadits yang disimpan.',
+        bm_hadist_empty_hint: 'Buka panel Hadits → detail → klik 🔖',
         // Backup
         backup_export:        'Export Backup',
         backup_import:        'Import Backup',
@@ -213,32 +213,32 @@ const I18N = {
         backup_empty:         'Kosong',
         backup_fav:           'Favorit',
         backup_bm_ayat:       'Bookmark Ayat',
-        backup_bm_hadist:     'Bookmark Hadist',
+        backup_bm_hadist:     'Bookmark Hadits',
         backup_last_read:     'Terakhir Dibaca',
         backup_categories:    'Kategori Baca',
         backup_settings:      'Pengaturan',
         backup_tajweed:       'Status Tajwid',
         // Hadist widget
-        hdw_title:            'Hadist Hari Ini',
+        hdw_title:            'Hadits Hari Ini',
         hdw_read_more:        'Baca Lebih Banyak',
         hdw_hide:             'Sembunyikan',
         hdw_show:             'Tampilkan',
         hdw_bm_save:          'Simpan bookmark',
         hdw_bm_remove:        'Hapus bookmark',
         hdw_error:            'Gagal memuat. Periksa koneksi.',
-        hdw_copied:           'Hadist berhasil disalin!',
+        hdw_copied:           'Hadits berhasil disalin!',
         // Hadist panel
-        hadist_loading:       'Memuat hadist...',
-        hadist_goto_placeholder: 'Nomor hadist, lalu Enter...',
+        hadist_loading:       'Memuat hadits...',
+        hadist_goto_placeholder: 'Nomor hadits, lalu Enter...',
         hadist_prev:          'Sebelumnya',
         hadist_next:          'Berikutnya',
-        hadist_random:        'Hadist acak',
-        hadist_prev_title:    'Hadist sebelumnya',
-        hadist_next_title:    'Hadist berikutnya',
+        hadist_random:        'Hadits acak',
+        hadist_prev_title:    'Hadits sebelumnya',
+        hadist_next_title:    'Hadits berikutnya',
         hadist_translation:   'Terjemahan',
         hadist_copy:          'Salin',
         hadist_bookmark:      'Bookmark',
-        hadist_error:         'Gagal memuat hadist ini.',
+        hadist_error:         'Gagal memuat hadits ini.',
         // Modals
         modal_datasource:     'Sumber Data',
         modal_tafsir:         'Tafsir Kemenag',
@@ -255,7 +255,7 @@ const I18N = {
         modal_asbab_desc:     'Data Asbabun Nuzul (sebab turun ayat) dalam bahasa Indonesia, bersumber dari Kemenag RI.',
         modal_aladhan_desc:   'Waktu shalat akurat berdasarkan koordinat GPS, menggunakan metode SIHAT Kemenag RI.',
         modal_bigdatacloud_desc: 'Reverse geocoding gratis untuk mengubah koordinat GPS menjadi nama kota/lokasi.',
-        modal_hadith_desc:    'Data hadist dari 9 kitab (Bukhari, Muslim, Abu Dawud, dll) dalam bahasa Indonesia.',
+        modal_hadith_desc:    'Data hadits dari 9 kitab (Bukhari, Muslim, Abu Dawud, dll) dalam bahasa Indonesia.',
         // Usage panel
         usage_reset_confirm:  'Reset semua data usage?',
         usage_audio_played:   'Audio Diputar',
@@ -635,12 +635,12 @@ function initI18n() {
 const SETTINGS_KEY = 'quran_settings';
 
 const SETTINGS_DEFAULT = {
-    fontSize: 36,
+    fontSize: 40,
     latinFontSize: 13,
     transFontSize: 13,
     bgColor: '#ffffff',
     bgName: 'Putih',
-    arabFont: 'Amiri Quran',
+    arabFont: 'Al Qalam Quran Majeed',
     qori: '05',
     darkMode: false,
     showTranslation: true,
@@ -661,6 +661,14 @@ function getSettings() {
         if (typeof merged.transFontSize   !== 'number')  merged.transFontSize   = SETTINGS_DEFAULT.transFontSize;
         if (typeof merged.bgColor         !== 'string')  merged.bgColor         = SETTINGS_DEFAULT.bgColor;
         if (typeof merged.arabFont        !== 'string')  merged.arabFont        = SETTINGS_DEFAULT.arabFont;
+        // Reset ke default jika font sudah tidak tersedia
+        const VALID_FONTS = [
+            'KFGQPC Hafs Uthmanic',
+            'Amiri Quran', 'Scheherazade',
+            'Noto Naskh Arabic',
+            'Al Mushaf', 'Al Qalam Quran Majeed', 'Al Qalam Quran Majeed 2', 'Noorehuda'
+        ];
+        if (!VALID_FONTS.includes(merged.arabFont)) merged.arabFont = SETTINGS_DEFAULT.arabFont;
         if (typeof merged.qori            !== 'string')  merged.qori            = SETTINGS_DEFAULT.qori;
         if (typeof merged.darkMode        !== 'boolean') merged.darkMode        = SETTINGS_DEFAULT.darkMode;
         if (typeof merged.showTranslation !== 'boolean') merged.showTranslation = SETTINGS_DEFAULT.showTranslation;
@@ -691,7 +699,7 @@ function applySettings(s) {
 
     // Font Arab
     if (s.arabFont) {
-        root.style.setProperty('--arabic-font-family', "'" + s.arabFont + "', 'Amiri', serif");
+        root.style.setProperty('--arabic-font-family', "'" + s.arabFont + "', 'Al Qalam Quran Majeed', 'KFGQPC Hafs Uthmanic', 'Amiri Quran', 'Amiri', serif");
     }
 
     // Background & warna teks — pakai CSS variable di :root
@@ -1167,3 +1175,5 @@ function markBgSelected(color, name, bgOptions, selectedLbl) {
     });
     if (selectedLbl) selectedLbl.textContent = name;
 }
+
+

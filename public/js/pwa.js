@@ -1,8 +1,8 @@
-/* pwa.js — PWA Manager
+﻿/* pwa.js — PWA Manager
    - Service Worker registration
    - Install prompt (Add to Home Screen)
    - Notification permission request
-   - Schedule: waktu shalat, hadist harian, reminder Quran
+   - Schedule: waktu shalat, hadits harian, reminder Quran
    - In-app notification banner (fallback saat tab aktif)
    ──────────────────────────────────────────────────────── */
 
@@ -521,3 +521,4 @@ function initPwa() {
     // Re-schedule saat prayer times di-update
     document.addEventListener('prayer-times-updated', rescheduleNotifications);
 }
+

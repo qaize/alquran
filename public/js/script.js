@@ -1,4 +1,4 @@
-﻿// ── NProgress config ──
+﻿// -- NProgress config --
 if (typeof NProgress !== 'undefined') {
     NProgress.configure({
         minimum: 0.15,
@@ -20,7 +20,6 @@ const searchButton = document.getElementById("search-button");
 const searchInput = document.getElementById("search-input");
 const pagination = document.getElementById("pagination");
 const titleSurah = document.getElementById("title-detail-surah");
-const info = document.querySelector(".info");
 
 let partialSurah = [];
 let allDataSurahPromise = null;
@@ -53,7 +52,7 @@ function Surah(nomor, nama_latin, arti, nama, tempatTurun, jumlahAyat) {
     this.jumlahAyat = jumlahAyat || 0;
 }
 
-// ── Debounce helper ──
+// -- Debounce helper --
 function debounce(fn, delay) {
     let timer;
     return function (...args) {
@@ -62,7 +61,7 @@ function debounce(fn, delay) {
     };
 }
 
-// ── Trigger search: hanya dipanggil dari tombol Cari atau Enter ──
+// -- Trigger search: hanya dipanggil dari tombol Cari atau Enter --
 function triggerSearch(query) {
     closeSuggestion();
     searchSurah = (query !== undefined ? query : searchInput.value).trim();
@@ -74,7 +73,7 @@ function triggerSearch(query) {
     loadPagingSurah(currentIndex, page * offset);
 }
 
-// ── Clear button ──
+// -- Clear button --
 const clearButton = document.getElementById("search-clear");
 function updateClearButton() {
     if (clearButton) {
@@ -92,10 +91,10 @@ if (clearButton) {
     });
 }
 
-// ── Tombol Cari ──
+// -- Tombol Cari --
 searchButton.addEventListener("click", () => triggerSearch());
 
-// ── Enter langsung cari ──
+// -- Enter langsung cari --
 searchInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
         e.preventDefault();
@@ -115,9 +114,9 @@ searchInput.addEventListener("keydown", (e) => {
 // Update clear button realtime tanpa debounce
 searchInput.addEventListener("input", updateClearButton);
 
-/*  ─────────────────────────────────────────────
+/*  ---------------------------------------------
     DROPDOWN SUGGESTION  (debounce 300ms, client-side filter dari cache)
-    ───────────────────────────────────────────── */
+    --------------------------------------------- */
 const suggestionEl = document.getElementById("search-suggestion");
 
 function renderSuggestion(items) {
@@ -241,7 +240,7 @@ nextButton.addEventListener("click", () => {
     Halaman Utama
 */
 
-// ── Filter & map helper (single source of truth) ──
+// -- Filter & map helper (single source of truth) --
 function filterAndMapSurah(list) {
     const q = searchSurah.toLowerCase();
     return list
@@ -260,7 +259,7 @@ function filterAndMapSurah(list) {
 function loadAllSurah() {
     const urlAllSurah = "https://equran.id/api/v2/surat";
 
-    // Cache sudah ada — filter langsung, tidak re-fetch
+    // Cache sudah ada � filter langsung, tidak re-fetch
     if (rawSurahListCache !== null) {
         return Promise.resolve(filterAndMapSurah(rawSurahListCache));
     }
@@ -285,7 +284,7 @@ function loadAllSurah() {
     return allDataSurahPromise;
 }
 
-// ── Highlight teks yang match query pencarian ──
+// -- Highlight teks yang match query pencarian --
 function highlightMatch(text, query) {
     if (!query) return text;
     const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -301,7 +300,7 @@ function surahCard(surah) {
     const card = document.createElement("div");
     card.classList.add("surah-card");
 
-    // Animate.css — fadeInUp dengan stagger delay
+    // Animate.css � fadeInUp dengan stagger delay
     card.classList.add("animate__animated", "animate__fadeInUp");
     const delay = Math.min(_cardAnimIndex * 50, 400); // max 400ms agar tidak terlalu lama
     card.style.animationDelay = delay + "ms";
@@ -331,7 +330,7 @@ function surahCard(surah) {
   </div>
   `;
 
-    // Bind star button via addEventListener — tidak pakai inline onclick
+    // Bind star button via addEventListener � tidak pakai inline onclick
     const starBtn = card.querySelector(`#star-${surah.nomor}`);
     if (starBtn) {
         starBtn.addEventListener('click', (e) => {
@@ -358,7 +357,7 @@ function loadPagingSurah(currentIndex, totalData) {
             hideLoadingScreen();
             titleSurah.innerHTML = "";
             mainBody.innerHTML = "";
-            info.style.display = "block";
+
 
             // Tampilkan kembali widget hadist harian
             const hdWidget = document.getElementById('hadist-daily-widget');
@@ -370,6 +369,30 @@ function loadPagingSurah(currentIndex, totalData) {
             if (totalPage > 1) {
                 pagination.style.display = "block";
             } else {
+                // -- Bottom nav wiring --
+                const prevBotBtn = document.getElementById('surah-prev-bottom');
+                const nextBotBtn = document.getElementById('surah-next-bottom');
+                if (prevBotBtn) {
+                    if (!data.suratSebelumnya || nomorSurah == 1) {
+                        prevBotBtn.style.visibility = 'hidden';
+                    } else {
+                        prevBotBtn.addEventListener('click', () => {
+                            loadSurahDetails(data.suratSebelumnya.nomor);
+                            document.documentElement.scrollIntoView({ behavior: 'smooth' });
+                        });
+                    }
+                }
+                if (nextBotBtn) {
+                    if (!data.suratSelanjutnya || nomorSurah == 114) {
+                        nextBotBtn.style.visibility = 'hidden';
+                    } else {
+                        nextBotBtn.addEventListener('click', () => {
+                            loadSurahDetails(data.suratSelanjutnya.nomor);
+                            document.documentElement.scrollIntoView({ behavior: 'smooth' });
+                        });
+                    }
+                }
+
                 pagination.style.display = "none";
             }
 
@@ -435,8 +458,25 @@ function loadPagingSurah(currentIndex, totalData) {
 // Set initial history state agar back dari detail bisa kembali ke list
 history.replaceState({ view: 'list' }, '', window.location.href);
 loadPagingSurah(currentIndex, totalData);
+// ── Klik logo (desktop sidebar & mobile topbar) → kembali ke menu utama ──
+function goHome() {
+    searchSurah = "";
+    searchInput.value = "";
+    updateClearButton();
+    page = 1;
+    currentIndex = 0;
+    titleSurah.innerHTML = "";
+    mainBody.innerHTML = "";
+    pagination.style.display = "block";
+    _titleNavCollapsed = true;
+    history.pushState({ view: 'list' }, '', window.location.pathname);
+    loadPagingSurah(currentIndex, page * offset);
+}
 
-// ── Handle tombol Back browser ──
+document.getElementById('sidebar-logo')?.addEventListener('click', goHome);
+document.getElementById('mobile-logo')?.addEventListener('click', goHome);
+
+// -- Handle tombol Back browser --
 window.addEventListener('popstate', (e) => {
     const state = e.state;
     if (!state || state.view === 'list') {
@@ -448,8 +488,9 @@ window.addEventListener('popstate', (e) => {
         currentIndex = 0;
         titleSurah.innerHTML = "";
         mainBody.innerHTML = "";
-        info.style.display = "block";
+
         pagination.style.display = "block";
+        _titleNavCollapsed = true; // reset state navigasi saat kembali ke list
         loadPagingSurah(currentIndex, page * offset);
     } else if (state.view === 'detail' && state.nomor) {
         // Navigasi antar surah via back/forward
@@ -487,6 +528,10 @@ function fetchDetailInformasiSurah(nomor) {
 
 // tampilkan detail surah
 function loadSurahDetails(nomorSurah, pushHistory = true) {
+    // Dismiss keyboard mobile — blur semua input aktif
+    if (document.activeElement && typeof document.activeElement.blur === "function") {
+        document.activeElement.blur();
+    }
     // Simpan state ke browser history agar tombol Back bekerja
     if (pushHistory) {
         history.pushState({ view: 'detail', nomor: nomorSurah }, '', `#surah-${nomorSurah}`);
@@ -495,7 +540,7 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
     fetchDetailInformasiSurah(nomorSurah)
         .then((data) => {
             titleSurah.innerHTML = "";
-            info.style.display = "none";
+
 
             // Sembunyikan widget hadist harian saat baca surah
             const hdWidget = document.getElementById('hadist-daily-widget');
@@ -503,7 +548,7 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
 
             titleSurah.appendChild(componentTitleSurah(data));
 
-            // ── Sync tombol terjemahan di navbar ──
+            // -- Sync tombol terjemahan di navbar --
             const transToggleBtn = document.getElementById('surah-trans-toggle');
             if (transToggleBtn) {
                 transToggleBtn.addEventListener('click', () => {
@@ -669,7 +714,7 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                     jumpInput.value       = "";
                     jumpInput.placeholder = `1 - ${totalAyat}`;
 
-                    // Clone → hapus listener lama yang menumpuk tiap buka surah
+                    // Clone ? hapus listener lama yang menumpuk tiap buka surah
                     const freshInput = jumpInput.cloneNode(true);
                     jumpInput.parentNode.replaceChild(freshInput, jumpInput);
 
@@ -703,29 +748,7 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                     });
                 }
 
-                // ── Bottom nav wiring ──
-                const prevBotBtn = document.getElementById('surah-prev-bottom');
-                const nextBotBtn = document.getElementById('surah-next-bottom');
-                if (prevBotBtn) {
-                    if (!data.suratSebelumnya || nomorSurah == 1) {
-                        prevBotBtn.style.visibility = 'hidden';
-                    } else {
-                        prevBotBtn.addEventListener('click', () => {
-                            loadSurahDetails(data.suratSebelumnya.nomor);
-                            document.documentElement.scrollIntoView({ behavior: 'smooth' });
-                        });
-                    }
-                }
-                if (nextBotBtn) {
-                    if (!data.suratSelanjutnya || nomorSurah == 114) {
-                        nextBotBtn.style.visibility = 'hidden';
-                    } else {
-                        nextBotBtn.addEventListener('click', () => {
-                            loadSurahDetails(data.suratSelanjutnya.nomor);
-                            document.documentElement.scrollIntoView({ behavior: 'smooth' });
-                        });
-                    }
-                }
+
             });
 
             pagination.style.display = "none";
@@ -736,6 +759,10 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
             console.error(error);
         });
 }
+
+// -- State collapse nav surah � persisten antar navigasi --
+let _titleNavCollapsed = true;
+let _titleNavHintShown = false; // hint hanya muncul sekali
 
 // komponen judul surah
 function componentTitleSurah(surah) {
@@ -774,25 +801,41 @@ function componentTitleSurah(surah) {
     // Collapse/expand logic
     const collapseBtn = title.querySelector('#title-collapse-btn');
     const body        = title.querySelector('#title-surah-body');
-    const icon        = collapseBtn.querySelector('i');
 
-    // ── Default: langsung collapsed saat pertama render ──
-    body.classList.add('collapsed');
-    body.style.maxHeight = '0px';
-    collapseBtn.classList.add('is-collapsed');
-    collapseBtn.title = 'Tampilkan detail';
+    // -- Terapkan state sebelumnya (collapsed/expanded) --
+    console.log('[TitleNav] _titleNavCollapsed =', _titleNavCollapsed);
+    if (_titleNavCollapsed) {
+        body.classList.add('collapsed');
+        body.style.maxHeight = '0px';
+        collapseBtn.classList.add('is-collapsed');
+        collapseBtn.title = 'Tampilkan detail';
+    } else {
+        // Paksa expanded tanpa animasi: matikan transition sementara
+        body.style.transition = 'none';
+        body.classList.remove('collapsed');
+        body.style.maxHeight = 'none';
+        collapseBtn.classList.remove('is-collapsed');
+        collapseBtn.title = 'Sembunyikan detail';
+        // Kembalikan transition setelah paint
+        requestAnimationFrame(() => {
+            body.style.transition = '';
+        });
+    }
 
-    // ── Tooltip hint: muncul 1 detik setelah render, hilang setelah 3 detik ──
-    const hint = document.createElement('div');
-    hint.className = 'title-collapse-hint';
-    hint.textContent = 'Tap untuk buka detail';
-    collapseBtn.appendChild(hint);
+    // -- Tooltip hint: hanya tampil sekali (pertama kali collapsed) --
+    if (_titleNavCollapsed && !_titleNavHintShown) {
+        _titleNavHintShown = true;
+        const hint = document.createElement('div');
+        hint.className = 'title-collapse-hint';
+        hint.textContent = 'Tap untuk buka detail';
+        collapseBtn.appendChild(hint);
 
-    setTimeout(() => hint.classList.add('hint-show'), 800);
-    setTimeout(() => {
-        hint.classList.remove('hint-show');
-        setTimeout(() => hint.remove(), 400);
-    }, 3500);
+        setTimeout(() => hint.classList.add('hint-show'), 800);
+        setTimeout(() => {
+            hint.classList.remove('hint-show');
+            setTimeout(() => hint.remove(), 400);
+        }, 3500);
+    }
 
     collapseBtn.addEventListener('click', () => {
         // Hapus hint kalau masih ada saat diklik
@@ -809,6 +852,7 @@ function componentTitleSurah(surah) {
             }, { once: true });
             collapseBtn.classList.remove('is-collapsed');
             collapseBtn.title = 'Sembunyikan detail';
+            _titleNavCollapsed = false; // simpan state: expanded
         } else {
             body.style.maxHeight = body.scrollHeight + 'px';
             requestAnimationFrame(() => {
@@ -819,6 +863,7 @@ function componentTitleSurah(surah) {
             });
             collapseBtn.classList.add('is-collapsed');
             collapseBtn.title = 'Tampilkan detail';
+            _titleNavCollapsed = true; // simpan state: collapsed
         }
     });
 
@@ -849,11 +894,11 @@ function componentDetailSurah(surah) {
         const ayat = document.createElement("div");
         ayat.classList.add("ayat");
 
-        // Bismillah ornament — tampil di atas ayat pertama (kecuali At-Taubah nomor 9)
+        // Bismillah ornament � tampil di atas ayat pertama (kecuali At-Taubah nomor 9)
         let isiAyat = surah.nomor !== 9 ? `
         <div class="ayat-bismillah">
             <span class="ayat-bsm-line"></span>
-            <span class="ayat-bsm-text">﷽</span>
+            <span class="ayat-bsm-text">&#xFDFD;</span>
             <span class="ayat-bsm-line"></span>
         </div>` : '';
         surah.ayat.forEach((ayat) => {
@@ -865,42 +910,42 @@ function componentDetailSurah(surah) {
             <div class="ayat-nav">
                 <span class="arabic">${teksArab}</span>
                 <span class="ayat-nomor-inline">
+                    <div class="ayat-btns-inline">
+                        <button class="btn-audio-ayat btn-hover-only"
+                            id="audio-btn-${nomorAyat}"
+                            title="${__("play_audio", "Putar murottal ayat ini")}">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                        <button class="btn-lastread-ayat btn-hover-only"
+                            id="lastread-btn-${nomorAyat}"
+                            title="${__("save_lastread", "Simpan terakhir dibaca")}">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </button>
+                        <button class="btn-asbab-ayat btn-hover-only"
+                            id="asbab-btn-${nomorAyat}"
+                            title="Asbabun Nuzul"
+                            data-surah="${surah.nomor}"
+                            data-ayat="${nomorAyat}">
+                            <i class="fa-solid fa-scroll"></i>
+                        </button>
+                        <button class="btn-tafsir-ayat btn-hover-only"
+                            id="tafsir-btn-${nomorAyat}"
+                            title="Tafsir">
+                            <i class="fa-solid fa-book"></i>
+                        </button>
+                        <button class="btn-copy-ayat btn-hover-only"
+                            id="copy-btn-${nomorAyat}"
+                            title="${__("copy_ayat", "Salin ayat")}">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                        <button class="btn-bookmark-ayat btn-hover-only"
+                            id="bookmark-btn-${nomorAyat}"
+                            title="${__("save_bookmark", "Simpan bookmark ayat ini")}">
+                            <i class="fa-solid fa-bookmark"></i>
+                        </button>
+                    </div>
                     <div class="urutan-ayat"><span>${numberToArabic(nomorAyat)}</span></div>
                 </span>
-            </div>
-            <div class="ayat-btns">
-                <button class="btn-audio-ayat btn-hover-only"
-                    id="audio-btn-${nomorAyat}"
-                    title="${__("play_audio", "Putar murottal ayat ini")}">
-                    <i class="fa-solid fa-play"></i>
-                </button>
-                <button class="btn-bookmark-ayat"
-                    id="bookmark-btn-${nomorAyat}"
-                    title="${__("save_bookmark", "Simpan bookmark ayat ini")}">
-                    <i class="fa-solid fa-bookmark"></i>
-                </button>
-                <button class="btn-lastread-ayat btn-hover-only"
-                    id="lastread-btn-${nomorAyat}"
-                    title="${__("save_lastread", "Simpan terakhir dibaca")}">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                </button>
-                <button class="btn-asbab-ayat btn-hover-only"
-                    id="asbab-btn-${nomorAyat}"
-                    title="Asbabun Nuzul"
-                    data-surah="${surah.nomor}"
-                    data-ayat="${nomorAyat}">
-                    <i class="fa-solid fa-scroll"></i>
-                </button>
-                <button class="btn-tafsir-ayat btn-hover-only"
-                    id="tafsir-btn-${nomorAyat}"
-                    title="Tafsir">
-                    <i class="fa-solid fa-book"></i>
-                </button>
-                <button class="btn-copy-ayat btn-hover-only"
-                    id="copy-btn-${nomorAyat}"
-                    title="${__("copy_ayat", "Salin ayat")}">
-                    <i class="fa-regular fa-copy"></i>
-                </button>
             </div>
         </div>
         </div>
@@ -909,7 +954,7 @@ function componentDetailSurah(surah) {
 
         ayat.innerHTML = isiAyat;
 
-        // ── Bind event listeners setelah HTML di-render ──
+        // -- Bind event listeners setelah HTML di-render --
         // Lebih aman dari inline onclick: tidak ada string interpolation ke handler
         const namaLatin = surah.namaLatin ?? surah.nama_latin;
         surah.ayat.forEach((ayatItem) => {
@@ -937,7 +982,7 @@ function componentDetailSurah(surah) {
         });
         detailSurah.appendChild(ayat);
 
-        // ── Bottom navigation prev/next ──
+        // -- Bottom navigation prev/next --
         const bottomNav = document.createElement('div');
         bottomNav.className = 'surah-bottom-nav';
         bottomNav.id = 'surah-bottom-nav';
@@ -1037,9 +1082,13 @@ function hideLoadingScreen() {
 
 // Ubah angka ke angka Arab
 function numberToArabic(number) {
-    const arabicNumeral = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+    const arabicNumeral = ["\u0660", "\u0661", "\u0662", "\u0663", "\u0664", "\u0665", "\u0666", "\u0667", "\u0668", "\u0669"];
     return String(number)
         .split("")
         .map((digit) => arabicNumeral[parseInt(digit)])
         .join("");
 }
+
+
+
+
