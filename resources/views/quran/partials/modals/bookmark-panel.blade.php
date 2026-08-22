@@ -22,7 +22,7 @@
       </button>
       <button class="bm-panel-tab" id="bm-tab-hadist" data-tab="hadist">
         <i class="fa-solid fa-scroll"></i>
-        <span data-i18n="bm_tab_hadist">Hadist</span>
+        <span data-i18n="bm_tab_hadist">Hadits</span>
         <span class="bm-tab-count" id="bm-count-hadist">0</span>
       </button>
     </div>

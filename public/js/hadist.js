@@ -1,4 +1,4 @@
-/* hadist.js — Hadist harian + panel browser
+﻿/* hadist.js — Hadist harian + panel browser
    API: hadis-api-id.vercel.app (primary)
    ──────────────────────────────────────── */
 
@@ -190,7 +190,7 @@ function initHadistWidget() {
 }
 
 let _widgetRandomOffset = 0;
-let _widgetCurrent = null; // { kitabId, nomor } dari hadist yang sedang tampil di widget
+let _widgetCurrent = null; // { kitabId, nomor } dari hadits yang sedang tampil di widget
 
 function _loadDailyWidget(random = false) {
     const body = document.getElementById('hdw-body');
@@ -218,7 +218,7 @@ function _loadDailyWidget(random = false) {
             const nomor    = h.number  ?? h.no ?? '';
             const isMarked = typeof isBookmarkedHadist === 'function' && isBookmarkedHadist(kitabId, nomor);
 
-            // Simpan referensi hadist aktif untuk tombol "Baca Lebih Banyak"
+            // Simpan referensi hadits aktif untuk tombol "Baca Lebih Banyak"
             _widgetCurrent = { kitabId, nomor };
 
             body.innerHTML = `
@@ -283,11 +283,11 @@ function _getKitabArab(slug) {
 }
 
 /* ══════════════════════════════════════════
-   PANEL BROWSER HADIST
+   PANEL BROWSER HADITS
    ══════════════════════════════════════════ */
 let _panelState = {
     kitab:   HADIST_KITAB[1], // default: Bukhari
-    nomor:   1,               // hadist yang sedang ditampilkan
+    nomor:   1,               // hadits yang sedang ditampilkan
 };
 
 // Ambil nomor random dari kitab yang dipilih (range 1 s/d total aktual)
@@ -328,7 +328,7 @@ function openHadistPanel(target = null) {
                 <div class="hadist-panel-title">
                     <i class="fa-solid fa-scroll"></i>
                     <div>
-                        <h2>Hadist</h2>
+                        <h2>Hadits</h2>
                         <p id="hadist-panel-subtitle">Memuat...</p>
                     </div>
                 </div>
@@ -569,3 +569,5 @@ function initHadist() {
         });
     }
 }
+
+

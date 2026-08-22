@@ -72,28 +72,9 @@
 
 /* ══════════════════════════════════════════════
    BOOKMARK BUTTON (pada tiap ayat — hover)
+   Sistem opacity dikelola oleh .btn-hover-only di ayat.css.
+   Di sini hanya override warna state saja.
    ══════════════════════════════════════════════ */
-.btn-bookmark-ayat {
-    display: none; /* tampil saat .barisSurah:hover */
-    width: 26px;
-    height: 26px;
-    margin-top: 0;
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text-light);
-    font-size: 11px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition);
-    flex-shrink: 0;
-    position: relative;
-}
-
-.barisSurah:hover .btn-bookmark-ayat {
-    display: flex;
-}
 
 .btn-bookmark-ayat:hover {
     background: var(--gold-pale);
@@ -102,35 +83,13 @@
     transform: scale(1.1);
 }
 
+/* Jika sudah dibookmark: selalu tampil (override opacity) */
 .btn-bookmark-ayat.bookmarked {
     background: var(--gold-pale);
     border-color: var(--gold);
     color: var(--gold);
-    display: flex; /* selalu tampil jika sudah dibookmark */
-}
-
-/* Tampilkan ayat-btns jika ada bookmark aktif */
-.nomor-ayat:has(.btn-bookmark-ayat.bookmarked) .ayat-btns {
-    display: flex;
-}
-
-/* nomor-ayat column — tombol horizontal di bawah nomor */
-.nomor-ayat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-}
-
-.nomor-ayat .ayat-btns {
-    display: none;
-    flex-direction: row;
-    align-items: center;
-    gap: 3px;
-}
-
-.barisSurah:hover .nomor-ayat .ayat-btns {
-    display: flex;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
 /* ══════════════════════════════════════════════

@@ -82,7 +82,123 @@
     }
 
     .search-wrapper {
-        padding: 12px 14px;
+        padding: 8px 12px;
+    }
+
+    /* search-container tidak full width — sisakan ruang kiri-kanan */
+    .search-container {
+        max-width: 100%;
+    }
+
+    #search {
+        border-radius: 10px;
+    }
+}
+
+/* ── Prayer time widget mobile — di bawah search bar ── */
+.prayer-time-widget-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .prayer-time-widget-mobile {
+        display: block;
+        background: var(--navy);
+        padding: 0 12px 8px;
+        border-bottom: 2px solid var(--gold);
+    }
+
+    .prayer-time-widget-mobile .ptw-allow-btn {
+        width: 100%;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: var(--radius-sm);
+        color: rgba(255,255,255,0.55);
+        padding: 7px 12px;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+        cursor: pointer;
+        transition: color var(--transition), border-color var(--transition);
+    }
+    .prayer-time-widget-mobile .ptw-allow-btn:hover {
+        color: var(--gold);
+        border-color: var(--gold);
+    }
+
+    /* Compact bar style untuk widget mobile */
+    .prayer-time-widget-mobile .ptw-compact,
+    .prayer-time-widget-mobile .ptw-mobile-bar {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        background: rgba(0,0,0,0.2);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: background var(--transition);
+        justify-content: center;
+        flex-wrap: wrap;
+        font-family: inherit;
+    }
+
+    .prayer-time-widget-mobile .ptw-compact:hover,
+    .prayer-time-widget-mobile .ptw-compact:active,
+    .prayer-time-widget-mobile .ptw-mobile-bar:hover,
+    .prayer-time-widget-mobile .ptw-mobile-bar:active {
+        background: rgba(0,0,0,0.35);
+    }
+
+    /* Teks waktu sholat — lebih kecil */
+    .prayer-time-widget-mobile .ptw-mobile-prayer {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .prayer-time-widget-mobile .ptw-mobile-icon {
+        font-size: 10px;
+        color: var(--gold);
+    }
+    .prayer-time-widget-mobile .ptw-mobile-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.6);
+    }
+    .prayer-time-widget-mobile .ptw-mobile-time {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--white);
+    }
+    .prayer-time-widget-mobile .ptw-mobile-sep {
+        font-size: 10px;
+        color: rgba(255,255,255,0.2);
+    }
+    /* Sembunyikan lokasi — biar makin ringkas */
+    .prayer-time-widget-mobile .ptw-mobile-loc {
+        display: none;
+    }
+    .prayer-time-widget-mobile .ptw-cd-mobile {
+        font-size: 10px;
+        font-family: monospace;
+        color: var(--gold);
+        background: rgba(201,168,76,0.12);
+        padding: 1px 5px;
+        border-radius: 3px;
+    }
+    .prayer-time-widget-mobile .ptw-loading {
+        color: rgba(255,255,255,0.35);
+        font-size: 11px;
+        padding: 5px 0;
+        text-align: center;
+    }
+
+    /* Sembunyikan search wrapper border-bottom agar tidak double dengan widget */
+    .search-wrapper {
+        border-bottom: none;
     }
 }
 

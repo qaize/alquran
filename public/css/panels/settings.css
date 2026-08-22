@@ -37,21 +37,11 @@
     padding: 0;
 }
 
-/* Footer row — fixed di bawah panel (child langsung .settings-panel) */
-.settings-footer-row {
-    border-top: 2px solid var(--border);
-    padding: 14px 20px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: var(--white);
-    flex-shrink: 0;
-}
+/* settings-footer-row sudah dihapus — konten dipindah ke group Pengaturan Lanjutan */
 
 /* Dark mode */
-.theme-dark .settings-footer-row {
-    background: var(--dark-bg);
-    border-top-color: var(--dark-border);
+.theme-dark .settings-panel-body {
+    /* panel body sekarang full height tanpa footer row */
 }
 .theme-dark .settings-reset-btn {
     border-color: rgba(255,255,255,0.15);

@@ -1,6 +1,6 @@
 {{-- LEFT SIDEBAR: Navigation --}}
 <aside class="sidebar-left sidebar-left-enter">
-  <div class="sidebar-logo">
+  <div class="sidebar-logo" id="sidebar-logo" style="cursor:pointer;" title="Kembali ke menu utama">
     <div class="logo-ornament">☽</div>
     <span class="logo-text">Al Quran</span>
   </div>
@@ -28,7 +28,7 @@
         </a>
         <a href="#" class="nav-item nav-sub-item" id="nav-hadist-btn">
           <i class="fa-solid fa-scroll nav-icon"></i>
-          <span data-i18n="nav_hadist">Hadist</span>
+          <span data-i18n="nav_hadist">Hadits</span>
         </a>
         <a href="#" class="nav-item nav-sub-item" id="nav-tajwid-guide-btn">
           <i class="fa-solid fa-graduation-cap nav-icon"></i>

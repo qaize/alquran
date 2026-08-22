@@ -142,6 +142,138 @@
     line-height: 1.35;
 }
 
+/* ── TAJWEED RULES LIST (flag per-rule di settings) ── */
+.tajweed-rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 0 8px;
+}
+
+.tjr-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-light);
+    padding: 8px 0 3px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+}
+
+.tjr-group-label:first-child {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 2px;
+}
+
+.tjr-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background var(--transition);
+    user-select: none;
+}
+
+.tjr-item:hover {
+    background: var(--blue-soft);
+}
+
+.tjr-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: var(--gold);
+    flex-shrink: 0;
+}
+
+.tjr-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.tjr-name {
+    font-size: 12px;
+    color: var(--text-dark);
+    flex: 1;
+}
+
+/* Strikethrough saat unchecked */
+.tjr-item:has(input:not(:checked)) .tjr-name {
+    color: var(--text-light);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-light);
+}
+
+/* Dark mode */
+.theme-dark .tjr-group-label {
+    color: var(--dark-text-mid);
+    border-top-color: var(--dark-border);
+}
+
+.theme-dark .tjr-item:hover {
+    background: var(--dark-hover);
+}
+
+.theme-dark .tjr-name {
+    color: var(--dark-text);
+}
+
+.theme-dark .tjr-item:has(input:not(:checked)) .tjr-name {
+    color: var(--dark-text-dim);
+}
+
+.theme-dark .tjr-swatch {
+    border-color: rgba(255,255,255,0.15);
+}
+
+/* ── DARK MODE — Tajweed Legend ── */
+.theme-dark .tajweed-legend {
+    background: var(--dark-surface2);
+    border-color: var(--dark-border);
+}
+
+.theme-dark .tajweed-legend-title {
+    color: var(--dark-text);
+    border-bottom-color: var(--dark-border);
+}
+
+.theme-dark .tajweed-group-label {
+    color: var(--dark-text-mid);
+}
+
+.theme-dark .tajweed-legend-item {
+    background: var(--dark-surface3);
+    border-color: var(--dark-border);
+}
+
+.theme-dark .tj-legend-text strong {
+    color: var(--dark-text);
+}
+
+.theme-dark .tj-legend-text small {
+    color: var(--dark-text-mid);
+}
+
+.theme-dark .tj-swatch {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.theme-dark .tajweed-legend::-webkit-scrollbar-track {
+    background: var(--dark-surface);
+}
+.theme-dark .tajweed-legend::-webkit-scrollbar-thumb {
+    background: var(--dark-surface3);
+    border-color: var(--dark-surface);
+}
+
 /* ── TAJWEED COLORS (applied to Arabic text) ── */
 .tj-ham_wasl {
     color: #aaaaaa;

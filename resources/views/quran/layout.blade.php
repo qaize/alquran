@@ -83,12 +83,6 @@
         @include('quran.partials.topbar-mobile')
 
         @yield('search')
-                <div class="info animate__animated animate__fadeIn" id="info-section" style="animation-duration:1s;">
-          <div class="info-inner animate__animated animate__zoomIn" style="animation-delay:0.2s;animation-duration:0.8s;">
-            <span class="info-ornament">﷽</span>
-          </div>
-          <p class="info-subtitle animate__animated animate__fadeInUp" style="animation-delay:0.5s;animation-duration:0.6s;" data-i18n="bismillah_subtitle">Dengan menyebut nama Allah Yang Maha Pengasih lagi Maha Penyayang</p>
-        </div>
         @yield('surah')
         @yield('content')
       </main>

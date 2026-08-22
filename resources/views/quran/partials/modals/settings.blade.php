@@ -160,50 +160,21 @@
               <span data-i18n="settings_arab_font">Jenis Font Arab</span>
             </label>
             <select id="arab-font-select" class="settings-select">
-              <optgroup label="── Mushaf Uthmani (KFGQPC) ──">
-                <option value="KFGQPC Hafs">⭐ KFGQPC Hafs (Uthmani v14)</option>
-                <option value="KFGQPC Hafs Smart">KFGQPC Hafs Smart</option>
-                <option value="KFGQPC Hafs Uthmanic">KFGQPC Hafs Uthmanic (Full)</option>
-                <option value="KFGQPC BAZZI">KFGQPC BAZZI</option>
-                <option value="KFGQPC Doori">KFGQPC Doori</option>
-                <option value="KFGQPC Nastaleeq">KFGQPC Nastaleeq</option>
+              <optgroup label="── Mushaf Uthmani ──">
+                <option value="KFGQPC Hafs Uthmanic">KFGQPC Uthmanic</option>
               </optgroup>
               <optgroup label="── Naskh Klasik ──">
-                <option value="Amiri Quran">⭐ Amiri Quran</option>
-                <option value="Scheherazade">⭐ Scheherazade New (SIL)</option>
-                <option value="Kitab">Kitab (SIL)</option>
-                <option value="Lateef">Lateef (SIL)</option>
-                <option value="Markazi Text">Markazi Text</option>
-                <option value="Harmattan">Harmattan (SIL)</option>
+                <option value="Amiri Quran">Amiri Quran</option>
+                <option value="Scheherazade">Scheherazade New</option>
               </optgroup>
               <optgroup label="── Naskh Modern ──">
-                <option value="Noto Naskh Arabic">⭐ Noto Naskh Arabic</option>
-                <option value="Noto Kufi Arabic">Noto Kufi Arabic</option>
-                <option value="El Messiri">El Messiri</option>
-                <option value="Mada">Mada</option>
-                <option value="Droid Arabic Naskh">Droid Arabic Naskh</option>
+                <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
               </optgroup>
               <optgroup label="── Mushaf Indonesia / Pakistan ──">
-                <option value="Al Mushaf">⭐ Al Mushaf (Alvi)</option>
-                <option value="Al Qalam Quran Majeed">⭐ Al Qalam Quran Majeed</option>
+                <option value="Al Mushaf">Al Mushaf (Alvi)</option>
+                <option value="Al Qalam Quran Majeed">⭐ Al Qalam Quran Majeed (Default)</option>
                 <option value="Al Qalam Quran Majeed 2">Al Qalam Quran Majeed 2</option>
-              </optgroup>
-              <optgroup label="── Noore (Pakistan / India) ──">
-                <option value="Noorehuda">⭐ Noorehuda</option>
-                <option value="Noorehidayat">Noorehidayat</option>
-                <option value="Noorehira">Noorehira</option>
-              </optgroup>
-              <optgroup label="── Nastaleeq / me_quran ──">
-                <option value="me_quran2">me_quran 2</option>
-                <option value="me_quran Volt">me_quran Volt</option>
-                <option value="Noto Nastaliq Urdu">Noto Nastaliq Urdu</option>
-              </optgroup>
-              <optgroup label="── Kufic / Dekoratif ──">
-                <option value="Aref Ruqaa">Aref Ruqaa</option>
-                <option value="Mirza">Mirza</option>
-                <option value="Katibeh">Katibeh</option>
-                <option value="Jomhuria">Jomhuria</option>
-                <option value="Lalezar">Lalezar</option>
+                <option value="Noorehuda">Noorehuda</option>
               </optgroup>
             </select>
             <p class="settings-preview settings-preview-arab" id="arab-font-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
@@ -242,6 +213,99 @@
           <span class="tajweed-toggle-label" id="tajweed-toggle-label" data-i18n="tajweed_off">Nonaktif</span>
         </div>
         <p class="settings-hint" data-i18n="settings_tajweed_hint">Mewarnai huruf Arab sesuai hukum bacaan tajwid.</p>
+        <p class="settings-hint" style="color:var(--gold);margin-top:2px;">
+          <i class="fa-solid fa-circle-info" style="font-size:10px;"></i>
+          Mode tajwid menggunakan rasm Uthmani (alquran.cloud). Teks normal kembali saat dinonaktifkan.
+        </p>
+        {{-- Flag per-rule tajwid --}}
+        <div id="tajweed-rules-section" style="display:none;">
+          <p class="settings-hint" style="margin-top:6px;margin-bottom:6px;">Pilih hukum tajwid yang ingin diwarnai:</p>
+          <div class="tajweed-rules-list">
+            {{-- Huruf Tidak Dibaca --}}
+            <div class="tjr-group-label">Huruf Tidak Dibaca</div>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="h">
+              <span class="tjr-swatch" style="background:#AAAAAA"></span>
+              <span class="tjr-name">Hamzat Wasl</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="s">
+              <span class="tjr-swatch" style="background:#AAAAAA"></span>
+              <span class="tjr-name">Lam Syamsiyyah / Huruf Sukun</span>
+            </label>
+            {{-- Mad --}}
+            <div class="tjr-group-label">Mad (Panjang)</div>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="n">
+              <span class="tjr-swatch" style="background:#537FFF"></span>
+              <span class="tjr-name">Mad Thabi'i</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="p">
+              <span class="tjr-swatch" style="background:#4050FF"></span>
+              <span class="tjr-name">Mad Jaiz Munfashil</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="o">
+              <span class="tjr-swatch" style="background:#2144C1"></span>
+              <span class="tjr-name">Mad Wajib Muttashil</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="m">
+              <span class="tjr-swatch" style="background:#000EBC"></span>
+              <span class="tjr-name">Mad Lazim</span>
+            </label>
+            {{-- Nun Mati & Tanwin --}}
+            <div class="tjr-group-label">Nun Mati &amp; Tanwin</div>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="f">
+              <span class="tjr-swatch" style="background:#9400A8"></span>
+              <span class="tjr-name">Ikhfa Haqiqi</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="c">
+              <span class="tjr-swatch" style="background:#D500B7"></span>
+              <span class="tjr-name">Ikhfa Syafawi</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="i">
+              <span class="tjr-swatch" style="background:#26BFFD"></span>
+              <span class="tjr-name">Iqlab</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="a">
+              <span class="tjr-swatch" style="background:#169777"></span>
+              <span class="tjr-name">Idgham bi Ghunnah</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="u">
+              <span class="tjr-swatch" style="background:#169200"></span>
+              <span class="tjr-name">Idgham bila Ghunnah</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="w">
+              <span class="tjr-swatch" style="background:#58B800"></span>
+              <span class="tjr-name">Idgham Syafawi (Mimi)</span>
+            </label>
+            {{-- Hukum Lainnya --}}
+            <div class="tjr-group-label">Hukum Lainnya</div>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="q">
+              <span class="tjr-swatch" style="background:#DD0008"></span>
+              <span class="tjr-name">Qalqalah</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="g">
+              <span class="tjr-swatch" style="background:#FF7E1E"></span>
+              <span class="tjr-name">Ghunnah</span>
+            </label>
+            <label class="tjr-item">
+              <input type="checkbox" class="tajweed-rule-cb" data-rule="d">
+              <span class="tjr-swatch" style="background:#A1A1A1"></span>
+              <span class="tjr-name">Idgham Mutajanisain / Mutaqaribain</span>
+            </label>
+          </div>
+        </div>
         <div class="tajweed-legend" id="tajweed-legend" style="display:none;">
           <h4 class="tajweed-legend-title"><i class="fa-solid fa-palette"></i> <span data-i18n="tajweed_legend_title">Keterangan Warna Tajwid</span></h4>
 
@@ -427,29 +491,55 @@
         <div id="pwa-notif-settings-container"></div>
       </div>
 
-    </div>{{-- .settings-panel-body --}}
+      {{-- Pengaturan Lanjutan (Backup, Reset) — group paling bawah --}}
+      <div class="settings-group" id="settings-group-advanced">
+        <button class="settings-group-trigger" id="settings-group-advanced-btn">
+          <div class="settings-group-trigger-left">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Pengaturan Lanjutan</span>
+          </div>
+          <i class="fa-solid fa-chevron-down settings-group-arrow" id="settings-group-advanced-arrow"></i>
+        </button>
+        <div class="settings-group-body" id="settings-group-advanced-body">
 
-    {{-- Backup & Reset — fixed di bawah panel, tidak ikut scroll --}}
-    <div class="settings-footer-row">
-      <div class="settings-backup-row">
-        <button id="settings-export-btn" class="settings-backup-btn settings-backup-export">
-          <i class="fa-solid fa-file-arrow-down"></i>
-          <span data-i18n="backup_export">Export Backup</span>
-        </button>
-        <label class="settings-backup-btn settings-backup-import" for="settings-backup-file">
-          <i class="fa-solid fa-file-arrow-up"></i>
-          <span data-i18n="backup_import">Import Backup</span>
-        </label>
-        <input type="file" id="settings-backup-file" accept=".json" style="display:none;">
-      </div>
-      <div class="settings-footer-btns">
-        <button id="settings-reset-btn" class="settings-reset-btn">
-          <i class="fa-solid fa-rotate-left"></i> <span data-i18n="settings_reset">Reset ke Default</span>
-        </button>
-        <button id="hard-restart-btn" class="settings-hard-restart-btn" title="Clear cache &amp; reload">
-          <i class="fa-solid fa-rotate-right"></i> Hard Restart
-        </button>
-      </div>
-    </div>
+          {{-- Backup & Import --}}
+          <div class="settings-section">
+            <label class="settings-label">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span data-i18n="backup_title">Backup &amp; Restore</span>
+            </label>
+            <div class="settings-backup-row">
+              <button id="settings-export-btn" class="settings-backup-btn settings-backup-export">
+                <i class="fa-solid fa-file-arrow-down"></i>
+                <span data-i18n="backup_export">Export Backup</span>
+              </button>
+              <label class="settings-backup-btn settings-backup-import" for="settings-backup-file">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <span data-i18n="backup_import">Import Backup</span>
+              </label>
+              <input type="file" id="settings-backup-file" accept=".json" style="display:none;">
+            </div>
+          </div>
+
+          {{-- Reset & Hard Restart --}}
+          <div class="settings-section" style="border-bottom:none;">
+            <label class="settings-label">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>Reset Aplikasi</span>
+            </label>
+            <div class="settings-footer-btns">
+              <button id="settings-reset-btn" class="settings-reset-btn">
+                <i class="fa-solid fa-rotate-left"></i> <span data-i18n="settings_reset">Reset ke Default</span>
+              </button>
+              <button id="hard-restart-btn" class="settings-hard-restart-btn" title="Clear cache &amp; reload">
+                <i class="fa-solid fa-rotate-right"></i> Hard Restart
+              </button>
+            </div>
+          </div>
+
+        </div>{{-- .settings-group-body --}}
+      </div>{{-- .settings-group --}}
+
+    </div>{{-- .settings-panel-body --}}
   </div>
 </div>

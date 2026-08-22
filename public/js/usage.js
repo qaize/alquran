@@ -1,4 +1,4 @@
-/* usage.js — Data usage tracker
+﻿/* usage.js — Data usage tracker
    Menyimpan estimasi penggunaan data ke localStorage.
    ─────────────────────────────────────────────────── */
 
@@ -25,8 +25,8 @@ const API_LABELS = {
     tafsir:       { label: 'Tafsir',          icon: 'fa-book',              source: 'equran.id'        },
     asbab:        { label: 'Asbabun Nuzul',   icon: 'fa-scroll',            source: 'Muslim API'       },
     tajweed:      { label: 'Tajwid Berwarna', icon: 'fa-wand-magic-sparkles', source: 'AlQuran Cloud'  },
-    hadist:       { label: 'Detail Hadist',   icon: 'fa-scroll',            source: 'Hadith API'       },
-    hadist_list:  { label: 'List Hadist',     icon: 'fa-list',              source: 'Hadith API'       },
+    hadist:       { label: 'Detail Hadits',   icon: 'fa-scroll',            source: 'Hadith API'       },
+    hadist_list:  { label: 'List Hadits',     icon: 'fa-list',              source: 'Hadith API'       },
     prayer_time:  { label: 'Waktu Shalat',    icon: 'fa-clock',             source: 'AlAdhan API'      },
     geocode:      { label: 'Lokasi',          icon: 'fa-location-dot',      source: 'BigDataCloud'     },
     qibla:        { label: 'Arah Kiblat',     icon: 'fa-kaaba',             source: 'AlAdhan API'      },
@@ -296,3 +296,4 @@ function _renderUsagePanel(panel) {
         });
     });
 }
+

@@ -1,4 +1,4 @@
-/* prayer-time.js — Waktu Shalat
+﻿/* prayer-time.js — Waktu Shalat
    API: api.aladhan.com/v1/timings (by coordinates)
    Reverse geocode: api.bigdatacloud.net (free, no key)
    Method: 11 (SIHAT — Indonesia)
@@ -424,14 +424,21 @@ function _renderQiblaSection() {
         <div class="pt-qibla" id="pt-qibla-wrap">
             <div class="pt-qibla-left">
                 <div class="pt-qibla-compass" id="pt-qibla-compass">
-                    <div class="pt-compass-ring">
+                    <!-- Ring dengan arah mata angin — ikut berputar saat device bergerak -->
+                    <div class="pt-compass-ring" id="pt-compass-ring">
                         <span class="pt-compass-dir pt-dir-n">N</span>
                         <span class="pt-compass-dir pt-dir-e">E</span>
                         <span class="pt-compass-dir pt-dir-s">S</span>
                         <span class="pt-compass-dir pt-dir-w">W</span>
+                        <!-- Ikon Ka'bah di ring — posisi sesuai arah kiblat dari North, ikut ring -->
+                        <div class="pt-kaaba-marker" id="pt-kaaba-marker" style="transform: rotate(${deg}deg) translateY(-38px) rotate(-${deg}deg)">
+                            <i class="fa-solid fa-kaaba"></i>
+                        </div>
                     </div>
-                    <div class="pt-qibla-needle" id="pt-qibla-needle">
-                        <i class="fa-solid fa-kaaba"></i>
+                    <!-- Jarum panah — selalu menunjuk ke atas (arah depan HP), tidak berputar -->
+                    <div class="pt-compass-arrow" id="pt-qibla-needle">
+                        <div class="pt-arrow-north"></div>
+                        <div class="pt-arrow-south"></div>
                     </div>
                 </div>
             </div>
@@ -439,6 +446,10 @@ function _renderQiblaSection() {
                 <span class="pt-qibla-title">${label}</span>
                 <span class="pt-qibla-deg">${deg.toFixed(1)}° <small>${cardinal}</small></span>
                 <span class="pt-qibla-cardinal">${fromNorth}</span>
+                <div class="pt-heading-indicator">
+                    <span class="pt-heading-label">${lang === 'en' ? 'Facing' : 'Hadap'}</span>
+                    <span class="pt-heading-value" id="pt-live-heading">--°</span>
+                </div>
                 <span class="pt-compass-status" id="pt-compass-status">
                     ${supportsCompass
                         ? `<i class="fa-solid fa-compass"></i> ${liveLabel}`
@@ -451,6 +462,7 @@ function _renderQiblaSection() {
 
 /* ── Live compass dengan DeviceOrientationEvent ── */
 let _compassHandler = null;
+let _compassLastHeading = null;
 
 function _startLiveCompass(qiblaDeg) {
     // Bersihkan handler lama
@@ -458,38 +470,74 @@ function _startLiveCompass(qiblaDeg) {
 
     if (!window.DeviceOrientationEvent) return;
 
+    const TOLERANCE = 5; // ±5 derajat dianggap tepat kiblat
+
     const requestPermission = () => {
-        const needle = document.getElementById('pt-qibla-needle');
-        const status = document.getElementById('pt-compass-status');
+        const needle  = document.getElementById('pt-qibla-needle');
+        const compass = document.getElementById('pt-qibla-compass');
+        const status  = document.getElementById('pt-compass-status');
         if (!needle) return;
 
         _compassHandler = (evt) => {
-            const needle = document.getElementById('pt-qibla-needle');
-            if (!needle) { _stopLiveCompass(); return; }
+            const needle  = document.getElementById('pt-qibla-needle');
+            const ring    = document.getElementById('pt-compass-ring');
+            const compass = document.getElementById('pt-qibla-compass');
+            const status  = document.getElementById('pt-compass-status');
+            if (!ring) { _stopLiveCompass(); return; }
 
-            // webkitCompassHeading = heading dari North (iOS)
-            // alpha = rotation around Z axis (Android, 0 = North saat dikalibrasi)
             let heading = null;
             if (evt.webkitCompassHeading !== undefined && evt.webkitCompassHeading !== null) {
-                heading = evt.webkitCompassHeading; // iOS: langsung heading dari North
-            } else if (evt.alpha !== null) {
-                heading = 360 - evt.alpha; // Android: konversi dari alpha
+                heading = evt.webkitCompassHeading;
+            } else if (evt.alpha !== null && evt.alpha !== undefined) {
+                heading = (360 - evt.alpha) % 360;
             }
-
             if (heading === null) return;
 
-            // Rotasi needle = arah kiblat - heading device
-            const needleRot = qiblaDeg - heading;
-            needle.style.transform = `rotate(${needleRot}deg)`;
+            // Smoothing low-pass filter — 0.12 = lebih halus, tidak jitter
+            if (_compassLastHeading !== null) {
+                let d = heading - _compassLastHeading;
+                if (d > 180) d -= 360;
+                if (d < -180) d += 360;
+                heading = _compassLastHeading + d * 0.12;
+            }
+            _compassLastHeading = heading;
 
-            // Update status jadi aktif
+            // Ring berputar berlawanan heading — N di ring selalu ke North asli
+            // Ka'bah marker ikut ring → otomatis menunjuk arah kiblat
+            ring.style.transform = `rotate(${-heading}deg)`;
+
+            // Update live heading indicator
+            const headingEl = document.getElementById('pt-live-heading');
+            if (headingEl) {
+                const h = Math.round((heading + 360) % 360);
+                headingEl.textContent = h + '°';
+            }
+
+            // Cek tepat kiblat: heading device ≈ qiblaDeg
+            let diffDeg = Math.abs(((qiblaDeg - heading) % 360 + 360) % 360);
+            if (diffDeg > 180) diffDeg = 360 - diffDeg;
+            const onQibla = diffDeg <= TOLERANCE;
+
+            if (compass) compass.classList.toggle('pt-compass-on-qibla', onQibla);
+            if (needle)  needle.classList.toggle('pt-needle-on-qibla', onQibla);
+
             if (status) {
                 const lang = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
-                status.innerHTML = `<i class="fa-solid fa-compass pt-compass-live"></i> ${lang === 'en' ? 'Live compass active' : 'Kompas aktif'}`;
+                if (onQibla) {
+                    status.innerHTML = `<i class="fa-solid fa-circle-check pt-compass-on-qibla-icon"></i> ${lang === 'en' ? 'Facing Qibla!' : 'Menghadap Kiblat!'}`;
+                } else {
+                    status.innerHTML = `<i class="fa-solid fa-compass pt-compass-live"></i> ${lang === 'en' ? 'Live compass active' : 'Kompas aktif'}`;
+                }
             }
         };
 
         window.addEventListener('deviceorientation', _compassHandler, true);
+
+        // Update status langsung ke "aktif"
+        if (status) {
+            const lang = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
+            status.innerHTML = `<i class="fa-solid fa-compass pt-compass-live"></i> ${lang === 'en' ? 'Live compass active' : 'Kompas aktif'}`;
+        }
     };
 
     // iOS 13+ butuh permission request
@@ -517,6 +565,7 @@ function _stopLiveCompass() {
         window.removeEventListener('deviceorientation', _compassHandler, true);
         _compassHandler = null;
     }
+    _compassLastHeading = null;
 }
 
 function _startModalCountdown(modal) {
