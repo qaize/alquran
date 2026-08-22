@@ -129,17 +129,11 @@
 }
 
 /* Reveal saat hover pada barisSurah */
-.barisSurah:hover .ayat-action-bar {
+.barisSurah:hover .ayat-action-bar,
+.barisSurah:focus-within .ayat-action-bar,
+.barisSurah.touched .ayat-action-bar {
     opacity: 1;
     pointer-events: auto;
-}
-
-/* Mobile: selalu tampil */
-@media (max-width: 768px) {
-    .ayat-action-bar {
-        opacity: 1;
-        pointer-events: auto;
-    }
 }
 
 /* Saat bookmarked — tombol bookmark selalu visible meski action-bar hidden */
