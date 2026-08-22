@@ -1,7 +1,7 @@
 /* ── 19. TERJEMAHAN ── */
 .terjemahan-ayat {
     display: none;
-    margin-top: 8px;
+    margin-top: 6px;
     animation: fadeIn 0.3s ease;
 }
 
@@ -11,8 +11,8 @@
     color: var(--text-mid);
     text-align: left;
     direction: ltr;
-    margin-bottom: 4px;
-    line-height: 1.6;
+    margin-bottom: 3px;
+    line-height: 1.5;
 }
 
 .terjemahan {
@@ -20,9 +20,9 @@
     color: var(--text-dark);
     text-align: justify;
     direction: ltr;
-    line-height: 1.7;
+    line-height: 1.6;
     background: var(--gold-pale);
     border-left: 3px solid var(--gold-light);
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }

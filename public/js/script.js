@@ -369,30 +369,6 @@ function loadPagingSurah(currentIndex, totalData) {
             if (totalPage > 1) {
                 pagination.style.display = "block";
             } else {
-                // -- Bottom nav wiring --
-                const prevBotBtn = document.getElementById('surah-prev-bottom');
-                const nextBotBtn = document.getElementById('surah-next-bottom');
-                if (prevBotBtn) {
-                    if (!data.suratSebelumnya || nomorSurah == 1) {
-                        prevBotBtn.style.visibility = 'hidden';
-                    } else {
-                        prevBotBtn.addEventListener('click', () => {
-                            loadSurahDetails(data.suratSebelumnya.nomor);
-                            document.documentElement.scrollIntoView({ behavior: 'smooth' });
-                        });
-                    }
-                }
-                if (nextBotBtn) {
-                    if (!data.suratSelanjutnya || nomorSurah == 114) {
-                        nextBotBtn.style.visibility = 'hidden';
-                    } else {
-                        nextBotBtn.addEventListener('click', () => {
-                            loadSurahDetails(data.suratSelanjutnya.nomor);
-                            document.documentElement.scrollIntoView({ behavior: 'smooth' });
-                        });
-                    }
-                }
-
                 pagination.style.display = "none";
             }
 
@@ -704,7 +680,7 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                     });
                 }
 
-                initiateTerjemah(data.ayat);
+                initiateTerjemah(data.ayat, data.nomor, data.namaLatin ?? data.nama_latin);
 
                 // Query scroll-input fresh setelah DOM siap
                 const jumpInput = document.getElementById("scroll-input");
@@ -910,40 +886,6 @@ function componentDetailSurah(surah) {
             <div class="ayat-nav">
                 <span class="arabic">${teksArab}</span>
                 <span class="ayat-nomor-inline">
-                    <div class="ayat-btns-inline">
-                        <button class="btn-audio-ayat btn-hover-only"
-                            id="audio-btn-${nomorAyat}"
-                            title="${__("play_audio", "Putar murottal ayat ini")}">
-                            <i class="fa-solid fa-play"></i>
-                        </button>
-                        <button class="btn-lastread-ayat btn-hover-only"
-                            id="lastread-btn-${nomorAyat}"
-                            title="${__("save_lastread", "Simpan terakhir dibaca")}">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                        </button>
-                        <button class="btn-asbab-ayat btn-hover-only"
-                            id="asbab-btn-${nomorAyat}"
-                            title="Asbabun Nuzul"
-                            data-surah="${surah.nomor}"
-                            data-ayat="${nomorAyat}">
-                            <i class="fa-solid fa-scroll"></i>
-                        </button>
-                        <button class="btn-tafsir-ayat btn-hover-only"
-                            id="tafsir-btn-${nomorAyat}"
-                            title="Tafsir">
-                            <i class="fa-solid fa-book"></i>
-                        </button>
-                        <button class="btn-copy-ayat btn-hover-only"
-                            id="copy-btn-${nomorAyat}"
-                            title="${__("copy_ayat", "Salin ayat")}">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                        <button class="btn-bookmark-ayat btn-hover-only"
-                            id="bookmark-btn-${nomorAyat}"
-                            title="${__("save_bookmark", "Simpan bookmark ayat ini")}">
-                            <i class="fa-solid fa-bookmark"></i>
-                        </button>
-                    </div>
                     <div class="urutan-ayat"><span>${numberToArabic(nomorAyat)}</span></div>
                 </span>
             </div>
@@ -954,53 +896,10 @@ function componentDetailSurah(surah) {
 
         ayat.innerHTML = isiAyat;
 
-        // -- Bind event listeners setelah HTML di-render --
-        // Lebih aman dari inline onclick: tidak ada string interpolation ke handler
+        // -- Bind event listeners dilakukan di initiateTerjemah setelah tombol di-render --
         const namaLatin = surah.namaLatin ?? surah.nama_latin;
-        surah.ayat.forEach((ayatItem) => {
-            const nomorAyat = ayatItem.nomorAyat ?? ayatItem.nomor;
-
-            const audioBtn    = ayat.querySelector(`#audio-btn-${nomorAyat}`);
-            const bookmarkBtn = ayat.querySelector(`#bookmark-btn-${nomorAyat}`);
-            const lastreadBtn = ayat.querySelector(`#lastread-btn-${nomorAyat}`);
-            const asbabBtn    = ayat.querySelector(`#asbab-btn-${nomorAyat}`);
-            const tafsirBtn   = ayat.querySelector(`#tafsir-btn-${nomorAyat}`);
-            const copyBtn     = ayat.querySelector(`#copy-btn-${nomorAyat}`);
-
-            if (audioBtn)    audioBtn.addEventListener('click', () =>
-                playAyatAudio(surah.nomor, nomorAyat, audioBtn));
-            if (bookmarkBtn) bookmarkBtn.addEventListener('click', () =>
-                toggleBookmarkAyat(surah.nomor, namaLatin, nomorAyat));
-            if (lastreadBtn) lastreadBtn.addEventListener('click', () =>
-                showSaveLastReadSlide(surah.nomor, namaLatin, nomorAyat));
-            if (asbabBtn)    asbabBtn.addEventListener('click', () =>
-                openAsbabunNuzul(surah.nomor, nomorAyat));
-            if (tafsirBtn)   tafsirBtn.addEventListener('click', () =>
-                openTafsir(surah.nomor, nomorAyat));
-            if (copyBtn)     copyBtn.addEventListener('click', () =>
-                copyAyat(surah.nomor, nomorAyat, namaLatin, copyBtn));
-        });
         detailSurah.appendChild(ayat);
 
-        // -- Bottom navigation prev/next --
-        const bottomNav = document.createElement('div');
-        bottomNav.className = 'surah-bottom-nav';
-        bottomNav.id = 'surah-bottom-nav';
-        bottomNav.innerHTML = `
-            <button class="surah-bottom-btn" id="surah-prev-bottom">
-                <i class="fa-solid fa-chevron-left"></i>
-                <span>${__('prev_surah','Surah Sebelumnya')}</span>
-            </button>
-            <div class="surah-bottom-info">
-                <span class="surah-bottom-name">${surah.namaLatin ?? surah.nama_latin}</span>
-                <span class="surah-bottom-count">${surah.ayat.length} ${__('ayat_word','ayat')}</span>
-            </div>
-            <button class="surah-bottom-btn surah-bottom-next" id="surah-next-bottom">
-                <span>${__('next_surah','Surah Selanjutnya')}</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        `;
-        detailSurah.appendChild(bottomNav);
 
         resolve(detailSurah);
     });
@@ -1034,26 +933,48 @@ function showHideAllTerjemah(listAyat, condition) {
     });
 }
 
-function initiateTerjemah(listAyat) {
+function initiateTerjemah(listAyat, nomorSurah, namaLatin) {
     return new Promise((resolve, reject) => {
         listAyat.forEach((ayat) => {
             const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
             const ayatSurah = document.getElementById(`isi-ayat${nomorAyat}`);
 
-            ComponentTerjemahan(ayat).then((element) => {
+            ComponentTerjemahan(ayat, nomorSurah).then((element) => {
                 ayatSurah.appendChild(element);
+
                 // Ikuti setting showTranslation (default: tampil)
                 const bodyTerjemahan = document.getElementById(`terjemahan${nomorAyat}`);
                 if (bodyTerjemahan) {
                     bodyTerjemahan.style.display = (window.__showTranslation !== false) ? "block" : "none";
                 }
+
+                // Bind tombol aksi setelah elemen ada di DOM
+                const audioBtn    = document.getElementById(`audio-btn-${nomorAyat}`);
+                const bookmarkBtn = document.getElementById(`bookmark-btn-${nomorAyat}`);
+                const lastreadBtn = document.getElementById(`lastread-btn-${nomorAyat}`);
+                const asbabBtn    = document.getElementById(`asbab-btn-${nomorAyat}`);
+                const tafsirBtn   = document.getElementById(`tafsir-btn-${nomorAyat}`);
+                const copyBtn     = document.getElementById(`copy-btn-${nomorAyat}`);
+
+                if (audioBtn)    audioBtn.addEventListener('click', () =>
+                    playAyatAudio(nomorSurah, nomorAyat, audioBtn));
+                if (bookmarkBtn) bookmarkBtn.addEventListener('click', () =>
+                    toggleBookmarkAyat(nomorSurah, namaLatin, nomorAyat));
+                if (lastreadBtn) lastreadBtn.addEventListener('click', () =>
+                    showSaveLastReadSlide(nomorSurah, namaLatin, nomorAyat));
+                if (asbabBtn)    asbabBtn.addEventListener('click', () =>
+                    openAsbabunNuzul(nomorSurah, nomorAyat));
+                if (tafsirBtn)   tafsirBtn.addEventListener('click', () =>
+                    openTafsir(nomorSurah, nomorAyat));
+                if (copyBtn)     copyBtn.addEventListener('click', () =>
+                    copyAyat(nomorSurah, nomorAyat, namaLatin, copyBtn));
             });
         });
         resolve();
     });
 }
 
-function ComponentTerjemahan(ayat) {
+function ComponentTerjemahan(ayat, nomorSurah) {
     return new Promise((resolve, reject) => {
         const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
         const teksLatin = ayat.teksLatin ?? ayat.tr;
@@ -1065,7 +986,67 @@ function ComponentTerjemahan(ayat) {
             <p class="tulisan-latin">${teksLatin}</p>
             <p class="terjemahan">${__("translation_suffix", "artinya:")} "${teksIndonesia}"</p>
         </div>
+        <div class="ayat-action-bar" id="aab-${nomorAyat}">
+            <div class="aab-main">
+                <button class="aab-btn btn-bookmark-ayat"
+                    id="bookmark-btn-${nomorAyat}"
+                    title="${__("save_bookmark", "Bookmark")}">
+                    <i class="fa-solid fa-bookmark"></i>
+                </button>
+                <button class="aab-btn btn-lastread-ayat"
+                    id="lastread-btn-${nomorAyat}"
+                    title="${__("save_lastread", "Terakhir dibaca")}">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </button>
+                <button class="aab-btn aab-expand-btn"
+                    id="aab-expand-${nomorAyat}"
+                    title="Lainnya"
+                    aria-expanded="false">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="aab-extra" id="aab-extra-${nomorAyat}" aria-hidden="true">
+                <button class="aab-btn btn-audio-ayat"
+                    id="audio-btn-${nomorAyat}"
+                    title="${__("play_audio", "Putar murottal")}">
+                    <i class="fa-solid fa-play"></i>
+                </button>
+                <button class="aab-btn btn-asbab-ayat"
+                    id="asbab-btn-${nomorAyat}"
+                    title="Asbabun Nuzul"
+                    data-surah="${nomorSurah}"
+                    data-ayat="${nomorAyat}">
+                    <i class="fa-solid fa-scroll"></i>
+                </button>
+                <button class="aab-btn btn-tafsir-ayat"
+                    id="tafsir-btn-${nomorAyat}"
+                    title="Tafsir">
+                    <i class="fa-solid fa-book"></i>
+                </button>
+                <button class="aab-btn btn-copy-ayat"
+                    id="copy-btn-${nomorAyat}"
+                    title="${__("copy_ayat", "Salin")}">
+                    <i class="fa-regular fa-copy"></i>
+                </button>
+            </div>
+        </div>
         `;
+
+        // Bind expand toggle
+        const expandBtn = terjemah.querySelector(`#aab-expand-${nomorAyat}`);
+        const extraEl   = terjemah.querySelector(`#aab-extra-${nomorAyat}`);
+        if (expandBtn && extraEl) {
+            expandBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = extraEl.classList.contains('aab-extra-open');
+                extraEl.classList.toggle('aab-extra-open', !isOpen);
+                expandBtn.setAttribute('aria-expanded', String(!isOpen));
+                expandBtn.querySelector('i').className = isOpen
+                    ? 'fa-solid fa-chevron-right'
+                    : 'fa-solid fa-chevron-left';
+            });
+        }
+
         resolve(terjemah);
     });
 }
