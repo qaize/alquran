@@ -102,20 +102,21 @@
 
 @media (max-width: 768px) {
     .prayer-time-widget-mobile {
-        display: block;
+        display: flex;
+        justify-content: center;
         background: var(--navy);
-        padding: 0 12px 8px;
+        padding: 0 12px 6px;
         border-bottom: 2px solid var(--gold);
     }
 
     .prayer-time-widget-mobile .ptw-allow-btn {
-        width: 100%;
+        width: auto;
         background: rgba(255,255,255,0.06);
         border: 1px solid rgba(255,255,255,0.15);
         border-radius: var(--radius-sm);
         color: rgba(255,255,255,0.55);
-        padding: 7px 12px;
-        font-size: 11px;
+        padding: 4px 12px;
+        font-size: 10px;
         display: flex;
         align-items: center;
         gap: 6px;
@@ -128,22 +129,21 @@
         border-color: var(--gold);
     }
 
-    /* Compact bar style untuk widget mobile */
+    /* Compact bar — lebar mengikuti konten */
     .prayer-time-widget-mobile .ptw-compact,
     .prayer-time-widget-mobile .ptw-mobile-bar {
-        width: 100%;
-        display: flex;
+        width: auto;
+        display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 5px 10px;
+        gap: 5px;
+        padding: 3px 10px;
         background: rgba(0,0,0,0.2);
         border: 1px solid rgba(255,255,255,0.08);
-        border-radius: var(--radius-sm);
+        border-radius: 20px;
         cursor: pointer;
         transition: background var(--transition);
-        justify-content: center;
-        flex-wrap: wrap;
         font-family: inherit;
+        white-space: nowrap;
     }
 
     .prayer-time-widget-mobile .ptw-compact:hover,
@@ -153,28 +153,28 @@
         background: rgba(0,0,0,0.35);
     }
 
-    /* Teks waktu sholat — lebih kecil */
+    /* Teks waktu sholat */
     .prayer-time-widget-mobile .ptw-mobile-prayer {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
     }
     .prayer-time-widget-mobile .ptw-mobile-icon {
-        font-size: 10px;
+        font-size: 9px;
         color: var(--gold);
     }
     .prayer-time-widget-mobile .ptw-mobile-label {
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 600;
         color: rgba(255,255,255,0.6);
     }
     .prayer-time-widget-mobile .ptw-mobile-time {
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         color: var(--white);
     }
     .prayer-time-widget-mobile .ptw-mobile-sep {
-        font-size: 10px;
+        font-size: 9px;
         color: rgba(255,255,255,0.2);
     }
     /* Sembunyikan lokasi — biar makin ringkas */
