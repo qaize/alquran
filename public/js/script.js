@@ -619,6 +619,18 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                     el.addEventListener("touchstart", (e) => {
                         _pressStarted = true;
                         el.classList.add('ayat-longpress-pending');
+
+                        // Toggle action bar via 'touched' class — tap = reveal, tap lain = hide
+                        const baris = el.closest('.barisSurah');
+                        if (baris) {
+                            const wasActive = baris.classList.contains('touched');
+                            // Hapus semua baris lain yang aktif
+                            document.querySelectorAll('.barisSurah.touched').forEach(b => {
+                                if (b !== baris) b.classList.remove('touched');
+                            });
+                            baris.classList.toggle('touched', !wasActive);
+                        }
+
                         _pressTimer = setTimeout(() => {
                             if (!_pressStarted) return;
                             el.classList.remove('ayat-longpress-pending');
