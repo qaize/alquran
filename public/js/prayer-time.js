@@ -463,6 +463,7 @@ function _renderQiblaSection() {
 /* ── Live compass dengan DeviceOrientationEvent ── */
 let _compassHandler = null;
 let _compassLastHeading = null;
+let _compassEventName = 'deviceorientation';
 
 function _startLiveCompass(qiblaDeg) {
     // Bersihkan handler lama
@@ -531,12 +532,28 @@ function _startLiveCompass(qiblaDeg) {
             }
         };
 
-        window.addEventListener('deviceorientation', _compassHandler, true);
+        // Android: coba deviceorientationabsolute dulu (true north), fallback ke deviceorientation
+        const eventName = window.ondeviceorientationabsolute !== undefined
+            ? 'deviceorientationabsolute'
+            : 'deviceorientation';
+        window.addEventListener(eventName, _compassHandler, true);
+        _compassEventName = eventName;
 
         // Update status langsung ke "aktif"
         if (status) {
             const lang = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
-            status.innerHTML = `<i class="fa-solid fa-compass pt-compass-live"></i> ${lang === 'en' ? 'Live compass active' : 'Kompas aktif'}`;
+            status.innerHTML = `<i class="fa-solid fa-compass pt-compass-live"></i> ${lang === 'en' ? 'Live compass active' : 'Kompas aktif'} <button class="pt-calibrate-btn" id="pt-calibrate-btn" title="Kalibrasi">&#8645;</button>`;
+            document.getElementById('pt-calibrate-btn')?.addEventListener('click', () => {
+                _compassLastHeading = null;
+                if (status) {
+                    const l = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
+                    status.innerHTML = `<i class="fa-solid fa-rotate pt-compass-live"></i> ${l === 'en' ? 'Calibrating...' : 'Kalibrasi... putar angka 8'}`;
+                    setTimeout(() => {
+                        status.innerHTML = `<i class="fa-solid fa-compass pt-compass-live"></i> ${l === 'en' ? 'Live compass active' : 'Kompas aktif'} <button class="pt-calibrate-btn" id="pt-calibrate-btn" title="Kalibrasi">&#8645;</button>`;
+                        document.getElementById('pt-calibrate-btn')?.addEventListener('click', arguments.callee);
+                    }, 3000);
+                }
+            });
         }
     };
 
@@ -562,7 +579,7 @@ function _startLiveCompass(qiblaDeg) {
 
 function _stopLiveCompass() {
     if (_compassHandler) {
-        window.removeEventListener('deviceorientation', _compassHandler, true);
+        window.removeEventListener(_compassEventName, _compassHandler, true);
         _compassHandler = null;
     }
     _compassLastHeading = null;

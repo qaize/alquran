@@ -71,7 +71,7 @@
 .barisSurah {
     display: flex;
     flex-direction: column;
-    padding: 16px 16px 12px;
+    padding: 10px 12px 6px;
     border-radius: var(--radius-sm);
     transition: background var(--transition);
     border-bottom: 1px solid transparent;
@@ -111,27 +111,187 @@
     flex-direction: row;
     align-items: center;
     gap: 6px;
-    padding-top: 20px; /* jarak dari atas agar tidak mepet ke teks Arab */
+    padding-top: 14px;
     align-self: flex-start;
 }
 
-/* Grup tombol horizontal di samping nomor */
-.ayat-btns-inline {
+/* ── AYAT ACTION BAR ── */
+.ayat-action-bar {
     display: flex;
-    flex-direction: row;
     align-items: center;
     gap: 4px;
-}
-
-/* Override btn-hover-only: sembunyikan saat tidak hover */
-.ayat-btns-inline .btn-hover-only {
+    padding: 4px 0 0;
+    direction: ltr;
+    /* Hidden by default — reveal on row hover */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
 }
-.barisSurah:hover .ayat-btns-inline .btn-hover-only {
+
+/* Reveal saat hover pada barisSurah */
+.barisSurah:hover .ayat-action-bar {
     opacity: 1;
     pointer-events: auto;
+}
+
+/* Mobile: selalu tampil */
+@media (max-width: 768px) {
+    .ayat-action-bar {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+/* Saat bookmarked — tombol bookmark selalu visible meski action-bar hidden */
+/* Gunakan visibility trick: action-bar tetap opacity:0 tapi bookmark btn override */
+.barisSurah:not(:hover) .aab-main:has(.btn-bookmark-ayat.bookmarked) {
+    opacity: 1;
+    pointer-events: auto;
+}
+.barisSurah:not(:hover) .aab-main:has(.btn-bookmark-ayat.bookmarked) .aab-btn:not(.btn-bookmark-ayat) {
+    opacity: 0;
+    pointer-events: none;
+}
+.barisSurah:not(:hover) .aab-main:has(.btn-bookmark-ayat.bookmarked) .aab-extra {
+    display: none;
+}
+
+/* Grup tombol utama */
+.aab-main {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+/* Grup tombol extra — collapsed by default */
+.aab-extra {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    max-width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity    0.2s ease;
+}
+
+/* Expanded state */
+.aab-extra.aab-extra-open {
+    max-width: 200px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ── Base button ── */
+.aab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-light);
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease,
+                border-color 0.15s ease, transform 0.15s ease;
+    flex-shrink: 0;
+    font-family: inherit;
+    padding: 0;
+}
+
+.aab-btn:hover {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+    transform: translateY(-1px);
+}
+
+.aab-btn:active {
+    transform: translateY(0);
+}
+
+/* Dark mode base */
+.theme-dark .aab-btn {
+    color: rgba(255,255,255,0.35);
+}
+.theme-dark .aab-btn:hover {
+    background: rgba(255,255,255,0.12);
+    color: var(--white);
+    border-color: rgba(255,255,255,0.2);
+}
+
+/* ── State khusus per tombol ── */
+/* Bookmark active */
+.aab-btn.btn-bookmark-ayat.bookmarked {
+    background: rgba(201,168,76,0.15) !important;
+    color: var(--gold) !important;
+    border-color: var(--gold) !important;
+}
+.aab-btn.btn-bookmark-ayat.bookmarked:hover {
+    background: var(--gold) !important;
+    color: var(--navy) !important;
+}
+
+/* Audio playing */
+.aab-btn.btn-audio-ayat.audio-playing {
+    background: rgba(201,168,76,0.15) !important;
+    color: var(--gold) !important;
+    border-color: var(--gold) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+.aab-btn.btn-audio-ayat.audio-paused {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+.aab-btn.btn-audio-ayat.audio-loading {
+    opacity: 1 !important;
+    pointer-events: none !important;
+}
+
+/* Last read saved */
+.aab-btn.btn-lastread-ayat.saved {
+    background: rgba(20,163,168,0.12) !important;
+    color: #0d7377 !important;
+    border-color: #14a3a8 !important;
+}
+
+/* Expand button — ikonis dots */
+.aab-expand-btn {
+    border-color: var(--border) !important;
+    background: var(--white) !important;
+    color: var(--text-light) !important;
+}
+.theme-dark .aab-expand-btn {
+    background: rgba(255,255,255,0.06) !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    color: rgba(255,255,255,0.4) !important;
+}
+.aab-expand-btn:hover {
+    background: var(--navy) !important;
+    color: var(--white) !important;
+    border-color: var(--navy) !important;
+}
+.theme-dark .aab-expand-btn:hover {
+    background: rgba(255,255,255,0.15) !important;
+    border-color: rgba(255,255,255,0.25) !important;
+    color: var(--white) !important;
+}
+/* Saat expanded — tombol aktif */
+.aab-expand-btn[aria-expanded="true"] {
+    background: var(--navy) !important;
+    color: var(--white) !important;
+    border-color: var(--navy) !important;
+}
+.theme-dark .aab-expand-btn[aria-expanded="true"] {
+    background: rgba(255,255,255,0.15) !important;
+    border-color: rgba(255,255,255,0.25) !important;
+    color: var(--white) !important;
 }
 
 /* Semua tombol dalam grup inline */

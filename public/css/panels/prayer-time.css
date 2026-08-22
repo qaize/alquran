@@ -492,6 +492,28 @@
     color: var(--navy);
 }
 
+/* Tombol kalibrasi kecil inline */
+.pt-calibrate-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    padding: 1px 5px;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 4px;
+    color: var(--gold);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: inherit;
+    vertical-align: middle;
+}
+.pt-calibrate-btn:hover {
+    background: var(--gold);
+    color: var(--navy);
+}
+
 /* ── Indikator TEPAT KIBLAT — hijau ── */
 .pt-qibla-compass.pt-compass-on-qibla {
     border-color: #27ae60;
