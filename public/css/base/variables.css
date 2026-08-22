@@ -151,21 +151,42 @@
     --gold-light:     #e8b870;
 }
 
-/* Hitam Pekat */
+/* Hitam Pekat — AMOLED true black */
 .theme-dark-black {
-    --navy:           #080808;
-    --navy-mid:       #101010;
-    --navy-light:     #1a1a1a;
-    --dark-bg:        #0a0a0a;
-    --dark-surface:   #111111;
-    --dark-surface2:  #181818;
-    --dark-surface3:  #222222;
+    --navy:           #000000;
+    --navy-mid:       #0a0a0a;
+    --navy-light:     #111111;
+    --dark-bg:        #000000;
+    --dark-surface:   #0a0a0a;
+    --dark-surface2:  #111111;
+    --dark-surface3:  #1a1a1a;
     --text-mid:       #555555;
     --text-light:     #777777;
-    --border:         #222222;
-    --dark-border:    rgba(255,255,255,0.08);
+    --border:         #1a1a1a;
+    --dark-border:    rgba(255,255,255,0.06);
+    --blue-soft:      #0a0a0a;
+    --blue-card:      #0f0f0f;
+    --gold-pale:      #111108;
     --accent:         #c9a84c;
     --accent-light:   #e8c97a;
+    --ayat-bg:        #000000;
+}
+
+/* Nomor ayat putih tulang di black theme */
+.theme-dark.theme-dark-black .ayat .urutan-ayat {
+    background: #f5f0e8 !important;
+}
+.theme-dark.theme-dark-black .ayat .urutan-ayat span {
+    color: #1a1a1a !important;
+}
+
+/* Background detail surah pure black di black theme */
+.theme-dark.theme-dark-black .ayat,
+.theme-dark.theme-dark-black .ayat.ayat-fullwidth,
+.theme-dark.theme-dark-black .barisSurah {
+    background: rgba(0,0,0,1) !important;
+    background-image: none !important;
+    background-color: #000000 !important;
 }
 
 /* ──────────────────────────────────────────────
