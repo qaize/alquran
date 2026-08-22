@@ -615,25 +615,36 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                     // Mobile: long press 2 detik
                     let _pressTimer = null;
                     let _pressStarted = false;
+                    let _lastTap = 0;
 
                     el.addEventListener("touchstart", (e) => {
                         _pressStarted = true;
                         el.classList.add('ayat-longpress-pending');
 
-                        // Toggle action bar via 'touched' class — tap = reveal, tap lain = hide
-                        const baris = el.closest('.barisSurah');
-                        if (baris) {
-                            const wasActive = baris.classList.contains('touched');
-                            // Hapus semua baris lain yang aktif
-                            document.querySelectorAll('.barisSurah.touched').forEach(b => {
-                                if (b !== baris) b.classList.remove('touched');
-                            });
-                            baris.classList.toggle('touched', !wasActive);
-                        }
-
+                        // Long press (700ms) → reveal action bar
                         _pressTimer = setTimeout(() => {
                             if (!_pressStarted) return;
                             el.classList.remove('ayat-longpress-pending');
+                            const baris = el.closest('.barisSurah');
+                            if (baris) {
+                                document.querySelectorAll('.barisSurah.touched').forEach(b => {
+                                    if (b !== baris) b.classList.remove('touched');
+                                });
+                                baris.classList.add('touched');
+                            }
+                            // Haptic feedback ringan jika tersedia
+                            if (navigator.vibrate) navigator.vibrate(30);
+                        }, 700);
+                    }, { passive: true });
+
+                    el.addEventListener("touchend", (e) => {
+                        _pressStarted = false;
+                        clearTimeout(_pressTimer);
+                        el.classList.remove('ayat-longpress-pending');
+
+                        // Double tap (dalam 300ms) → last read
+                        const now = Date.now();
+                        if (now - _lastTap < 300) {
                             el.classList.add('ayat-jump-highlight');
                             setTimeout(() => el.classList.remove('ayat-jump-highlight'), 2000);
                             if (typeof showSaveLastReadSlide === "function") {
@@ -643,7 +654,10 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                                     nomorAyat,
                                 );
                             }
-                        }, 2000);
+                            _lastTap = 0;
+                        } else {
+                            _lastTap = now;
+                        }
                     }, { passive: true });
 
                     const cancelPress = () => {
@@ -651,7 +665,6 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                         clearTimeout(_pressTimer);
                         el.classList.remove('ayat-longpress-pending');
                     };
-                    el.addEventListener("touchend",    cancelPress, { passive: true });
                     el.addEventListener("touchmove",   cancelPress, { passive: true });
                     el.addEventListener("touchcancel", cancelPress, { passive: true });
                 });
