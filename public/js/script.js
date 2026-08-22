@@ -433,7 +433,24 @@ function loadPagingSurah(currentIndex, totalData) {
 // inisiasi halaman utama
 // Set initial history state agar back dari detail bisa kembali ke list
 history.replaceState({ view: 'list' }, '', window.location.href);
-loadPagingSurah(currentIndex, totalData);
+
+// ── Restore surah terakhir dibaca saat refresh ──
+const _lastSurahKey = 'quran_last_surah';
+const _lastSurahSaved = sessionStorage.getItem(_lastSurahKey);
+if (_lastSurahSaved) {
+    const _lastNomor = parseInt(_lastSurahSaved);
+    if (_lastNomor >= 1 && _lastNomor <= 114) {
+        // Delay kecil agar semua module siap
+        setTimeout(() => {
+            loadSurahDetails(_lastNomor, false);
+        }, 100);
+    } else {
+        sessionStorage.removeItem(_lastSurahKey);
+        loadPagingSurah(currentIndex, totalData);
+    }
+} else {
+    loadPagingSurah(currentIndex, totalData);
+}
 // ── Klik logo (desktop sidebar & mobile topbar) → kembali ke menu utama ──
 function goHome() {
     searchSurah = "";
@@ -445,6 +462,7 @@ function goHome() {
     mainBody.innerHTML = "";
     pagination.style.display = "block";
     _titleNavCollapsed = true;
+    sessionStorage.removeItem(_lastSurahKey);
     history.pushState({ view: 'list' }, '', window.location.pathname);
     loadPagingSurah(currentIndex, page * offset);
 }
@@ -467,6 +485,7 @@ window.addEventListener('popstate', (e) => {
 
         pagination.style.display = "block";
         _titleNavCollapsed = true; // reset state navigasi saat kembali ke list
+        sessionStorage.removeItem(_lastSurahKey);
         loadPagingSurah(currentIndex, page * offset);
     } else if (state.view === 'detail' && state.nomor) {
         // Navigasi antar surah via back/forward
@@ -508,6 +527,8 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
     if (document.activeElement && typeof document.activeElement.blur === "function") {
         document.activeElement.blur();
     }
+    // Simpan surah aktif agar bisa restore saat refresh
+    sessionStorage.setItem(_lastSurahKey, nomorSurah);
     // Simpan state ke browser history agar tombol Back bekerja
     if (pushHistory) {
         history.pushState({ view: 'detail', nomor: nomorSurah }, '', `#surah-${nomorSurah}`);
@@ -682,6 +703,118 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                 if (detailSurahEl)
                     detailSurahEl.classList.add("fullwidth-mode");
 
+                // ── Swipe kiri/kanan → prev/next surah (mobile) ──
+                let _swipeStartX = null;
+                let _swipeStartY = null;
+                let _swipeActive = false;
+
+                // Buat indikator swipe
+                const _swipeIndicator = document.createElement('div');
+                _swipeIndicator.className = 'swipe-indicator';
+                _swipeIndicator.innerHTML = `
+                    <span class="swipe-ind-prev"><i class="fa-solid fa-chevron-left"></i> ${data.suratSebelumnya ? data.suratSebelumnya.namaLatin : ''}</span>
+                    <span class="swipe-ind-next">${data.suratSelanjutnya ? data.suratSelanjutnya.namaLatin : ''} <i class="fa-solid fa-chevron-right"></i></span>
+                `;
+                ayatContainer.appendChild(_swipeIndicator);
+
+                ayatContainer.addEventListener('touchstart', (e) => {
+                    _swipeStartX = e.touches[0].clientX;
+                    _swipeStartY = e.touches[0].clientY;
+                    _swipeActive = false;
+                }, { passive: true });
+
+                ayatContainer.addEventListener('touchmove', (e) => {
+                    if (_swipeStartX === null) return;
+                    const dx = e.touches[0].clientX - _swipeStartX;
+                    const dy = e.touches[0].clientY - _swipeStartY;
+
+                    // Hanya aktifkan swipe horizontal
+                    if (!_swipeActive && Math.abs(dx) < 10) return;
+                    if (!_swipeActive && Math.abs(dy) > Math.abs(dx)) return;
+                    _swipeActive = true;
+
+                    // Clamp drag max 80px
+                    const clamp = Math.max(-80, Math.min(80, dx));
+                    const progress = Math.abs(clamp) / 80; // 0–1
+
+                    // Geser + miring sedikit
+                    ayatContainer.style.transform = `translateX(${clamp * 0.35}px)`;
+                    ayatContainer.style.transition = 'none';
+
+                    // Tampilkan indikator sesuai arah
+                    if (dx < -20 && data.suratSelanjutnya) {
+                        _swipeIndicator.className = 'swipe-indicator show-next';
+                        _swipeIndicator.style.opacity = Math.min(progress * 1.5, 0.9);
+                    } else if (dx > 20 && data.suratSebelumnya) {
+                        _swipeIndicator.className = 'swipe-indicator show-prev';
+                        _swipeIndicator.style.opacity = Math.min(progress * 1.5, 0.9);
+                    } else {
+                        _swipeIndicator.className = 'swipe-indicator';
+                        _swipeIndicator.style.opacity = 0;
+                    }
+                }, { passive: true });
+
+                ayatContainer.addEventListener('touchend', (e) => {
+                    // Reset transform
+                    ayatContainer.style.transform = '';
+                    ayatContainer.style.transition = '';
+                    _swipeIndicator.className = 'swipe-indicator';
+                    _swipeIndicator.style.opacity = 0;
+
+                    if (_swipeStartX === null) return;
+                    const dx = e.changedTouches[0].clientX - _swipeStartX;
+                    const dy = e.changedTouches[0].clientY - _swipeStartY;
+                    _swipeStartX = null;
+                    _swipeStartY = null;
+
+                    // Hanya proses jika horizontal > vertikal & jarak cukup (>60px)
+                    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+                    const container = document.querySelector('#main-body');
+
+                    if (dx < 0 && data.suratSelanjutnya && nomorSurah < 114) {
+                        if (container) container.classList.add('surah-slide-out-left');
+                        setTimeout(() => {
+                            if (typeof showToast === 'function') {
+                                showToast({ type: 'info', icon: 'fa-chevron-right', message: data.suratSelanjutnya.namaLatin, duration: 1500 });
+                            }
+                            loadSurahDetails(data.suratSelanjutnya.nomor);
+                            setTimeout(() => {
+                                const newContainer = document.querySelector('#main-body');
+                                if (newContainer) {
+                                    newContainer.classList.remove('surah-slide-out-left');
+                                    newContainer.classList.add('surah-slide-in-right');
+                                    setTimeout(() => newContainer.classList.remove('surah-slide-in-right'), 250);
+                                }
+                            }, 100);
+                        }, 180);
+                    } else if (dx > 0 && data.suratSebelumnya && nomorSurah > 1) {
+                        if (container) container.classList.add('surah-slide-out-right');
+                        setTimeout(() => {
+                            if (typeof showToast === 'function') {
+                                showToast({ type: 'info', icon: 'fa-chevron-left', message: data.suratSebelumnya.namaLatin, duration: 1500 });
+                            }
+                            loadSurahDetails(data.suratSebelumnya.nomor);
+                            setTimeout(() => {
+                                const newContainer = document.querySelector('#main-body');
+                                if (newContainer) {
+                                    newContainer.classList.remove('surah-slide-out-right');
+                                    newContainer.classList.add('surah-slide-in-left');
+                                    setTimeout(() => newContainer.classList.remove('surah-slide-in-left'), 250);
+                                }
+                            }, 100);
+                        }, 180);
+                    }
+                }, { passive: true });
+
+                ayatContainer.addEventListener('touchcancel', () => {
+                    ayatContainer.style.transform = '';
+                    ayatContainer.style.transition = '';
+                    _swipeIndicator.className = 'swipe-indicator';
+                    _swipeIndicator.style.opacity = 0;
+                    _swipeStartX = null;
+                }, { passive: true });
+
                 let showDetail = false;
                 if (hideDetailButton) {
                     hideDetailButton.addEventListener("click", () => {
@@ -758,6 +891,11 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
         .catch((error) => {
             npDone();
             console.error(error);
+            // Kalau restore gagal — hapus state dan kembali ke list
+            sessionStorage.removeItem(_lastSurahKey);
+            titleSurah.innerHTML = "";
+            mainBody.innerHTML = "";
+            loadPagingSurah(0, page * offset);
         });
 }
 

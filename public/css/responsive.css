@@ -1,4 +1,67 @@
-/* ── 23. RESPONSIVE ── */
+/* ── Swipe surah transition animations ── */
+@keyframes slideOutLeft {
+    from { transform: translateX(0);     opacity: 1; }
+    to   { transform: translateX(-60px); opacity: 0; }
+}
+@keyframes slideOutRight {
+    from { transform: translateX(0);    opacity: 1; }
+    to   { transform: translateX(60px); opacity: 0; }
+}
+@keyframes slideInRight {
+    from { transform: translateX(60px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes slideInLeft {
+    from { transform: translateX(-60px); opacity: 0; }
+    to   { transform: translateX(0);     opacity: 1; }
+}
+
+.surah-slide-out-left  { animation: slideOutLeft  0.2s ease forwards; }
+.surah-slide-out-right { animation: slideOutRight 0.2s ease forwards; }
+.surah-slide-in-right  { animation: slideInRight  0.22s ease forwards; }
+.surah-slide-in-left   { animation: slideInLeft   0.22s ease forwards; }
+
+/* ── Swipe indicator — muncul saat drag ── */
+.swipe-indicator {
+    position: sticky;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+}
+
+.swipe-ind-prev,
+.swipe-ind-next {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--navy);
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Cinzel', serif;
+    white-space: nowrap;
+    max-width: 45%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+/* Hanya tampilkan indikator yang relevan */
+.swipe-indicator .swipe-ind-prev { visibility: hidden; }
+.swipe-indicator .swipe-ind-next { visibility: hidden; }
+.swipe-indicator.show-prev .swipe-ind-prev { visibility: visible; }
+.swipe-indicator.show-next .swipe-ind-next { visibility: visible; }
 @media (max-width: 1100px) {
     .app-wrapper {
         grid-template-columns: 1fr;
