@@ -1,15 +1,14 @@
 ﻿/* prayer-time.js — Waktu Shalat
-   API: api.aladhan.com/v1/timings (by coordinates)
+   Engine  : PrayTimes.js v2.5 (praytimes.org) — kalkulasi LOKAL, tanpa API call
    Reverse geocode: api.bigdatacloud.net (free, no key)
-   Method: 11 (SIHAT — Indonesia)
+   Qibla   : api.aladhan.com/v1/qibla
+   Metode  : Kemenag RI / MABIMS — Fajr 20°, Isha 18°, Asr Syafi'i
    ─────────────────────────────────────────────── */
 
-const PT_CACHE_KEY  = 'quran_prayer_times';
+const PT_CACHE_KEY  = 'quran_prayer_times_v3';
 const PT_LOC_KEY    = 'quran_prayer_location';
-const PT_API        = 'https://api.aladhan.com/v1/timings';
 const PT_QIBLA_API  = 'https://api.aladhan.com/v1/qibla';
 const PT_GEO_API    = 'https://api.bigdatacloud.net/data/reverse-geocode-client';
-const PT_METHOD     = 11; // Kementerian Agama RI / SIHAT
 
 const PRAYER_KEYS = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
@@ -127,22 +126,77 @@ function _ptGetLocation() {
 }
 
 /* ── Fetch prayer times ── */
+/* ── Kalkulasi waktu sholat lokal via PrayTimes.js ── */
+function _ptRoundCoord(val) {
+    return Math.round(val * 10000) / 10000;
+}
+
+/**
+ * Hitung waktu sholat lokal menggunakan PrayTimes.js
+ * Tidak butuh internet — kalkulasi astronomi murni di browser.
+ *
+ * Metode: Kemenag RI / MABIMS
+ *   Fajr  20°, Isha 18°, Asr Syafi'i (Standard), Maghrib 0 min after sunset
+ */
+function _ptCalcTimings(lat, lng) {
+    if (typeof PrayTimes === 'undefined') {
+        return Promise.reject(new Error('PrayTimes.js not loaded'));
+    }
+
+    const pt = new PrayTimes('MWL');
+
+    // Sesuaikan ke parameter Kemenag RI
+    pt.adjust({
+        fajr    : 20,          // 20° — standar Kemenag RI & MABIMS
+        isha    : 18,          // 18° — standar Kemenag RI & MABIMS
+        maghrib : '0 min',     // tepat saat matahari terbenam
+        asr     : 'Standard',  // Syafi'i: shadow factor 1x (bukan Hanafi 2x)
+        midnight: 'Standard',
+    });
+
+    const now = new Date();
+
+    // Timezone offset otomatis dari browser (menit → jam)
+    // Ini sudah sesuai lokasi user tanpa hardcode
+    const tzOffset = -now.getTimezoneOffset() / 60;
+
+    const raw = pt.getTimes(now, [lat, lng], tzOffset, 0, '24h');
+
+    // Normalisasi key ke format yang sama dengan response aladhan.com lama
+    const timings = {
+        Fajr    : raw.fajr,
+        Sunrise : raw.sunrise,
+        Dhuhr   : raw.dhuhr,
+        Asr     : raw.asr,
+        Sunset  : raw.sunset,
+        Maghrib : raw.maghrib,
+        Isha    : raw.isha,
+        Imsak   : raw.imsak,
+        Midnight: raw.midnight,
+    };
+
+    return Promise.resolve(timings);
+}
+
 function _ptFetchTimings(lat, lng) {
     const today = new Date().toISOString().slice(0, 10);
+    const rLat  = _ptRoundCoord(lat);
+    const rLng  = _ptRoundCoord(lng);
+
+    // Cek cache — masih valid jika tanggal dan koordinat sama
     try {
         const cached = JSON.parse(localStorage.getItem(PT_CACHE_KEY));
-        if (cached && cached.date === today && cached.lat === lat && cached.lng === lng)
+        if (cached && cached.date === today
+            && _ptRoundCoord(cached.lat) === rLat
+            && _ptRoundCoord(cached.lng) === rLng)
             return Promise.resolve(cached.timings);
     } catch(e) {}
 
-    return fetch(`${PT_API}?latitude=${lat}&longitude=${lng}&method=${PT_METHOD}`)
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(json => {
-            const timings = json.data.timings;
-            localStorage.setItem(PT_CACHE_KEY, JSON.stringify({ date: today, lat, lng, timings }));
-            if (typeof trackApiCall === 'function') trackApiCall('prayer_time');
-            return timings;
-        });
+    // Kalkulasi lokal — tidak ada network request
+    return _ptCalcTimings(lat, lng).then(timings => {
+        localStorage.setItem(PT_CACHE_KEY, JSON.stringify({ date: today, lat: rLat, lng: rLng, timings }));
+        return timings;
+    });
 }
 
 /* ══════════════════════════════════════════

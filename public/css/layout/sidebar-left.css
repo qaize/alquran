@@ -160,6 +160,11 @@
     max-height: 200px;
 }
 
+/* Ibadah Harian group body */
+.nav-ibadah-body.open {
+    max-height: 200px;
+}
+
 /* Sub-items indented inside konten group */
 .nav-sub-item {
     padding-left: 28px !important;

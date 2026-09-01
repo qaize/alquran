@@ -22,9 +22,9 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initSaveLastReadSlide(); } catch(e) { console.error('initSaveLastReadSlide error:', e); }
     try { initBookmarks(); } catch(e) { console.error('initBookmarks error:', e); }
     try { initFavoritesNav(); } catch(e) { console.error('initFavoritesNav error:', e); }
+    try { initKontenGroup(); } catch(e) { console.error('initKontenGroup error:', e); }
     try { initMobileDrawer(); } catch(e) { console.error('initMobileDrawer error:', e); }
     try { initJuz(); } catch(e) { console.error('initJuz error:', e); }
-    try { initKontenGroup(); } catch(e) { console.error('initKontenGroup error:', e); }
     try { initDataSourceModal(); } catch(e) { console.error('initDataSourceModal error:', e); }
     try { initTajwidGuide(); } catch(e) { console.error('initTajwidGuide error:', e); }
     try { initSidebarRightCollapse(); } catch(e) { console.error('initSidebarRightCollapse error:', e); }
@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initJanjiAllah();     } catch(e) { console.error('initJanjiAllah error:', e); }
     try { initHadist();         } catch(e) { console.error('initHadist error:', e); }
     try { initPrayerTime();    } catch(e) { console.error('initPrayerTime error:', e); }
+    try { initIbadahGroup();   } catch(e) { console.error('initIbadahGroup error:', e); }
+    try { initDzikir();        } catch(e) { console.error('initDzikir error:', e); }
     try { initPwa();           } catch(e) { console.error('initPwa error:', e); }
 });
 
