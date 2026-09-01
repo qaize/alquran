@@ -1,0 +1,172 @@
+/**
+ * =============================================================================
+ * QURAN FONT STYLESHEET
+ * =============================================================================
+ * CSS untuk tampilan teks ayat Al-Quran dengan font Mushaf yang benar.
+ * 
+ * PENTING:
+ * 1. Pastikan teks ayat menggunakan versi "Uthmani" (bukan Imla'i) agar
+ *    cocok dengan font Mushaf seperti LPMQ Isep Misbah atau KFGQPC.
+ * 2. Halaman HTML harus ber-encoding UTF-8:
+ *    <meta charset="UTF-8">
+ * =============================================================================
+ */
+
+/* =============================================================================
+   @FONT-FACE DECLARATIONS
+   =============================================================================
+   Struktur folder font yang diharapkan:
+   /public/fonts/
+   ├── lpmq-isep-misbah.woff2
+   ├── lpmq-isep-misbah.ttf
+   ├── kfgqpc-uthmanic-hafs.woff2
+   └── kfgqpc-uthmanic-hafs.ttf
+   ============================================================================= */
+
+/* Font Utama: LPMQ Isep Misbah (Font Resmi Mushaf Kemenag RI) */
+@font-face {
+    font-family: 'LPMQ Isep Misbah';
+    src: url('../fonts/lpmq-isep-misbah.woff2') format('woff2'),
+         url('../fonts/lpmq-isep-misbah.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Fallback 1: LPMQ (versi lain dari Kemenag) */
+@font-face {
+    font-family: 'LPMQ';
+    src: url('../fonts/lpmq.woff2') format('woff2'),
+         url('../fonts/lpmq.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Fallback 2: KFGQPC Uthmanic Script HAFS (Font King Fahd Complex) */
+@font-face {
+    font-family: 'KFGQPC Uthmanic Script HAFS';
+    src: url('../fonts/kfgqpc-uthmanic-hafs.woff2') format('woff2'),
+         url('../fonts/kfgqpc-uthmanic-hafs.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Fallback 3: Amiri Quran (Google Fonts / self-host) */
+@font-face {
+    font-family: 'Amiri Quran';
+    src: url('../fonts/amiri-quran.woff2') format('woff2'),
+         url('../fonts/amiri-quran.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Fallback 4: Scheherazade New (SIL International) */
+@font-face {
+    font-family: 'Scheherazade New';
+    src: url('../fonts/scheherazade-new.woff2') format('woff2'),
+         url('../fonts/scheherazade-new.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* =============================================================================
+   QURAN TEXT STYLING
+   ============================================================================= */
+
+.quran-text {
+    /* Font Stack dengan fallback berurutan */
+    font-family: 
+        'LPMQ Isep Misbah',
+        'LPMQ',
+        'KFGQPC Uthmanic Script HAFS',
+        'Amiri Quran',
+        'Scheherazade New',
+        serif;
+    
+    /* Arah teks Arab: kanan ke kiri */
+    direction: rtl;
+    text-align: right;
+    
+    /* Font size responsif dengan clamp() */
+    /* Mobile: 1.75rem | Fluid: 4vw | Desktop max: 2.5rem */
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    
+    /* Font weight - gunakan normal/lighter untuk tampilan lebih ringan */
+    font-weight: normal;
+    
+    /* Line height tinggi agar harakat tidak terpotong */
+    line-height: 2.6;
+    
+    /* Spacing antar kata dan huruf */
+    word-spacing: 0.15em;
+    letter-spacing: 0.02em;
+    
+    /* Hindari text-transform yang merusak glyph Arab */
+    text-transform: none;
+    
+    /* Rendering optimal untuk teks Arab - subpixel-antialiased membuat lebih tipis */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    
+    /* Feature settings untuk OpenType (jika didukung font) */
+    font-feature-settings: "kern" 1, "liga" 1;
+    
+    /* Warna teks (sesuaikan dengan desain) */
+    color: #1a1a1a;
+    
+    /* Padding untuk breathing room */
+    padding: 0.5em 0;
+    
+    /* Prevent unwanted word breaks */
+    word-break: keep-all;
+    overflow-wrap: normal;
+}
+
+/* =============================================================================
+   RESPONSIVE ADJUSTMENTS (OPSIONAL)
+   =============================================================================
+   clamp() sudah menangani responsif, tapi ini untuk fine-tuning jika perlu
+   ============================================================================= */
+
+@media screen and (max-width: 480px) {
+    .quran-text {
+        /* Sedikit kurangi line-height di mobile untuk hemat ruang vertikal */
+        line-height: 2.4;
+        
+        /* Kurangi word-spacing sedikit di layar kecil */
+        word-spacing: 0.1em;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .quran-text {
+        /* Line-height lebih lega di desktop besar */
+        line-height: 2.8;
+    }
+}
+
+/* =============================================================================
+   UTILITY CLASSES (OPSIONAL)
+   ============================================================================= */
+
+/* Ukuran teks lebih kecil (untuk tampilan list surah) */
+.quran-text--sm {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    line-height: 2.2;
+}
+
+/* Ukuran teks lebih besar (untuk tampilan fokus/baca) */
+.quran-text--lg {
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 2.8;
+}
+
+/* Warna mode gelap */
+.quran-text--dark {
+    color: #e8e8e8;
+}

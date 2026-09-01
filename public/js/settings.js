@@ -194,6 +194,8 @@ const I18N = {
         nav_konten_islam:     'Konten Islam',
         nav_janji_allah:      'Janji Allah',
         nav_hadist:           'Hadits',
+        nav_ibadah_harian:    'Ibadah Harian',
+        nav_dzikir:           'Dzikir & Doa',
         // Bookmark panel tabs
         bm_tab_ayat:          'Ayat',
         bm_tab_hadist:        'Hadits',
@@ -418,6 +420,8 @@ const I18N = {
         nav_konten_islam:     'Islamic Content',
         nav_janji_allah:      "Allah's Promises",
         nav_hadist:           'Hadith',
+        nav_ibadah_harian:    'Daily Worship',
+        nav_dzikir:           'Dhikr & Duas',
         // Bookmark panel tabs
         bm_tab_ayat:          'Verses',
         bm_tab_hadist:        'Hadith',
@@ -640,7 +644,7 @@ const SETTINGS_DEFAULT = {
     transFontSize: 13,
     bgColor: '#ffffff',
     bgName: 'Putih',
-    arabFont: 'Al Qalam Quran Majeed',
+    arabFont: 'LPMQ Isep Misbah',
     qori: '05',
     darkMode: false,
     showTranslation: true,
@@ -663,6 +667,7 @@ function getSettings() {
         if (typeof merged.arabFont        !== 'string')  merged.arabFont        = SETTINGS_DEFAULT.arabFont;
         // Reset ke default jika font sudah tidak tersedia
         const VALID_FONTS = [
+            'LPMQ Isep Misbah',
             'KFGQPC Hafs Uthmanic',
             'Amiri Quran', 'Scheherazade',
             'Noto Naskh Arabic',
@@ -699,7 +704,7 @@ function applySettings(s) {
 
     // Font Arab
     if (s.arabFont) {
-        root.style.setProperty('--arabic-font-family', "'" + s.arabFont + "', 'Al Qalam Quran Majeed', 'KFGQPC Hafs Uthmanic', 'Amiri Quran', 'Amiri', serif");
+        root.style.setProperty('--arabic-font-family', "'" + s.arabFont + "', 'LPMQ Isep Misbah', 'KFGQPC Hafs Uthmanic', 'Amiri Quran', 'Amiri', serif");
     }
 
     // Background & warna teks — pakai CSS variable di :root

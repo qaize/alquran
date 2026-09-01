@@ -34,9 +34,24 @@
           <i class="fa-solid fa-graduation-cap nav-icon"></i>
           <span data-i18n="nav_tajwid_guide">Panduan Tajwid</span>
         </a>
+      </div>
+    </div>
+
+    {{-- Ibadah Harian: expandable group --}}
+    <div class="nav-dropdown" id="nav-ibadah-dropdown">
+      <button class="nav-item nav-dropdown-trigger" id="nav-ibadah-btn">
+        <i class="fa-solid fa-hands-praying nav-icon"></i>
+        <span data-i18n="nav_ibadah_harian">Ibadah Harian</span>
+        <i class="fa-solid fa-chevron-down nav-dropdown-arrow" id="nav-ibadah-arrow"></i>
+      </button>
+      <div class="nav-dropdown-body nav-ibadah-body" id="nav-ibadah-body">
         <a href="#" class="nav-item nav-sub-item" id="nav-prayer-time-btn">
           <i class="fa-solid fa-clock nav-icon"></i>
           <span data-i18n="nav_prayer_time">Waktu Shalat</span>
+        </a>
+        <a href="#" class="nav-item nav-sub-item" id="nav-dzikir-btn">
+          <i class="fa-solid fa-hands nav-icon"></i>
+          <span data-i18n="nav_dzikir">Dzikir &amp; Doa</span>
         </a>
       </div>
     </div>

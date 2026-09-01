@@ -1,0 +1,402 @@
+/* ══════════════════════════════════════════════
+   DZIKIR & DOA HARIAN — Modal Panel
+   Pola CSS sama persis dengan hadist.css
+   ══════════════════════════════════════════════ */
+
+/* ── Overlay ── */
+.dzikir-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 33, 55, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 5500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.dzikir-panel-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ── Panel container ── */
+.dzikir-panel {
+    width: min(680px, 96vw);
+    max-height: 92vh;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(13, 33, 55, 0.35);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dzikir-panel-overlay.open .dzikir-panel {
+    transform: translateY(0) scale(1);
+}
+
+/* ── Header ── */
+.dzikir-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 14px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    border-bottom: 2px solid var(--gold);
+    flex-shrink: 0;
+}
+
+.dzikir-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dzikir-panel-title > i {
+    font-size: 20px;
+    color: var(--gold);
+}
+
+.dzikir-panel-title h2 {
+    font-size: 16px;
+    color: var(--white);
+    font-weight: 700;
+    margin: 0;
+}
+
+.dzikir-panel-title p {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 2px 0 0;
+}
+
+.dzikir-panel-close {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    flex-shrink: 0;
+}
+
+.dzikir-panel-close:hover {
+    background: rgba(201, 168, 76, 0.2);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+/* ── Category bar (seperti kitab bar di hadist) ── */
+.dzikir-kat-bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    overflow-x: auto;
+    background: var(--navy);
+    border-bottom: 1px solid rgba(201, 168, 76, 0.25);
+    flex-shrink: 0;
+    scrollbar-width: none;
+}
+
+.dzikir-kat-bar::-webkit-scrollbar { display: none; }
+
+.dzikir-kat-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.dzikir-kat-btn i { font-size: 11px; }
+
+.dzikir-kat-btn:hover {
+    border-color: var(--gold-light);
+    color: var(--gold-light);
+    background: rgba(201, 168, 76, 0.12);
+}
+
+.dzikir-kat-btn.active {
+    background: var(--dz-color, var(--gold));
+    border-color: var(--dz-color, var(--gold));
+    color: var(--white);
+    font-weight: 700;
+}
+
+/* ── Body — scrollable ── */
+.dzikir-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dzikir-panel-body::-webkit-scrollbar { width: 6px; }
+.dzikir-panel-body::-webkit-scrollbar-thumb {
+    background: var(--gold-light);
+    border-radius: 6px;
+}
+
+/* ── Loading ── */
+.dzikir-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+    font-size: 22px;
+}
+
+.dzikir-loading i { color: var(--gold); opacity: 0.5; }
+
+/* ── Dzikir item card ── */
+.dzikir-item {
+    background: var(--blue-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px 14px;
+    transition: border-color var(--transition), opacity var(--transition), background var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.dzikir-item.dzikir-item-done {
+    opacity: 0.5;
+    border-color: #4caf50;
+    background: rgba(76, 175, 80, 0.04);
+    box-shadow: none;
+}
+
+/* Arabic text */
+.dzikir-item-arab {
+    font-family: var(--arabic-font-family, 'LPMQ Isep Misbah', 'Amiri Quran', serif);
+    font-size: 26px;
+    line-height: 2;
+    text-align: right;
+    color: var(--navy);
+    margin-bottom: 10px;
+}
+
+/* Latin */
+.dzikir-item-latin {
+    font-size: 12.5px;
+    font-style: italic;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+
+/* Translation */
+.dzikir-item-arti {
+    font-size: 13.5px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    margin-bottom: 8px;
+}
+
+/* Faedah / benefit note */
+.dzikir-item-faedah {
+    font-size: 12px;
+    color: var(--navy-mid);
+    background: var(--gold-pale);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.dzikir-item-faedah i {
+    margin-right: 4px;
+    font-size: 10px;
+    color: var(--gold);
+}
+
+/* Footer row */
+.dzikir-item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+}
+
+.dzikir-item-sumber {
+    font-size: 11px;
+    color: var(--text-light);
+    font-style: italic;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Counter wrap */
+.dzikir-counter-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.dzikir-counter-lbl {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    min-width: 44px;
+    text-align: right;
+}
+
+/* Counter / check button */
+.dzikir-counter-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--navy-mid);
+    background: transparent;
+    color: var(--navy-mid);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.dzikir-counter-btn:hover {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+    transform: scale(1.08);
+}
+
+.dzikir-counter-btn:active {
+    transform: scale(0.9);
+}
+
+.dzikir-counter-btn.done {
+    border-color: #4caf50;
+    color: #4caf50;
+}
+
+.dzikir-counter-btn.done:hover {
+    background: #4caf50;
+    color: var(--white);
+    border-color: #4caf50;
+}
+
+/* ── Dark mode ── */
+.theme-dark .dzikir-panel {
+    background: var(--navy-mid);
+}
+
+.theme-dark .dzikir-item {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--dark-border);
+    box-shadow: none;
+}
+
+.theme-dark .dzikir-item.dzikir-item-done {
+    background: rgba(76, 175, 80, 0.07);
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.theme-dark .dzikir-item-arab {
+    color: var(--gold-light);
+}
+
+.theme-dark .dzikir-item-latin {
+    color: var(--dark-text-dim);
+}
+
+.theme-dark .dzikir-item-arti {
+    color: var(--dark-text-mid);
+}
+
+.theme-dark .dzikir-item-faedah {
+    background: rgba(201, 168, 76, 0.1);
+    border-color: var(--gold);
+    color: var(--gold-light);
+}
+
+.theme-dark .dzikir-item-faedah i {
+    color: var(--gold-light);
+}
+
+.theme-dark .dzikir-item-footer {
+    border-color: var(--dark-border);
+}
+
+.theme-dark .dzikir-item-sumber {
+    color: var(--dark-text-dim);
+}
+
+.theme-dark .dzikir-counter-lbl {
+    color: var(--gold);
+}
+
+.theme-dark .dzikir-counter-btn {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.theme-dark .dzikir-counter-btn:hover {
+    background: var(--gold);
+    color: var(--navy);
+    border-color: var(--gold);
+}
+
+.theme-dark .dzikir-counter-btn.done {
+    border-color: #66bb6a;
+    color: #66bb6a;
+}
+
+.theme-dark .dzikir-counter-btn.done:hover {
+    background: #66bb6a;
+    color: var(--white);
+}
+
+/* ── Mobile (sama persis pola hadist) ── */
+@media (max-width: 768px) {
+    .dzikir-panel {
+        width: 100vw;
+        max-height: 95vh;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .dzikir-panel-overlay {
+        align-items: flex-end;
+    }
+
+    .dzikir-item-arab {
+        font-size: 22px;
+    }
+}

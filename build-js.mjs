@@ -31,7 +31,9 @@ const JS_FILES = [
     'backup.js',
     'janji-allah.js',
     'hadist.js',
+    'praytimes.js',
     'prayer-time.js',
+    'dzikir.js',
     'pwa.js',
 ];
 

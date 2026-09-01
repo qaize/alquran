@@ -160,6 +160,9 @@
               <span data-i18n="settings_arab_font">Jenis Font Arab</span>
             </label>
             <select id="arab-font-select" class="settings-select">
+              <optgroup label="── Mushaf Indonesia (Kemenag RI) ──">
+                <option value="LPMQ Isep Misbah">⭐ LPMQ Isep Misbah (Default)</option>
+              </optgroup>
               <optgroup label="── Mushaf Uthmani ──">
                 <option value="KFGQPC Hafs Uthmanic">KFGQPC Uthmanic</option>
               </optgroup>
@@ -170,9 +173,9 @@
               <optgroup label="── Naskh Modern ──">
                 <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
               </optgroup>
-              <optgroup label="── Mushaf Indonesia / Pakistan ──">
+              <optgroup label="── Mushaf Pakistan ──">
                 <option value="Al Mushaf">Al Mushaf (Alvi)</option>
-                <option value="Al Qalam Quran Majeed">⭐ Al Qalam Quran Majeed (Default)</option>
+                <option value="Al Qalam Quran Majeed">Al Qalam Quran Majeed</option>
                 <option value="Al Qalam Quran Majeed 2">Al Qalam Quran Majeed 2</option>
                 <option value="Noorehuda">Noorehuda</option>
               </optgroup>

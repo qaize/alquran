@@ -57,6 +57,7 @@
 @import url('panels/janji-allah.css');
 @import url('panels/hadist.css');
 @import url('panels/prayer-time.css');
+@import url('panels/dzikir.css');
 
 /* ── RESPONSIVE ── */
 @import url('responsive.css');
