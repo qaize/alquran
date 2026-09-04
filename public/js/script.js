@@ -589,13 +589,30 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                 const prevNomor = suratSebelumnya
                     ? suratSebelumnya.nomor
                     : nomorSurah - 1;
-                loadSurahDetails(prevNomor);
+                const track = document.getElementById('surah-track');
+                if (track && !track._swipeLocked) {
+                    const pw = track.parentElement.offsetWidth;
+                    track._swipeLocked = true;
+                    track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    track.style.transform  = `translateX(${-pw * 2}px)`;
+                    track.addEventListener('transitionend', () => loadSurahDetails(prevNomor), { once: true });
+                } else {
+                    loadSurahDetails(prevNomor);
+                }
             });
             nextSurah.addEventListener("click", () => {
                 const nextNomor = suratSelanjutnya
                     ? suratSelanjutnya.nomor
                     : nomorSurah + 1;
-                loadSurahDetails(nextNomor);
+                const track = document.getElementById('surah-track');
+                if (track && !track._swipeLocked) {
+                    track._swipeLocked = true;
+                    track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    track.style.transform  = `translateX(0px)`;
+                    track.addEventListener('transitionend', () => loadSurahDetails(nextNomor), { once: true });
+                } else {
+                    loadSurahDetails(nextNomor);
+                }
             });
 
             mainBody.innerHTML = "";
@@ -703,116 +720,177 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                 if (detailSurahEl)
                     detailSurahEl.classList.add("fullwidth-mode");
 
-                // ── Swipe kiri/kanan → prev/next surah (mobile) ──
+                // ── Swipe gallery 3-panel — arah mushaf (next kiri, prev kanan) ──
+                // Layout track: [next | current | prev]
+                // Track start: translateX(-100vw) → current terlihat
+                // Swipe kanan (dx>0) → next (translateX 0)
+                // Swipe kiri  (dx<0) → prev (translateX -200vw)
+
+                // Bungkus mainBody jadi clipper jika belum
+                if (!mainBody.classList.contains('surah-swipe-clipper')) {
+                    mainBody.classList.add('surah-swipe-clipper');
+                }
+
+                // Buat track 3-panel
+                const _track = document.createElement('div');
+                _track.id = 'surah-track';
+                _track.className = 'surah-swipe-track';
+
+                // Panel next — di KIRI (index 0)
+                const _panelNext = document.createElement('div');
+                _panelNext.className = 'surah-panel surah-panel-next';
+
+                // Panel current — di TENGAH (index 1)
+                const _panelCurrent = document.createElement('div');
+                _panelCurrent.className = 'surah-panel surah-panel-current';
+
+                // Panel prev — di KANAN (index 2)
+                const _panelPrev = document.createElement('div');
+                _panelPrev.className = 'surah-panel surah-panel-prev';
+
+                // Pindahkan konten yang sudah ada dari mainBody ke panel current
+                while (mainBody.firstChild) {
+                    _panelCurrent.appendChild(mainBody.firstChild);
+                }
+
+                _track.appendChild(_panelNext);
+                _track.appendChild(_panelCurrent);
+                _track.appendChild(_panelPrev);
+                mainBody.appendChild(_track);
+
+                // Gunakan lebar mainBody (bukan vw) agar tidak kepotong di desktop
+                const _PW = mainBody.offsetWidth;
+                _track.style.width   = `${_PW * 3}px`;
+                _panelNext.style.width    = `${_PW}px`;
+                _panelCurrent.style.width = `${_PW}px`;
+                _panelPrev.style.width    = `${_PW}px`;
+
+                // Prefetch dan render panel next/prev di background
+                const _nextNomor = data.suratSelanjutnya ? data.suratSelanjutnya.nomor : null;
+                const _prevNomor = data.suratSebelumnya ? data.suratSebelumnya.nomor : null;
+
+                if (_nextNomor) {
+                    fetchDetailInformasiSurah(_nextNomor).then(nextData => {
+                        return componentDetailSurah(nextData).then(nextEl => {
+                            const nextAyat = nextEl.querySelector('.ayat');
+                            if (nextAyat) nextAyat.classList.add('ayat-fullwidth');
+                            const nextDetailEl = nextEl.querySelector('.detailSurah') || nextEl;
+                            if (nextDetailEl.classList) nextDetailEl.classList.add('fullwidth-mode');
+                            _panelNext.appendChild(nextEl);
+                        });
+                    }).catch(() => {});
+                }
+
+                if (_prevNomor) {
+                    fetchDetailInformasiSurah(_prevNomor).then(prevData => {
+                        return componentDetailSurah(prevData).then(prevEl => {
+                            const prevAyat = prevEl.querySelector('.ayat');
+                            if (prevAyat) prevAyat.classList.add('ayat-fullwidth');
+                            const prevDetailEl = prevEl.querySelector('.detailSurah') || prevEl;
+                            if (prevDetailEl.classList) prevDetailEl.classList.add('fullwidth-mode');
+                            _panelPrev.appendChild(prevEl);
+                        });
+                    }).catch(() => {});
+                }
+
+                // Swipe state
                 let _swipeStartX = null;
                 let _swipeStartY = null;
                 let _swipeActive = false;
+                let _swipeLocked = false;
+                // Posisi awal: panel current di tengah
+                _track.style.transform = `translateX(${-_PW}px)`;
 
-                // Buat indikator swipe
-                const _swipeIndicator = document.createElement('div');
-                _swipeIndicator.className = 'swipe-indicator';
-                _swipeIndicator.innerHTML = `
-                    <span class="swipe-ind-prev"><i class="fa-solid fa-chevron-left"></i> ${data.suratSebelumnya ? data.suratSebelumnya.namaLatin : ''}</span>
-                    <span class="swipe-ind-next">${data.suratSelanjutnya ? data.suratSelanjutnya.namaLatin : ''} <i class="fa-solid fa-chevron-right"></i></span>
-                `;
-                ayatContainer.appendChild(_swipeIndicator);
+                // ── Hint animasi: peek ke kanan (arah next) dua kali ──
+                // Tampil sekali per sesi (reset saat hard refresh / tutup browser)
+                const _HINT_KEY = 'quran_swipe_hint_shown';
+                if (!sessionStorage.getItem(_HINT_KEY) && (_nextNomor || _prevNomor)) {
+                    sessionStorage.setItem(_HINT_KEY, '1');
+                    const _dir = _nextNomor ? 1 : -1;
+                    const _peekPx = Math.round(_PW * 0.12);
+                    const _ease = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
-                ayatContainer.addEventListener('touchstart', (e) => {
+                    const _doPeek = (delay) => setTimeout(() => {
+                        if (_swipeLocked) return;
+                        _track.style.transition = `transform 0.32s ${_ease}`;
+                        _track.style.transform  = `translateX(${-_PW + _dir * _peekPx}px)`;
+                        setTimeout(() => {
+                            if (_swipeLocked) return;
+                            _track.style.transition = `transform 0.4s ${_ease}`;
+                            _track.style.transform  = `translateX(${-_PW}px)`;
+                        }, 380);
+                    }, delay);
+
+                    _doPeek(900);
+                    _doPeek(1700);
+                }
+
+                _track.addEventListener('touchstart', (e) => {
+                    if (_swipeLocked) return;
                     _swipeStartX = e.touches[0].clientX;
                     _swipeStartY = e.touches[0].clientY;
                     _swipeActive = false;
+                    _track.style.transition = 'none';
                 }, { passive: true });
 
-                ayatContainer.addEventListener('touchmove', (e) => {
-                    if (_swipeStartX === null) return;
+                _track.addEventListener('touchmove', (e) => {
+                    if (_swipeLocked || _swipeStartX === null) return;
                     const dx = e.touches[0].clientX - _swipeStartX;
                     const dy = e.touches[0].clientY - _swipeStartY;
 
-                    // Hanya aktifkan swipe horizontal
-                    if (!_swipeActive && Math.abs(dx) < 10) return;
-                    if (!_swipeActive && Math.abs(dy) > Math.abs(dx)) return;
-                    _swipeActive = true;
-
-                    // Clamp drag max 80px
-                    const clamp = Math.max(-80, Math.min(80, dx));
-                    const progress = Math.abs(clamp) / 80; // 0–1
-
-                    // Geser + miring sedikit
-                    ayatContainer.style.transform = `translateX(${clamp * 0.35}px)`;
-                    ayatContainer.style.transition = 'none';
-
-                    // Tampilkan indikator sesuai arah
-                    if (dx < -20 && data.suratSelanjutnya) {
-                        _swipeIndicator.className = 'swipe-indicator show-next';
-                        _swipeIndicator.style.opacity = Math.min(progress * 1.5, 0.9);
-                    } else if (dx > 20 && data.suratSebelumnya) {
-                        _swipeIndicator.className = 'swipe-indicator show-prev';
-                        _swipeIndicator.style.opacity = Math.min(progress * 1.5, 0.9);
-                    } else {
-                        _swipeIndicator.className = 'swipe-indicator';
-                        _swipeIndicator.style.opacity = 0;
+                    if (!_swipeActive) {
+                        if (Math.abs(dx) < 8) return;
+                        if (Math.abs(dy) > Math.abs(dx)) {
+                            _swipeStartX = null;
+                            return;
+                        }
+                        _swipeActive = true;
                     }
+
+                    if (dx > 0 && !_nextNomor) return;
+                    if (dx < 0 && !_prevNomor) return;
+
+                    _track.style.transform = `translateX(${-_PW + dx}px)`;
                 }, { passive: true });
 
-                ayatContainer.addEventListener('touchend', (e) => {
-                    // Reset transform
-                    ayatContainer.style.transform = '';
-                    ayatContainer.style.transition = '';
-                    _swipeIndicator.className = 'swipe-indicator';
-                    _swipeIndicator.style.opacity = 0;
+                const _snapBack = () => {
+                    _track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    _track.style.transform  = `translateX(${-_PW}px)`;
+                };
 
-                    if (_swipeStartX === null) return;
+                _track.addEventListener('touchend', (e) => {
+                    if (_swipeLocked || _swipeStartX === null) return;
+                    if (!_swipeActive) { _swipeStartX = null; return; }
+
                     const dx = e.changedTouches[0].clientX - _swipeStartX;
                     const dy = e.changedTouches[0].clientY - _swipeStartY;
                     _swipeStartX = null;
-                    _swipeStartY = null;
 
-                    // Hanya proses jika horizontal > vertikal & jarak cukup (>60px)
-                    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+                    const threshold = _PW * 0.35;
+                    const shouldSwipe = Math.abs(dx) > threshold && Math.abs(dx) > Math.abs(dy) * 1.2;
 
-                    const container = document.querySelector('#main-body');
-
-                    if (dx < 0 && data.suratSelanjutnya && nomorSurah < 114) {
-                        if (container) container.classList.add('surah-slide-out-left');
-                        setTimeout(() => {
-                            if (typeof showToast === 'function') {
-                                showToast({ type: 'info', icon: 'fa-chevron-right', message: data.suratSelanjutnya.namaLatin, duration: 1500 });
-                            }
-                            loadSurahDetails(data.suratSelanjutnya.nomor);
-                            setTimeout(() => {
-                                const newContainer = document.querySelector('#main-body');
-                                if (newContainer) {
-                                    newContainer.classList.remove('surah-slide-out-left');
-                                    newContainer.classList.add('surah-slide-in-right');
-                                    setTimeout(() => newContainer.classList.remove('surah-slide-in-right'), 250);
-                                }
-                            }, 100);
-                        }, 180);
-                    } else if (dx > 0 && data.suratSebelumnya && nomorSurah > 1) {
-                        if (container) container.classList.add('surah-slide-out-right');
-                        setTimeout(() => {
-                            if (typeof showToast === 'function') {
-                                showToast({ type: 'info', icon: 'fa-chevron-left', message: data.suratSebelumnya.namaLatin, duration: 1500 });
-                            }
-                            loadSurahDetails(data.suratSebelumnya.nomor);
-                            setTimeout(() => {
-                                const newContainer = document.querySelector('#main-body');
-                                if (newContainer) {
-                                    newContainer.classList.remove('surah-slide-out-right');
-                                    newContainer.classList.add('surah-slide-in-left');
-                                    setTimeout(() => newContainer.classList.remove('surah-slide-in-left'), 250);
-                                }
-                            }, 100);
-                        }, 180);
+                    if (shouldSwipe && dx > 0 && _nextNomor) {
+                        _swipeLocked = true;
+                        _track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                        _track.style.transform  = `translateX(0px)`;
+                        _track.addEventListener('transitionend', () => {
+                            loadSurahDetails(_nextNomor);
+                        }, { once: true });
+                    } else if (shouldSwipe && dx < 0 && _prevNomor) {
+                        _swipeLocked = true;
+                        _track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                        _track.style.transform  = `translateX(${-_PW * 2}px)`;
+                        _track.addEventListener('transitionend', () => {
+                            loadSurahDetails(_prevNomor);
+                        }, { once: true });
+                    } else {
+                        _snapBack();
                     }
                 }, { passive: true });
 
-                ayatContainer.addEventListener('touchcancel', () => {
-                    ayatContainer.style.transform = '';
-                    ayatContainer.style.transition = '';
-                    _swipeIndicator.className = 'swipe-indicator';
-                    _swipeIndicator.style.opacity = 0;
+                _track.addEventListener('touchcancel', () => {
                     _swipeStartX = null;
+                    _snapBack();
                 }, { passive: true });
 
                 let showDetail = false;
@@ -921,12 +999,12 @@ function componentTitleSurah(surah) {
     <div class="title-surah-body" id="title-surah-body">
         <p class="title-surah-arti">${surah.arti}</p>
         <div class="scroll-navigation">
-          <button id="surah-prev"><i class="fa-solid fa-chevron-left"></i> ${__("prev_surah", "Sebelumnya")}</button>
+          <button id="surah-next"><i class="fa-solid fa-chevron-left"></i> ${__("next_surah", "Selanjutnya")}</button>
           <div class="jump-group">
             <label for="scroll-input">${__("jump_to_ayat", "Lompat ke:")}</label>
             <input id="scroll-input" maxlength="3" type="number">
           </div>
-          <button id="surah-next">${__("next_surah", "Selanjutnya")} <i class="fa-solid fa-chevron-right"></i></button>
+          <button id="surah-prev">${__("prev_surah", "Sebelumnya")} <i class="fa-solid fa-chevron-right"></i></button>
         </div>
         <div class="surah-trans-toggle-wrap">
           <button id="surah-trans-toggle" class="surah-trans-btn ${window.__showTranslation !== false ? 'active' : ''}">
