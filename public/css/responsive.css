@@ -1,25 +1,34 @@
-/* ── Swipe surah transition animations ── */
-@keyframes slideOutLeft {
-    from { transform: translateX(0);     opacity: 1; }
-    to   { transform: translateX(-60px); opacity: 0; }
-}
-@keyframes slideOutRight {
-    from { transform: translateX(0);    opacity: 1; }
-    to   { transform: translateX(60px); opacity: 0; }
-}
-@keyframes slideInRight {
-    from { transform: translateX(60px); opacity: 0; }
-    to   { transform: translateX(0);    opacity: 1; }
-}
-@keyframes slideInLeft {
-    from { transform: translateX(-60px); opacity: 0; }
-    to   { transform: translateX(0);     opacity: 1; }
+/* ── Swipe gallery 3-panel ── */
+
+/* Clipper: main-body jadi overflow:hidden saat mode swipe */
+#main-body.surah-swipe-clipper {
+    overflow-x: hidden;
+    position: relative;
 }
 
-.surah-slide-out-left  { animation: slideOutLeft  0.2s ease forwards; }
-.surah-slide-out-right { animation: slideOutRight 0.2s ease forwards; }
-.surah-slide-in-right  { animation: slideInRight  0.22s ease forwards; }
-.surah-slide-in-left   { animation: slideInLeft   0.22s ease forwards; }
+/* Track: 3 panel berjajar horizontal */
+.surah-swipe-track {
+    display: flex;
+    /* Lebar diset via JS agar tepat 3× lebar parent */
+    will-change: transform;
+    touch-action: pan-y;
+    /* Pastikan tidak wrap */
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+/* Tiap panel mengikuti lebar yang diset JS */
+.surah-panel {
+    flex-shrink: 0;
+    overflow: hidden;
+    /* width diset via JS: mainBody.offsetWidth */
+}
+
+/* Panel prev/next tidak bisa diinteraksi */
+.surah-panel-prev,
+.surah-panel-next {
+    pointer-events: none;
+}
 
 /* ── Swipe indicator — muncul saat drag ── */
 .swipe-indicator {
