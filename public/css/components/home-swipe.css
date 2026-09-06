@@ -1,0 +1,175 @@
+/* ── HOME 2-PANEL SWIPE ── */
+
+/* Tab indicator */
+.home-tabs {
+    display: flex;
+    gap: 0;
+    margin: 0 12px 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    overflow: hidden;
+    border: 1px solid rgba(201, 168, 76, 0.25);
+    border-bottom: none;
+    background: var(--navy);
+}
+
+.home-tab {
+    flex: 1;
+    padding: 10px 0;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: color 0.2s ease, background 0.2s ease;
+    position: relative;
+}
+
+.home-tab i {
+    font-size: 12px;
+}
+
+.home-tab.active {
+    color: var(--gold-light);
+    background: rgba(201, 168, 76, 0.1);
+}
+
+/* Underline aktif */
+.home-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px 2px 0 0;
+}
+
+/* Track: 2 panel berjajar */
+.home-track {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    /* width dan transform diset via JS */
+    will-change: transform;
+    touch-action: pan-y;
+}
+
+/* Tiap panel */
+.home-panel {
+    flex-shrink: 0;
+    /* width diset via JS */
+}
+
+/* ── JUZ HOME LIST ── */
+.juz-home-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 12px 32px;
+}
+
+/* Kartu juz di beranda */
+.juz-home-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 2px 8px rgba(201, 168, 76, 0.06);
+    position: relative;
+    overflow: hidden;
+}
+
+.juz-home-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--gold), var(--gold-light), var(--navy-light));
+    border-radius: 4px 0 0 4px;
+}
+
+.juz-home-card:active {
+    transform: scale(0.98);
+    box-shadow: none;
+}
+
+/* Nomor juz — hexagon style mirip urutan-ayat */
+.jhc-number {
+    width: 46px;
+    height: 46px;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 60%, #b8943c 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.jhc-label {
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1px;
+}
+
+.jhc-val {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+}
+
+/* Info surah */
+.jhc-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.jhc-surah {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jhc-ayat {
+    font-size: 11.5px;
+    color: var(--text-light);
+}
+
+/* Arrow */
+.jhc-arrow {
+    font-size: 11px;
+    color: var(--gold);
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+/* Dark mode */
+.theme-dark .juz-home-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%);
+    border-color: rgba(201,168,76,0.2);
+}
+.theme-dark .jhc-surah { color: rgba(255,255,248,0.9); }
+.theme-dark .jhc-ayat  { color: rgba(255,255,255,0.45); }

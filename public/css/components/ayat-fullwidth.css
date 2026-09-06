@@ -104,6 +104,35 @@
     background: var(--gold-pale);
 }
 
+.theme-dark .ayat.ayat-fullwidth .urutan-ayat {
+    background: transparent;
+    position: relative;
+}
+
+.theme-dark .ayat.ayat-fullwidth .urutan-ayat::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 0;
+}
+
+.theme-dark .ayat.ayat-fullwidth .urutan-ayat::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: var(--dark-bg, #0f1923);
+    z-index: 1;
+}
+
+.theme-dark .ayat.ayat-fullwidth .urutan-ayat span {
+    color: rgba(255, 255, 255, 0.92);
+    position: relative;
+    z-index: 2;
+}
+
 /* Terjemahan dalam fullwidth — rata kiri, full width */
 .ayat.ayat-fullwidth .terjemahan-ayat {
     direction: ltr;

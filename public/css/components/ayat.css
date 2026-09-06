@@ -352,11 +352,34 @@
 }
 
 .theme-dark .ayat .urutan-ayat {
-    background: linear-gradient(160deg, var(--gold-light) 0%, var(--gold) 60%, #b8943c 100%);
+    background: transparent;
+    position: relative;
+}
+
+/* Layer 1 (belakang): hexagon putih sedikit lebih besar → jadi outline */
+.theme-dark .ayat .urutan-ayat::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 0;
+}
+
+/* Layer 2 (depan): hexagon gelap menutupi bagian dalam → fill gelap */
+.theme-dark .ayat .urutan-ayat::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: var(--dark-bg, #0f1923);
+    z-index: 1;
 }
 
 .theme-dark .ayat .urutan-ayat span {
-    color: var(--navy);
+    color: rgba(255, 255, 255, 0.92);
+    position: relative;
+    z-index: 2;
 }
 
 .isi-ayat {
@@ -574,16 +597,27 @@
 .arabic {
     font-family: var(--arabic-font-family, "Al Qalam Quran Majeed", "KFGQPC Hafs Uthmanic", "Amiri Quran", "Amiri", serif);
     font-size: var(--arabic-font-size, 40px);
-    font-weight: normal;
+    font-weight: var(--arabic-font-weight, normal);
     color: var(--navy);
-    line-height: 2.4;
+    line-height: var(--arabic-line-height, 2.4);
     direction: rtl;
     unicode-bidi: embed;
-    word-spacing: 8px;
+    word-spacing: var(--arabic-word-spacing, 8px);
+    text-align: var(--arabic-text-align, right);
     text-rendering: optimizeLegibility;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* Harakat tersembunyi — sembunyikan tanda baca Arab */
+.hide-harakat .arabic [class*="tajweed"],
+.hide-harakat .arabic {
+    /* Filter unicode: harakat adalah U+064B–U+065F, U+0670 */
+}
+/* Cara yang benar: CSS tidak bisa filter unicode range, pakai class di element */
+.hide-harakat .isi-ayat .arabic {
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "haln" 1;
 }
 
 /* Dark navy mode — teks Arab putih */
@@ -648,4 +682,56 @@
 
 .show-hide-terjemahan:hover {
     color: var(--navy);
+}
+
+
+/* ═══════════════════════════════════════════════════
+   MODE BACA — .ayat.read-mode
+   Satu blok teks mengalir seperti paragraf mushaf
+   ═══════════════════════════════════════════════════ */
+
+.ayat.read-mode {
+    padding: 16px 20px 24px;
+}
+
+/* Paragraf mengalir RTL */
+.read-mode-flow {
+    direction: rtl;
+    text-align: justify;
+    font-family: var(--arabic-font-family, 'Scheherazade', serif);
+    font-size: var(--arabic-font-size, 40px);
+    font-weight: var(--arabic-font-weight, normal);
+    line-height: var(--arabic-line-height, 2.6);
+    word-spacing: var(--arabic-word-spacing, 8px);
+    color: var(--navy);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* Teks Arab tiap ayat — inline */
+.rm-arab {
+    display: inline;
+}
+
+/* Nomor ayat inline — ornament mushaf ﴿١﴾ */
+.rm-nomor {
+    display: inline;
+    font-family: 'Scheherazade', 'Amiri', serif;
+    font-size: 0.65em;
+    color: var(--gold);
+    vertical-align: middle;
+    margin: 0 3px;
+    white-space: nowrap;
+    font-weight: normal;
+    cursor: default;
+    user-select: none;
+}
+
+/* Dark mode */
+.theme-dark .read-mode-flow {
+    color: var(--dark-text);
+}
+.theme-dark .rm-nomor {
+    color: var(--gold-light);
 }

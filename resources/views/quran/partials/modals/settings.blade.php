@@ -7,9 +7,19 @@
         <i class="fa-solid fa-gear"></i>
         <h3 data-i18n="settings_title">Pengaturan</h3>
       </div>
-      <button id="close-settings-btn" class="settings-close-btn" data-i18n-title="close" title="Tutup">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <div class="settings-header-actions">
+        <button id="open-font-settings-btn" class="settings-advanced-btn" title="Pengaturan Font">
+          <i class="fa-solid fa-font"></i>
+          <span data-i18n="settings_font_group">Font</span>
+        </button>
+        <button id="open-advanced-settings-btn" class="settings-advanced-btn" title="Pengaturan Lanjutan">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Lanjutan</span>
+        </button>
+        <button id="close-settings-btn" class="settings-close-btn" data-i18n-title="close" title="Tutup">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
     </div>
 
     <div class="settings-panel-body">
@@ -78,113 +88,6 @@
         </div>
         <p class="settings-hint" data-i18n="settings_dark_mode_hint">Tampilan latar gelap, nyaman untuk membaca di malam hari.</p>
       </div>
-
-      {{-- FONT GROUP — expandable --}}
-      <div class="settings-group" id="settings-group-font">
-        <button class="settings-group-trigger" id="settings-group-font-btn">
-          <div class="settings-group-trigger-left">
-            <i class="fa-solid fa-font"></i>
-            <span data-i18n="settings_font_group">Pengaturan Font</span>
-          </div>
-          <i class="fa-solid fa-chevron-down settings-group-arrow" id="settings-group-font-arrow"></i>
-        </button>
-        <div class="settings-group-body" id="settings-group-font-body">
-
-          {{-- Font Size Arab --}}
-          <div class="settings-section">
-            <label class="settings-label">
-              <i class="fa-solid fa-text-height"></i>
-              <span data-i18n="settings_font_size">Ukuran Teks Arab</span>
-            </label>
-            <div class="font-size-controls">
-              <button class="font-btn" id="font-decrease"
-                data-i18n-title="font_decrease_arab"
-                title="Perkecil ukuran teks Arab">A−</button>
-              <span id="font-size-display" class="font-size-display">36px</span>
-              <button class="font-btn" id="font-increase"
-                data-i18n-title="font_increase_arab"
-                title="Perbesar ukuran teks Arab">A+</button>
-            </div>
-            <input type="range" id="font-size-slider" class="settings-slider"
-              min="24" max="64" step="2" value="36"
-              title="Geser untuk mengatur ukuran teks Arab">
-            <p class="settings-preview settings-preview-arab" id="arab-size-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ</p>
-          </div>
-
-          {{-- Font Size Latin --}}
-          <div class="settings-section">
-            <label class="settings-label">
-              <i class="fa-solid fa-italic"></i>
-              <span data-i18n="settings_latin_font_size">Ukuran Teks Latin</span>
-            </label>
-            <div class="font-size-controls">
-              <button class="font-btn" id="latin-font-decrease"
-                data-i18n-title="font_decrease_latin"
-                title="Perkecil ukuran teks Latin">A−</button>
-              <span id="latin-font-size-display" class="font-size-display">13px</span>
-              <button class="font-btn" id="latin-font-increase"
-                data-i18n-title="font_increase_latin"
-                title="Perbesar ukuran teks Latin">A+</button>
-            </div>
-            <input type="range" id="latin-font-size-slider" class="settings-slider"
-              min="11" max="20" step="1" value="13"
-              title="Geser untuk mengatur ukuran teks Latin">
-            <p class="settings-preview settings-preview-latin" id="latin-size-preview">Bismillāhir-raḥmānir-raḥīm</p>
-          </div>
-
-          {{-- Font Size Terjemahan --}}
-          <div class="settings-section">
-            <label class="settings-label">
-              <i class="fa-solid fa-book-open-reader"></i>
-              <span data-i18n="settings_translation_font_size">Ukuran Teks Terjemahan</span>
-            </label>
-            <div class="font-size-controls">
-              <button class="font-btn" id="trans-font-decrease"
-                data-i18n-title="font_decrease_trans"
-                title="Perkecil ukuran teks Terjemahan">A−</button>
-              <span id="trans-font-size-display" class="font-size-display">13px</span>
-              <button class="font-btn" id="trans-font-increase"
-                data-i18n-title="font_increase_trans"
-                title="Perbesar ukuran teks Terjemahan">A+</button>
-            </div>
-            <input type="range" id="trans-font-size-slider" class="settings-slider"
-              min="11" max="20" step="1" value="13"
-              title="Geser untuk mengatur ukuran teks Terjemahan">
-            <p class="settings-preview settings-preview-trans" id="trans-size-preview">Dengan menyebut nama Allah Yang Maha Pengasih lagi Maha Penyayang</p>
-          </div>
-
-          {{-- Jenis Font Arab --}}
-          <div class="settings-section">
-            <label class="settings-label">
-              <i class="fa-solid fa-pen-nib"></i>
-              <span data-i18n="settings_arab_font">Jenis Font Arab</span>
-            </label>
-            <select id="arab-font-select" class="settings-select">
-              <optgroup label="── Mushaf Indonesia (Kemenag RI) ──">
-                <option value="LPMQ Isep Misbah">⭐ LPMQ Isep Misbah (Default)</option>
-              </optgroup>
-              <optgroup label="── Mushaf Uthmani ──">
-                <option value="KFGQPC Hafs Uthmanic">KFGQPC Uthmanic</option>
-              </optgroup>
-              <optgroup label="── Naskh Klasik ──">
-                <option value="Amiri Quran">Amiri Quran</option>
-                <option value="Scheherazade">Scheherazade New</option>
-              </optgroup>
-              <optgroup label="── Naskh Modern ──">
-                <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
-              </optgroup>
-              <optgroup label="── Mushaf Pakistan ──">
-                <option value="Al Mushaf">Al Mushaf (Alvi)</option>
-                <option value="Al Qalam Quran Majeed">Al Qalam Quran Majeed</option>
-                <option value="Al Qalam Quran Majeed 2">Al Qalam Quran Majeed 2</option>
-                <option value="Noorehuda">Noorehuda</option>
-              </optgroup>
-            </select>
-            <p class="settings-preview settings-preview-arab" id="arab-font-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
-          </div>
-
-        </div>{{-- .settings-group-body --}}
-      </div>{{-- .settings-group --}}
 
       {{-- Bahasa --}}
       <div class="settings-section">
@@ -494,55 +397,276 @@
         <div id="pwa-notif-settings-container"></div>
       </div>
 
-      {{-- Pengaturan Lanjutan (Backup, Reset) — group paling bawah --}}
-      <div class="settings-group" id="settings-group-advanced">
-        <button class="settings-group-trigger" id="settings-group-advanced-btn">
-          <div class="settings-group-trigger-left">
-            <i class="fa-solid fa-sliders"></i>
-            <span>Pengaturan Lanjutan</span>
-          </div>
-          <i class="fa-solid fa-chevron-down settings-group-arrow" id="settings-group-advanced-arrow"></i>
-        </button>
-        <div class="settings-group-body" id="settings-group-advanced-body">
-
-          {{-- Backup & Import --}}
-          <div class="settings-section">
-            <label class="settings-label">
-              <i class="fa-solid fa-floppy-disk"></i>
-              <span data-i18n="backup_title">Backup &amp; Restore</span>
-            </label>
-            <div class="settings-backup-row">
-              <button id="settings-export-btn" class="settings-backup-btn settings-backup-export">
-                <i class="fa-solid fa-file-arrow-down"></i>
-                <span data-i18n="backup_export">Export Backup</span>
-              </button>
-              <label class="settings-backup-btn settings-backup-import" for="settings-backup-file">
-                <i class="fa-solid fa-file-arrow-up"></i>
-                <span data-i18n="backup_import">Import Backup</span>
-              </label>
-              <input type="file" id="settings-backup-file" accept=".json" style="display:none;">
-            </div>
-          </div>
-
-          {{-- Reset & Hard Restart --}}
-          <div class="settings-section" style="border-bottom:none;">
-            <label class="settings-label">
-              <i class="fa-solid fa-rotate-left"></i>
-              <span>Reset Aplikasi</span>
-            </label>
-            <div class="settings-footer-btns">
-              <button id="settings-reset-btn" class="settings-reset-btn">
-                <i class="fa-solid fa-rotate-left"></i> <span data-i18n="settings_reset">Reset ke Default</span>
-              </button>
-              <button id="hard-restart-btn" class="settings-hard-restart-btn" title="Clear cache &amp; reload">
-                <i class="fa-solid fa-rotate-right"></i> Hard Restart
-              </button>
-            </div>
-          </div>
-
-        </div>{{-- .settings-group-body --}}
-      </div>{{-- .settings-group --}}
 
     </div>{{-- .settings-panel-body --}}
+  </div>
+</div>
+
+{{-- ADVANCED SETTINGS MODAL --}}
+<div id="advanced-settings-overlay" class="adv-settings-overlay">
+  <div class="adv-settings-panel">
+
+    <div class="adv-settings-header">
+      <div class="settings-title">
+        <i class="fa-solid fa-sliders"></i>
+        <h3>Pengaturan Lanjutan</h3>
+      </div>
+      <button id="close-advanced-settings-btn" class="settings-close-btn" title="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="adv-settings-body">
+
+      {{-- Grid tombol aksi --}}
+      <div class="adv-settings-grid">
+
+        {{-- Export Backup --}}
+        <button id="settings-export-btn" class="adv-action-card adv-card-export">
+          <div class="adv-card-icon">
+            <i class="fa-solid fa-file-arrow-down"></i>
+          </div>
+          <div class="adv-card-info">
+            <span class="adv-card-title" data-i18n="backup_export">Export Backup</span>
+            <span class="adv-card-desc">Simpan semua data ke file JSON</span>
+          </div>
+        </button>
+
+        {{-- Import Backup --}}
+        <label class="adv-action-card adv-card-import" for="settings-backup-file">
+          <div class="adv-card-icon">
+            <i class="fa-solid fa-file-arrow-up"></i>
+          </div>
+          <div class="adv-card-info">
+            <span class="adv-card-title" data-i18n="backup_import">Import Backup</span>
+            <span class="adv-card-desc">Pulihkan data dari file JSON</span>
+          </div>
+        </label>
+        <input type="file" id="settings-backup-file" accept=".json" style="display:none;">
+
+        {{-- Reset ke Default --}}
+        <button id="settings-reset-btn" class="adv-action-card adv-card-reset">
+          <div class="adv-card-icon">
+            <i class="fa-solid fa-rotate-left"></i>
+          </div>
+          <div class="adv-card-info">
+            <span class="adv-card-title" data-i18n="settings_reset">Reset ke Default</span>
+            <span class="adv-card-desc">Kembalikan semua pengaturan tampilan</span>
+          </div>
+        </button>
+
+        {{-- Hard Restart --}}
+        <button id="hard-restart-btn" class="adv-action-card adv-card-restart">
+          <div class="adv-card-icon">
+            <i class="fa-solid fa-rotate-right"></i>
+          </div>
+          <div class="adv-card-info">
+            <span class="adv-card-title">Hard Restart</span>
+            <span class="adv-card-desc">Clear cache &amp; muat ulang aplikasi</span>
+          </div>
+        </button>
+
+      </div>{{-- .adv-settings-grid --}}
+
+      <p class="adv-settings-warning">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        Reset &amp; Hard Restart akan menghapus data yang tidak di-backup. Pastikan sudah export terlebih dahulu.
+      </p>
+
+    </div>{{-- .adv-settings-body --}}
+  </div>
+</div>
+
+{{-- FONT SETTINGS MODAL --}}
+<div id="font-settings-overlay" class="adv-settings-overlay">
+  <div class="adv-settings-panel font-settings-panel">
+
+    <div class="adv-settings-header">
+      <div class="settings-title">
+        <i class="fa-solid fa-font"></i>
+        <h3 data-i18n="settings_font_group">Pengaturan Font</h3>
+      </div>
+      <button id="close-font-settings-btn" class="settings-close-btn" title="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="adv-settings-body font-settings-body">
+
+      {{-- ── SEKSI 1: Ukuran Font (grid 3 kolom) ── --}}
+      <div class="font-modal-section-label">
+        <i class="fa-solid fa-text-height"></i> Ukuran Teks
+      </div>
+      <div class="font-size-grid">
+
+        <div class="font-size-card">
+          <div class="fsc-header">
+            <i class="fa-solid fa-mosque"></i>
+            <span>Arab</span>
+          </div>
+          <p class="fsc-preview fsc-preview-arab" id="arab-size-preview" dir="rtl">بِسْمِ اللَّهِ</p>
+          <div class="fsc-controls">
+            <button class="fsc-btn" id="font-decrease" title="Perkecil">A−</button>
+            <span class="fsc-display" id="font-size-display">40px</span>
+            <button class="fsc-btn" id="font-increase" title="Perbesar">A+</button>
+          </div>
+          <input type="range" id="font-size-slider" class="settings-slider fsc-slider" min="24" max="64" step="2" value="40">
+        </div>
+
+        <div class="font-size-card">
+          <div class="fsc-header">
+            <i class="fa-solid fa-italic"></i>
+            <span>Latin</span>
+          </div>
+          <p class="fsc-preview fsc-preview-latin" id="latin-size-preview">Bismillāhir-raḥmān</p>
+          <div class="fsc-controls">
+            <button class="fsc-btn" id="latin-font-decrease" title="Perkecil">A−</button>
+            <span class="fsc-display" id="latin-font-size-display">13px</span>
+            <button class="fsc-btn" id="latin-font-increase" title="Perbesar">A+</button>
+          </div>
+          <input type="range" id="latin-font-size-slider" class="settings-slider fsc-slider" min="11" max="20" step="1" value="13">
+        </div>
+
+        <div class="font-size-card">
+          <div class="fsc-header">
+            <i class="fa-solid fa-book-open-reader"></i>
+            <span>Terjemahan</span>
+          </div>
+          <p class="fsc-preview fsc-preview-trans" id="trans-size-preview">Dengan nama Allah</p>
+          <div class="fsc-controls">
+            <button class="fsc-btn" id="trans-font-decrease" title="Perkecil">A−</button>
+            <span class="fsc-display" id="trans-font-size-display">13px</span>
+            <button class="fsc-btn" id="trans-font-increase" title="Perbesar">A+</button>
+          </div>
+          <input type="range" id="trans-font-size-slider" class="settings-slider fsc-slider" min="11" max="20" step="1" value="13">
+        </div>
+
+      </div>{{-- .font-size-grid --}}
+
+      {{-- ── SEKSI 2: Tampilan Teks Arab (grid 2 kolom) ── --}}
+      <div class="font-modal-section-label">
+        <i class="fa-solid fa-sliders"></i> Tampilan Teks Arab
+      </div>
+      <div class="font-display-grid">
+
+        {{-- Line Height --}}
+        <div class="font-size-card">
+          <div class="fsc-header">
+            <i class="fa-solid fa-arrows-up-down"></i>
+            <span>Jarak Baris</span>
+          </div>
+          <div class="fsc-controls">
+            <button class="fsc-btn" id="arab-lh-decrease" title="Rapat">−</button>
+            <span class="fsc-display" id="arab-lh-display">2.4</span>
+            <button class="fsc-btn" id="arab-lh-increase" title="Renggang">+</button>
+          </div>
+          <input type="range" id="arab-line-height-slider" class="settings-slider fsc-slider"
+            min="1.4" max="4.0" step="0.2" value="2.4">
+          <p class="fsc-hint">Jarak antar baris teks Arab</p>
+        </div>
+
+        {{-- Word Spacing --}}
+        <div class="font-size-card">
+          <div class="fsc-header">
+            <i class="fa-solid fa-left-right"></i>
+            <span>Jarak Kata</span>
+          </div>
+          <div class="fsc-controls">
+            <button class="fsc-btn" id="arab-ws-decrease" title="Rapat">−</button>
+            <span class="fsc-display" id="arab-ws-display">8px</span>
+            <button class="fsc-btn" id="arab-ws-increase" title="Renggang">+</button>
+          </div>
+          <input type="range" id="arab-word-spacing-slider" class="settings-slider fsc-slider"
+            min="0" max="24" step="2" value="8">
+          <p class="fsc-hint">Jarak antar kata Arab</p>
+        </div>
+
+        {{-- Bold Arab --}}
+        <div class="font-size-card font-toggle-card">
+          <div class="fsc-header">
+            <i class="fa-solid fa-bold"></i>
+            <span>Tebal (Bold)</span>
+          </div>
+          <div class="fsc-toggle-row">
+            <label class="toggle-switch">
+              <input type="checkbox" id="arab-bold-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="fsc-toggle-label" id="arab-bold-label">Nonaktif</span>
+          </div>
+          <p class="fsc-hint">Teks Arab lebih tebal, lebih mudah dibaca</p>
+        </div>
+
+        {{-- Harakat --}}
+        <div class="font-size-card font-toggle-card">
+          <div class="fsc-header">
+            <i class="fa-solid fa-eye-slash"></i>
+            <span>Sembunyikan Harakat</span>
+          </div>
+          <div class="fsc-toggle-row">
+            <label class="toggle-switch">
+              <input type="checkbox" id="hide-harakat-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="fsc-toggle-label" id="hide-harakat-label">Nonaktif</span>
+          </div>
+          <p class="fsc-hint">Sembunyikan tanda baca (harakat) untuk latihan membaca</p>
+        </div>
+
+        {{-- Text Align --}}
+        <div class="font-size-card font-align-card">
+          <div class="fsc-header">
+            <i class="fa-solid fa-align-right"></i>
+            <span>Perataan Teks</span>
+          </div>
+          <div class="font-align-options">
+            <button class="font-align-btn active" data-align="right" title="Rata Kanan">
+              <i class="fa-solid fa-align-right"></i>
+              <span>Kanan</span>
+            </button>
+            <button class="font-align-btn" data-align="justify" title="Rata Kiri-Kanan">
+              <i class="fa-solid fa-align-justify"></i>
+              <span>Justify</span>
+            </button>
+            <button class="font-align-btn" data-align="center" title="Tengah">
+              <i class="fa-solid fa-align-center"></i>
+              <span>Tengah</span>
+            </button>
+          </div>
+          <p class="fsc-hint">Perataan teks Arab dalam baris</p>
+        </div>
+
+      </div>{{-- .font-display-grid --}}
+
+      {{-- ── SEKSI 3: Jenis Font Arab ── --}}
+      <div class="font-modal-section-label">
+        <i class="fa-solid fa-pen-nib"></i> Jenis Font Arab
+      </div>
+      <div class="font-family-section">
+        <select id="arab-font-select" class="settings-select">
+          <optgroup label="── Mushaf Indonesia (Kemenag RI) ──">
+            <option value="LPMQ Isep Misbah">LPMQ Isep Misbah</option>
+          </optgroup>
+          <optgroup label="── Mushaf Uthmani ──">
+            <option value="KFGQPC Hafs Uthmanic">KFGQPC Uthmanic</option>
+          </optgroup>
+          <optgroup label="── Naskh Klasik ──">
+            <option value="Amiri Quran">Amiri Quran</option>
+            <option value="Scheherazade">⭐ Scheherazade New (Default)</option>
+          </optgroup>
+          <optgroup label="── Naskh Modern ──">
+            <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
+          </optgroup>
+          <optgroup label="── Mushaf Pakistan ──">
+            <option value="Al Mushaf">Al Mushaf (Alvi)</option>
+            <option value="Al Qalam Quran Majeed">Al Qalam Quran Majeed</option>
+            <option value="Al Qalam Quran Majeed 2">Al Qalam Quran Majeed 2</option>
+            <option value="Noorehuda">Noorehuda</option>
+          </optgroup>
+        </select>
+        <p class="settings-preview settings-preview-arab" id="arab-font-preview" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
+      </div>
+
+    </div>{{-- .font-settings-body --}}
   </div>
 </div>
