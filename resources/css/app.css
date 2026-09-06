@@ -48,6 +48,9 @@
 @import '../../public/css/components/pwa.css';
 @import '../../public/css/components/splash.css';
 
+/* ── HOME SWIPE ── */
+@import '../../public/css/components/home-swipe.css';
+
 /* ── PANELS ── */
 @import '../../public/css/panels/settings.css';
 @import '../../public/css/panels/bookmark.css';

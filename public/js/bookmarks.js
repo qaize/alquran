@@ -216,8 +216,8 @@ function buildBookmarkItem(bm, isPanel) {
 
     // Buka ayat
     item.querySelector('.bookmark-go-btn').addEventListener('click', () => {
+        window._pendingJumpAyat = bm.nomorAyat;
         loadSurahDetails(bm.nomorSurah);
-        setTimeout(() => jumpToLastRead({ nomorAyat: bm.nomorAyat }), 950);
         // Tutup panel jika terbuka
         const overlay = document.getElementById('bookmark-panel-overlay');
         if (overlay) overlay.classList.remove('open');

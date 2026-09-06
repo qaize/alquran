@@ -137,10 +137,8 @@ function initJuz() {
             document.body.style.overflow = '';
 
             // Buka surah lalu jump ke ayat
+            window._pendingJumpAyat = j.ayat;
             loadSurahDetails(j.surah);
-            setTimeout(() => {
-                jumpToLastRead({ nomorAyat: j.ayat });
-            }, 950);
         });
         listEl.appendChild(item);
     });

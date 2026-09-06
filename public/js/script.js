@@ -43,6 +43,67 @@ function __(key, fallback) {
     return typeof t === "function" ? t(key) : fallback;
 }
 
+// ── Mode Baca — init dari localStorage ──
+window.__readMode = localStorage.getItem('quran_read_mode') === '1';
+
+function _applyReadMode(on) {
+    // Cari .ayat di panel current, fallback ke mainBody
+    const scope = document.querySelector('.surah-panel-current') || document.getElementById('main-body');
+    const ayatEl = scope ? scope.querySelector('.ayat') : document.querySelector('.ayat');
+    if (!ayatEl) return;
+
+    if (on) {
+        // Jangan inject ulang kalau sudah ada
+        if (ayatEl.querySelector('.read-mode-flow')) return;
+
+        // Kumpulkan semua teks Arab + nomor dari setiap barisSurah
+        const rows = ayatEl.querySelectorAll('.barisSurah');
+        if (!rows.length) return;
+
+        // Buat elemen <p> mengalir
+        const flow = document.createElement('p');
+        flow.className = 'read-mode-flow';
+        flow.dir = 'rtl';
+
+        rows.forEach(row => {
+            const isiAyat = row.querySelector('.isi-ayat');
+            if (!isiAyat) return;
+
+            const nomorAyat = isiAyat.dataset.ayat;
+            const arabicEl  = isiAyat.querySelector('.arabic');
+            const arabicHTML = arabicEl ? arabicEl.innerHTML : '';
+            const nomorArab  = numberToArabic ? numberToArabic(nomorAyat) : nomorAyat;
+
+            // Teks Arab sebagai span
+            const textSpan = document.createElement('span');
+            textSpan.className = 'rm-arab';
+            textSpan.innerHTML = arabicHTML + '\u00A0'; // spasi non-break setelah teks
+
+            // Nomor ayat inline — lingkaran kecil
+            const numSpan = document.createElement('span');
+            numSpan.className = 'rm-nomor';
+            numSpan.setAttribute('data-ayat', nomorAyat);
+            numSpan.textContent = '\uFD3F' + nomorArab + '\uFD3E'; // ﴿ ١ ﴾ ornament
+
+            flow.appendChild(textSpan);
+            flow.appendChild(numSpan);
+            flow.appendChild(document.createTextNode(' ')); // spasi antar ayat
+        });
+
+        // Sembunyikan barisSurah asli
+        rows.forEach(r => r.style.display = 'none');
+        ayatEl.classList.add('read-mode');
+        ayatEl.appendChild(flow);
+
+    } else {
+        // Hapus flow dan tampilkan kembali barisSurah
+        const flow = ayatEl.querySelector('.read-mode-flow');
+        if (flow) flow.remove();
+        ayatEl.querySelectorAll('.barisSurah').forEach(r => r.style.display = '');
+        ayatEl.classList.remove('read-mode');
+    }
+}
+
 function Surah(nomor, nama_latin, arti, nama, tempatTurun, jumlahAyat) {
     this.nomor = nomor;
     this.nama_latin = nama_latin;
@@ -422,6 +483,9 @@ function loadPagingSurah(currentIndex, totalData) {
                         }
                     });
                 }
+
+                // Inisialisasi home swipe (Surah ↔ Juz)
+                initHomeSwipe();
             }
         })
         .catch((error) => {
@@ -430,27 +494,32 @@ function loadPagingSurah(currentIndex, totalData) {
         });
 }
 
+// Cleanup home swipe track saat pindah ke detail atau kembali ke home
+function _destroyHomeSwipe() {
+    const track = document.getElementById('home-track');
+    const tabs  = document.getElementById('home-tabs');
+    if (!track) return;
+
+    const parent = track.parentElement;
+
+    // Kembalikan #main-body ke parent track jika sedang di dalam panel
+    if (mainBody && mainBody.closest('#home-track')) {
+        parent.insertBefore(mainBody, track);
+    }
+    // Kembalikan #pagination ke parent track jika sedang di dalam panel
+    if (pagination && pagination.closest('#home-track')) {
+        parent.insertBefore(pagination, track);
+    }
+
+    track.remove();
+    tabs && tabs.remove();
+}
+
 // inisiasi halaman utama
 // Set initial history state agar back dari detail bisa kembali ke list
 history.replaceState({ view: 'list' }, '', window.location.href);
 
-// ── Restore surah terakhir dibaca saat refresh ──
-const _lastSurahKey = 'quran_last_surah';
-const _lastSurahSaved = sessionStorage.getItem(_lastSurahKey);
-if (_lastSurahSaved) {
-    const _lastNomor = parseInt(_lastSurahSaved);
-    if (_lastNomor >= 1 && _lastNomor <= 114) {
-        // Delay kecil agar semua module siap
-        setTimeout(() => {
-            loadSurahDetails(_lastNomor, false);
-        }, 100);
-    } else {
-        sessionStorage.removeItem(_lastSurahKey);
-        loadPagingSurah(currentIndex, totalData);
-    }
-} else {
-    loadPagingSurah(currentIndex, totalData);
-}
+loadPagingSurah(currentIndex, totalData);
 // ── Klik logo (desktop sidebar & mobile topbar) → kembali ke menu utama ──
 function goHome() {
     searchSurah = "";
@@ -459,16 +528,168 @@ function goHome() {
     page = 1;
     currentIndex = 0;
     titleSurah.innerHTML = "";
+    _destroyHomeSwipe();
     mainBody.innerHTML = "";
+    mainBody.classList.remove('surah-swipe-clipper');
     pagination.style.display = "block";
     _titleNavCollapsed = true;
-    sessionStorage.removeItem(_lastSurahKey);
     history.pushState({ view: 'list' }, '', window.location.pathname);
     loadPagingSurah(currentIndex, page * offset);
 }
 
 document.getElementById('sidebar-logo')?.addEventListener('click', goHome);
 document.getElementById('mobile-logo')?.addEventListener('click', goHome);
+
+// Intercept link "Beranda" di sidebar agar tidak reload halaman
+document.querySelector('a.nav-item[href="/"]')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    goHome();
+});
+
+// ── Home 2-panel swipe: Surah ↔ Juz ──
+// Dipanggil dari loadPagingSurah setelah kartu surah selesai dirender
+function initHomeSwipe() {
+    // Cleanup track lama jika ada
+    const oldTrack = document.getElementById('home-track');
+    if (oldTrack) oldTrack.remove();
+    const oldTabs = document.getElementById('home-tabs');
+    if (oldTabs) oldTabs.remove();
+
+    // Buat tab indicator
+    const tabs = document.createElement('div');
+    tabs.id = 'home-tabs';
+    tabs.className = 'home-tabs';
+    tabs.innerHTML = `
+        <button class="home-tab active" data-panel="0">
+            <i class="fa-solid fa-book-quran"></i> Surah
+        </button>
+        <button class="home-tab" data-panel="1">
+            <i class="fa-solid fa-layer-group"></i> Juz
+        </button>
+    `;
+
+    // Buat track 2-panel
+    const track = document.createElement('div');
+    track.id = 'home-track';
+    track.className = 'home-track';
+
+    // Panel Surah — pindahkan mainBody + pagination ke dalamnya
+    const panelSurah = document.createElement('div');
+    panelSurah.className = 'home-panel home-panel-surah';
+
+    // Panel Juz
+    const panelJuz = document.createElement('div');
+    panelJuz.className = 'home-panel home-panel-juz';
+    const juzList = document.createElement('div');
+    juzList.className = 'juz-home-list';
+    panelJuz.appendChild(juzList);
+
+    // Pindahkan #main-body dan #pagination ke panel surah
+    const mbClone = mainBody.parentNode;
+    panelSurah.appendChild(mainBody);
+    panelSurah.appendChild(pagination);
+
+    track.appendChild(panelSurah);
+    track.appendChild(panelJuz);
+
+    // Insert tabs + track ke parent #main-body sebelumnya
+    mbClone.appendChild(tabs);
+    mbClone.appendChild(track);
+
+    // Set ukuran track dan panel
+    function _setSize() {
+        const pw = track.parentElement ? track.parentElement.offsetWidth : window.innerWidth;
+        track.style.width = `${pw * 2}px`;
+        track.querySelectorAll('.home-panel').forEach(p => { p.style.width = `${pw}px`; });
+    }
+    _setSize();
+
+    let _activePanel = 0;
+    let _startX = null, _startY = null, _dragging = false;
+
+    function _snapTo(idx, animate = true) {
+        const pw = track.parentElement ? track.parentElement.offsetWidth : window.innerWidth;
+        _activePanel = idx;
+        track.style.transition = animate
+            ? 'transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            : 'none';
+        track.style.transform = `translateX(${-pw * idx}px)`;
+        tabs.querySelectorAll('.home-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }
+    _snapTo(0, false);
+
+    // Tab click
+    tabs.querySelectorAll('.home-tab').forEach((tab, i) => {
+        tab.addEventListener('click', () => { if (i !== _activePanel) _snapTo(i); });
+    });
+
+    // Touch swipe
+    track.addEventListener('touchstart', (e) => {
+        _startX = e.touches[0].clientX;
+        _startY = e.touches[0].clientY;
+        _dragging = false;
+        track.style.transition = 'none';
+    }, { passive: true });
+
+    track.addEventListener('touchmove', (e) => {
+        if (_startX === null) return;
+        const dx = e.touches[0].clientX - _startX;
+        const dy = e.touches[0].clientY - _startY;
+        if (!_dragging) {
+            if (Math.abs(dx) < 8) return;
+            if (Math.abs(dy) > Math.abs(dx)) { _startX = null; return; }
+            _dragging = true;
+        }
+        const pw = track.parentElement ? track.parentElement.offsetWidth : window.innerWidth;
+        if (dx > 0 && _activePanel === 0) return;
+        if (dx < 0 && _activePanel === 1) return;
+        track.style.transform = `translateX(${-pw * _activePanel + dx}px)`;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+        if (_startX === null || !_dragging) { _startX = null; return; }
+        const dx = e.changedTouches[0].clientX - _startX;
+        const dy = e.changedTouches[0].clientY - _startY;
+        _startX = null;
+        const pw = track.parentElement ? track.parentElement.offsetWidth : window.innerWidth;
+        const ok = Math.abs(dx) > pw * 0.3 && Math.abs(dx) > Math.abs(dy) * 1.2;
+        if (ok && dx < 0 && _activePanel === 0) _snapTo(1);
+        else if (ok && dx > 0 && _activePanel === 1) _snapTo(0);
+        else _snapTo(_activePanel);
+    }, { passive: true });
+
+    track.addEventListener('touchcancel', () => { _startX = null; _snapTo(_activePanel); }, { passive: true });
+
+    // Resize
+    window.addEventListener('resize', _setSize);
+
+    // Render kartu Juz
+    if (typeof JUZ_MAP !== 'undefined') {
+        JUZ_MAP.forEach((j, idx) => {
+            const card = document.createElement('div');
+            card.className = 'juz-home-card';
+            card.innerHTML = `
+                <div class="jhc-number">
+                    <span class="jhc-label">Juz</span>
+                    <span class="jhc-val">${j.juz}</span>
+                </div>
+                <div class="jhc-info">
+                    <span class="jhc-surah">${j.namaLatin}</span>
+                    <span class="jhc-ayat">Surah ${j.surah}, Ayat ${j.ayat}</span>
+                </div>
+                <i class="fa-solid fa-chevron-left jhc-arrow"></i>
+            `;
+            card.addEventListener('click', () => {
+                // Set _pendingJumpAyat SEBELUM loadSurahDetails agar tidak terlewat saat cache hit
+                if (j.ayat > 1) {
+                    window._pendingJumpAyat = j.ayat;
+                }
+                loadSurahDetails(j.surah, true, { juzIndex: idx });
+            });
+            juzList.appendChild(card);
+        });
+    }
+}
 
 // -- Handle tombol Back browser --
 window.addEventListener('popstate', (e) => {
@@ -481,11 +702,12 @@ window.addEventListener('popstate', (e) => {
         page = 1;
         currentIndex = 0;
         titleSurah.innerHTML = "";
+        _destroyHomeSwipe();
         mainBody.innerHTML = "";
+        mainBody.classList.remove('surah-swipe-clipper');
 
         pagination.style.display = "block";
         _titleNavCollapsed = true; // reset state navigasi saat kembali ke list
-        sessionStorage.removeItem(_lastSurahKey);
         loadPagingSurah(currentIndex, page * offset);
     } else if (state.view === 'detail' && state.nomor) {
         // Navigasi antar surah via back/forward
@@ -522,13 +744,13 @@ function fetchDetailInformasiSurah(nomor) {
 }
 
 // tampilkan detail surah
-function loadSurahDetails(nomorSurah, pushHistory = true) {
+function loadSurahDetails(nomorSurah, pushHistory = true, juzContext = null) {
+    // Hapus home swipe track jika masih ada (mode list → detail)
+    _destroyHomeSwipe();
     // Dismiss keyboard mobile — blur semua input aktif
     if (document.activeElement && typeof document.activeElement.blur === "function") {
         document.activeElement.blur();
     }
-    // Simpan surah aktif agar bisa restore saat refresh
-    sessionStorage.setItem(_lastSurahKey, nomorSurah);
     // Simpan state ke browser history agar tombol Back bekerja
     if (pushHistory) {
         history.pushState({ view: 'detail', nomor: nomorSurah }, '', `#surah-${nomorSurah}`);
@@ -568,50 +790,112 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                 });
             }
 
+            // ── Mode Baca toggle ──
+            const readModeBtn = document.getElementById('surah-read-mode-toggle');
+            if (readModeBtn) {
+                readModeBtn.addEventListener('click', () => {
+                    window.__readMode = !window.__readMode;
+                    localStorage.setItem('quran_read_mode', window.__readMode ? '1' : '0');
+                    _applyReadMode(window.__readMode);
+                    readModeBtn.classList.toggle('active', window.__readMode);
+                    readModeBtn.querySelector('i').className = 'fa-solid fa-book-open-reader';
+                    readModeBtn.querySelector('span').textContent = window.__readMode
+                        ? __('read_mode_on', 'Mode Baca')
+                        : __('read_mode_off', 'Mode Baca');
+                });
+                // Apply state saat ini — defer agar .surah-panel-current sudah ada
+                requestAnimationFrame(() => _applyReadMode(window.__readMode));
+            }
+
             const nextSurah = document.getElementById("surah-next");
             const prevSurah = document.getElementById("surah-prev");
 
-            const suratSebelumnya = data.suratSebelumnya;
-            const suratSelanjutnya = data.suratSelanjutnya;
-
-            if (!suratSebelumnya || nomorSurah == 1) {
-                prevSurah.style.display = "none";
+            if (juzContext !== null && typeof JUZ_MAP !== 'undefined') {
+                // Mode juz: tampilkan/sembunyikan berdasarkan ada tidaknya juz sebelum/sesudah
+                const ji = juzContext.juzIndex;
+                const hasNext = !!JUZ_MAP[ji + 1];
+                const hasPrev = !!JUZ_MAP[ji - 1];
+                prevSurah.style.display = hasPrev ? "inline-block" : "none";
+                nextSurah.style.display = hasNext ? "inline-block" : "none";
+                // Ubah label tombol menjadi nama juz
+                if (hasPrev) {
+                    const pj = JUZ_MAP[ji - 1];
+                    prevSurah.innerHTML = `${pj.namaLatin} <i class="fa-solid fa-chevron-right"></i>`;
+                }
+                if (hasNext) {
+                    const nj = JUZ_MAP[ji + 1];
+                    nextSurah.innerHTML = `<i class="fa-solid fa-chevron-left"></i> ${nj.namaLatin}`;
+                }
             } else {
-                prevSurah.style.display = "inline-block";
-            }
-            if (!suratSelanjutnya || nomorSurah == 114) {
-                nextSurah.style.display = "none";
-            } else {
-                nextSurah.style.display = "inline-block";
+                const suratSebelumnya = data.suratSebelumnya;
+                const suratSelanjutnya = data.suratSelanjutnya;
+                if (!suratSebelumnya || nomorSurah == 1) {
+                    prevSurah.style.display = "none";
+                } else {
+                    prevSurah.style.display = "inline-block";
+                }
+                if (!suratSelanjutnya || nomorSurah == 114) {
+                    nextSurah.style.display = "none";
+                } else {
+                    nextSurah.style.display = "inline-block";
+                }
             }
 
             prevSurah.addEventListener("click", () => {
-                const prevNomor = suratSebelumnya
-                    ? suratSebelumnya.nomor
-                    : nomorSurah - 1;
                 const track = document.getElementById('surah-track');
+                let targetNomor, targetAyat = 1, newJuzIndex = null;
+                if (juzContext !== null && typeof JUZ_MAP !== 'undefined') {
+                    const pj = JUZ_MAP[juzContext.juzIndex - 1];
+                    if (!pj) return;
+                    targetNomor  = pj.surah;
+                    targetAyat   = pj.ayat;
+                    newJuzIndex  = juzContext.juzIndex - 1;
+                } else {
+                    const suratSebelumnya = data.suratSebelumnya;
+                    targetNomor = suratSebelumnya ? suratSebelumnya.nomor : nomorSurah - 1;
+                }
                 if (track && !track._swipeLocked) {
                     const pw = track.parentElement.offsetWidth;
                     track._swipeLocked = true;
                     track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                     track.style.transform  = `translateX(${-pw * 2}px)`;
-                    track.addEventListener('transitionend', () => loadSurahDetails(prevNomor), { once: true });
+                    track.addEventListener('transitionend', () => {
+                        const ctx = newJuzIndex !== null ? { juzIndex: newJuzIndex } : null;
+                        if (targetAyat > 1) window._pendingJumpAyat = targetAyat;
+                        loadSurahDetails(targetNomor, true, ctx);
+                    }, { once: true });
                 } else {
-                    loadSurahDetails(prevNomor);
+                    const ctx = newJuzIndex !== null ? { juzIndex: newJuzIndex } : null;
+                    if (targetAyat > 1) window._pendingJumpAyat = targetAyat;
+                    loadSurahDetails(targetNomor, true, ctx);
                 }
             });
             nextSurah.addEventListener("click", () => {
-                const nextNomor = suratSelanjutnya
-                    ? suratSelanjutnya.nomor
-                    : nomorSurah + 1;
                 const track = document.getElementById('surah-track');
+                let targetNomor, targetAyat = 1, newJuzIndex = null;
+                if (juzContext !== null && typeof JUZ_MAP !== 'undefined') {
+                    const nj = JUZ_MAP[juzContext.juzIndex + 1];
+                    if (!nj) return;
+                    targetNomor  = nj.surah;
+                    targetAyat   = nj.ayat;
+                    newJuzIndex  = juzContext.juzIndex + 1;
+                } else {
+                    const suratSelanjutnya = data.suratSelanjutnya;
+                    targetNomor = suratSelanjutnya ? suratSelanjutnya.nomor : nomorSurah + 1;
+                }
                 if (track && !track._swipeLocked) {
                     track._swipeLocked = true;
                     track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                     track.style.transform  = `translateX(0px)`;
-                    track.addEventListener('transitionend', () => loadSurahDetails(nextNomor), { once: true });
+                    track.addEventListener('transitionend', () => {
+                        const ctx = newJuzIndex !== null ? { juzIndex: newJuzIndex } : null;
+                        if (targetAyat > 1) window._pendingJumpAyat = targetAyat;
+                        loadSurahDetails(targetNomor, true, ctx);
+                    }, { once: true });
                 } else {
-                    loadSurahDetails(nextNomor);
+                    const ctx = newJuzIndex !== null ? { juzIndex: newJuzIndex } : null;
+                    if (targetAyat > 1) window._pendingJumpAyat = targetAyat;
+                    loadSurahDetails(targetNomor, true, ctx);
                 }
             });
 
@@ -630,6 +914,23 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                         detail: { nomorSurah: data.nomor },
                     }),
                 );
+
+                // Eksekusi pending jump ayat (dari navigasi juz / last read)
+                if (window._pendingJumpAyat) {
+                    const _ayatTarget = window._pendingJumpAyat;
+                    window._pendingJumpAyat = null;
+                    requestAnimationFrame(() => requestAnimationFrame(() => {
+                        // Cari di _panelCurrent dulu agar tidak tertukar dengan
+                        // duplicate ID di _panelNext/_panelPrev hasil prefetch
+                        const _scope = document.querySelector('.surah-panel-current') || mainBody;
+                        const _el = _scope.querySelector(`#isi-ayat${_ayatTarget}`);
+                        if (_el) {
+                            _el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            _el.classList.add('ayat-jump-highlight');
+                            setTimeout(() => _el.classList.remove('ayat-jump-highlight'), 2000);
+                        }
+                    }));
+                }
 
                 data.ayat.forEach((ayat) => {
                     const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
@@ -766,8 +1067,29 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                 _panelPrev.style.width    = `${_PW}px`;
 
                 // Prefetch dan render panel next/prev di background
-                const _nextNomor = data.suratSelanjutnya ? data.suratSelanjutnya.nomor : null;
-                const _prevNomor = data.suratSebelumnya ? data.suratSebelumnya.nomor : null;
+                // Mode juz: next/prev berdasarkan JUZ_MAP, bukan suratSelanjutnya/Sebelumnya
+                let _nextNomor, _prevNomor, _nextAyat = 1, _prevAyat = 1;
+                if (juzContext !== null && typeof JUZ_MAP !== 'undefined') {
+                    const ji = juzContext.juzIndex;
+                    const nextJuz = JUZ_MAP[ji + 1] || null;
+                    const prevJuz = JUZ_MAP[ji - 1] || null;
+                    _nextNomor = nextJuz ? nextJuz.surah : null;
+                    _prevNomor = prevJuz ? prevJuz.surah : null;
+                    _nextAyat  = nextJuz ? nextJuz.ayat : 1;
+                    _prevAyat  = prevJuz ? prevJuz.ayat : 1;
+                } else {
+                    _nextNomor = data.suratSelanjutnya ? data.suratSelanjutnya.nomor : null;
+                    _prevNomor = data.suratSebelumnya ? data.suratSebelumnya.nomor : null;
+                }
+
+                // Helper: load surah dengan context juz (jika ada) + scroll ke ayat
+                const _loadWithContext = (nomor, ayat, newJuzIndex) => {
+                    const ctx = (juzContext !== null && newJuzIndex !== null)
+                        ? { juzIndex: newJuzIndex }
+                        : null;
+                    if (ayat > 1) window._pendingJumpAyat = ayat;
+                    loadSurahDetails(nomor, true, ctx);
+                };
 
                 if (_nextNomor) {
                     fetchDetailInformasiSurah(_nextNomor).then(nextData => {
@@ -874,14 +1196,16 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                         _track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                         _track.style.transform  = `translateX(0px)`;
                         _track.addEventListener('transitionend', () => {
-                            loadSurahDetails(_nextNomor);
+                            const ji = juzContext !== null ? juzContext.juzIndex + 1 : null;
+                            _loadWithContext(_nextNomor, _nextAyat, ji);
                         }, { once: true });
                     } else if (shouldSwipe && dx < 0 && _prevNomor) {
                         _swipeLocked = true;
                         _track.style.transition = 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                         _track.style.transform  = `translateX(${-_PW * 2}px)`;
                         _track.addEventListener('transitionend', () => {
-                            loadSurahDetails(_prevNomor);
+                            const ji = juzContext !== null ? juzContext.juzIndex - 1 : null;
+                            _loadWithContext(_prevNomor, _prevAyat, ji);
                         }, { once: true });
                     } else {
                         _snapBack();
@@ -940,7 +1264,9 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
                             }
                             return;
                         }
-                        const el = document.getElementById(`isi-ayat${nomorAyat}`);
+                        // Cari di _panelCurrent agar tidak tertukar dengan duplicate ID di panel prefetch
+                        const _inputScope = document.querySelector('.surah-panel-current') || mainBody;
+                        const el = _inputScope.querySelector(`#isi-ayat${nomorAyat}`);
                         if (!el) return;
                         // Langsung scroll
                         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -969,8 +1295,6 @@ function loadSurahDetails(nomorSurah, pushHistory = true) {
         .catch((error) => {
             npDone();
             console.error(error);
-            // Kalau restore gagal — hapus state dan kembali ke list
-            sessionStorage.removeItem(_lastSurahKey);
             titleSurah.innerHTML = "";
             mainBody.innerHTML = "";
             loadPagingSurah(0, page * offset);
@@ -1010,6 +1334,10 @@ function componentTitleSurah(surah) {
           <button id="surah-trans-toggle" class="surah-trans-btn ${window.__showTranslation !== false ? 'active' : ''}">
             <i class="fa-solid ${window.__showTranslation !== false ? 'fa-eye' : 'fa-eye-slash'}"></i>
             <span>${window.__showTranslation !== false ? __('trans_visible','Terjemahan') : __('trans_hidden','Terjemahan')}</span>
+          </button>
+          <button id="surah-read-mode-toggle" class="surah-trans-btn ${window.__readMode ? 'active' : ''}" title="Mode Baca">
+            <i class="fa-solid fa-book-open-reader"></i>
+            <span>${window.__readMode ? __('read_mode_on','Mode Baca') : __('read_mode_off','Mode Baca')}</span>
           </button>
         </div>
     </div>

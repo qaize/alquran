@@ -80,14 +80,20 @@ function renderLastReadBadge() {
 }
 
 function jumpToLastRead(lr) {
-    const el = document.getElementById(`isi-ayat${lr.nomorAyat}`);
-    if (!el) return;
+    const nomorAyat = lr.nomorAyat ?? lr.nomor;
+    if (!nomorAyat) return;
 
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    // Smooth pulse highlight
-    el.classList.add('ayat-jump-highlight');
-    setTimeout(() => el.classList.remove('ayat-jump-highlight'), 2000);
+    const el = document.getElementById(`isi-ayat${nomorAyat}`);
+    if (el) {
+        // Elemen sudah ada di DOM — langsung scroll
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ayat-jump-highlight');
+        setTimeout(() => el.classList.remove('ayat-jump-highlight'), 2000);
+    } else {
+        // Elemen belum ada — simpan sebagai pending, akan dieksekusi
+        // setelah ayat-rendered di-dispatch oleh loadSurahDetails
+        window._pendingJumpAyat = nomorAyat;
+    }
 }
 
 function initLastRead() {
@@ -100,8 +106,8 @@ function initLastRead() {
         const lr = getLastRead();
         if (!lr) return;
         // Buka surah lalu jump + kedip ke ayat terakhir
+        window._pendingJumpAyat = lr.nomorAyat ?? lr.nomor;
         loadSurahDetails(lr.nomorSurah);
-        setTimeout(() => jumpToLastRead(lr), 950);
     });
 }
 
@@ -209,15 +215,15 @@ function renderLastReadPanel() {
         item.querySelector('.lr-cat-info').addEventListener('click', () => {
             if (cat.nomorSurah) {
                 document.getElementById('last-read-panel-overlay').classList.remove('open');
+                window._pendingJumpAyat = cat.nomorAyat;
                 loadSurahDetails(cat.nomorSurah);
-                setTimeout(() => jumpToLastRead({ nomorAyat: cat.nomorAyat }), 950);
             }
         });
         item.querySelector('.lr-cat-icon').addEventListener('click', () => {
             if (cat.nomorSurah) {
                 document.getElementById('last-read-panel-overlay').classList.remove('open');
+                window._pendingJumpAyat = cat.nomorAyat;
                 loadSurahDetails(cat.nomorSurah);
-                setTimeout(() => jumpToLastRead({ nomorAyat: cat.nomorAyat }), 950);
             }
         });
 
@@ -380,8 +386,8 @@ function renderLastReadDropdown() {
         if (hasPos) {
             item.querySelector('.lr-cat-main').addEventListener('click', () => {
                 closeAllNavDropdowns();
+                window._pendingJumpAyat = cat.nomorAyat;
                 loadSurahDetails(cat.nomorSurah);
-                setTimeout(() => jumpToLastRead({ nomorAyat: cat.nomorAyat }), 950);
             });
         }
 

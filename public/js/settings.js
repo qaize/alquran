@@ -179,6 +179,8 @@ const I18N = {
         settings_show_trans_hint: 'Tampilkan teks latin dan terjemahan di bawah setiap ayat.',
         trans_visible:            'Tampil',
         trans_hidden:             'Tersembunyi',
+        read_mode_on:             'Mode Baca',
+        read_mode_off:            'Mode Baca',
         // Tajweed
         settings_tajweed:     'Warna Tajwid',
         settings_tajweed_hint:'Mewarnai huruf Arab sesuai hukum bacaan tajwid.',
@@ -405,6 +407,8 @@ const I18N = {
         settings_show_trans_hint: 'Show transliteration and translation below each verse.',
         trans_visible:            'Visible',
         trans_hidden:             'Hidden',
+        read_mode_on:             'Read Mode',
+        read_mode_off:            'Read Mode',
         // Tajweed
         settings_tajweed:     'Colored Tajweed',
         settings_tajweed_hint:'Display color-coded Arabic letters based on tajweed rules.',
@@ -644,7 +648,12 @@ const SETTINGS_DEFAULT = {
     transFontSize: 13,
     bgColor: '#ffffff',
     bgName: 'Putih',
-    arabFont: 'LPMQ Isep Misbah',
+    arabFont: 'Scheherazade',
+    arabLineHeight: 2.4,
+    arabWordSpacing: 8,
+    arabBold: false,
+    arabAlign: 'right',
+    hideHarakat: false,
     qori: '05',
     darkMode: false,
     showTranslation: true,
@@ -669,11 +678,17 @@ function getSettings() {
         const VALID_FONTS = [
             'LPMQ Isep Misbah',
             'KFGQPC Hafs Uthmanic',
-            'Amiri Quran', 'Scheherazade',
+            'Amiri Quran',
+            'Scheherazade',
             'Noto Naskh Arabic',
             'Al Mushaf', 'Al Qalam Quran Majeed', 'Al Qalam Quran Majeed 2', 'Noorehuda'
         ];
         if (!VALID_FONTS.includes(merged.arabFont)) merged.arabFont = SETTINGS_DEFAULT.arabFont;
+        if (typeof merged.arabLineHeight  !== 'number')  merged.arabLineHeight  = SETTINGS_DEFAULT.arabLineHeight;
+        if (typeof merged.arabWordSpacing !== 'number')  merged.arabWordSpacing = SETTINGS_DEFAULT.arabWordSpacing;
+        if (typeof merged.arabBold        !== 'boolean') merged.arabBold        = SETTINGS_DEFAULT.arabBold;
+        if (!['right','justify','center'].includes(merged.arabAlign)) merged.arabAlign = SETTINGS_DEFAULT.arabAlign;
+        if (typeof merged.hideHarakat    !== 'boolean') merged.hideHarakat    = SETTINGS_DEFAULT.hideHarakat;
         if (typeof merged.qori            !== 'string')  merged.qori            = SETTINGS_DEFAULT.qori;
         if (typeof merged.darkMode        !== 'boolean') merged.darkMode        = SETTINGS_DEFAULT.darkMode;
         if (typeof merged.showTranslation !== 'boolean') merged.showTranslation = SETTINGS_DEFAULT.showTranslation;
@@ -706,6 +721,39 @@ function applySettings(s) {
     if (s.arabFont) {
         root.style.setProperty('--arabic-font-family', "'" + s.arabFont + "', 'LPMQ Isep Misbah', 'KFGQPC Hafs Uthmanic', 'Amiri Quran', 'Amiri', serif");
     }
+
+    // Line height Arab
+    root.style.setProperty('--arabic-line-height', s.arabLineHeight ?? SETTINGS_DEFAULT.arabLineHeight);
+
+    // Word spacing Arab
+    root.style.setProperty('--arabic-word-spacing', (s.arabWordSpacing ?? SETTINGS_DEFAULT.arabWordSpacing) + 'px');
+
+    // Bold Arab
+    root.style.setProperty('--arabic-font-weight', (s.arabBold ? '700' : 'normal'));
+
+    // Text align Arab
+    root.style.setProperty('--arabic-text-align', s.arabAlign ?? SETTINGS_DEFAULT.arabAlign);
+
+    // Harakat — strip/restore diacritics di semua .arabic yang sudah dirender
+    const harakatRangeRegex = /[\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED]/g;
+    if (s.hideHarakat) {
+        document.documentElement.classList.add('hide-harakat');
+        document.querySelectorAll('.isi-ayat .arabic').forEach(el => {
+            if (!el.dataset.originalHtml && !el.classList.contains('tajweed-active')) {
+                el.dataset.originalHtml = el.innerHTML;
+                el.innerHTML = el.innerHTML.replace(harakatRangeRegex, '');
+            }
+        });
+    } else {
+        document.documentElement.classList.remove('hide-harakat');
+        document.querySelectorAll('.isi-ayat .arabic').forEach(el => {
+            if (el.dataset.originalHtml && !el.classList.contains('tajweed-active')) {
+                el.innerHTML = el.dataset.originalHtml;
+                delete el.dataset.originalHtml;
+            }
+        });
+    }
+    window.__hideHarakat = !!s.hideHarakat;
 
     // Background & warna teks — pakai CSS variable di :root
     root.style.setProperty('--ayat-bg', s.bgColor);
@@ -880,6 +928,51 @@ function initSettings() {
         if (e.target === overlay) overlay.classList.remove('open');
     });
 
+    // ── Pengaturan Lanjutan modal ──
+    const advOverlay   = document.getElementById('advanced-settings-overlay');
+    const advOpenBtn   = document.getElementById('open-advanced-settings-btn');
+    const advCloseBtn  = document.getElementById('close-advanced-settings-btn');
+
+    if (advOverlay && advOpenBtn) {
+        advOpenBtn.addEventListener('click', () => {
+            advOverlay.classList.add('open');
+        });
+    }
+    if (advOverlay && advCloseBtn) {
+        advCloseBtn.addEventListener('click', () => advOverlay.classList.remove('open'));
+    }
+    if (advOverlay) {
+        advOverlay.addEventListener('click', (e) => {
+            if (e.target === advOverlay) advOverlay.classList.remove('open');
+        });
+    }
+
+    // ── Font Settings modal ──
+    const fontOverlay  = document.getElementById('font-settings-overlay');
+    const fontOpenBtn  = document.getElementById('open-font-settings-btn');
+    const fontCloseBtn = document.getElementById('close-font-settings-btn');
+
+    if (fontOverlay && fontOpenBtn) {
+        fontOpenBtn.addEventListener('click', () => {
+            // Sync semua nilai ke UI saat modal dibuka
+            const cur = getSettings();
+            if (lhSlider)  { lhSlider.value = cur.arabLineHeight ?? 2.4; if (lhDisplay) lhDisplay.textContent = parseFloat(lhSlider.value).toFixed(1); }
+            if (wsSlider)  { wsSlider.value = cur.arabWordSpacing ?? 8;  if (wsDisplay) wsDisplay.textContent = wsSlider.value + 'px'; }
+            if (boldToggle){ boldToggle.checked = cur.arabBold || false;  if (boldLabel) boldLabel.textContent = cur.arabBold ? 'Aktif' : 'Nonaktif'; }
+            if (harakatToggle){ harakatToggle.checked = cur.hideHarakat || false; if (harakatLabel) harakatLabel.textContent = cur.hideHarakat ? 'Aktif' : 'Nonaktif'; }
+            alignBtns.forEach(b => b.classList.toggle('active', b.dataset.align === (cur.arabAlign || 'right')));
+            fontOverlay.classList.add('open');
+        });
+    }
+    if (fontOverlay && fontCloseBtn) {
+        fontCloseBtn.addEventListener('click', () => fontOverlay.classList.remove('open'));
+    }
+    if (fontOverlay) {
+        fontOverlay.addEventListener('click', (e) => {
+            if (e.target === fontOverlay) fontOverlay.classList.remove('open');
+        });
+    }
+
     // Font size — slider
     slider.addEventListener('input', () => {
         const val = parseInt(slider.value);
@@ -997,6 +1090,103 @@ function initSettings() {
             if (fontPreview) fontPreview.style.fontFamily = "'" + font + "', serif";
         });
     }
+
+    // ── Line Height Arab ──
+    const lhSlider  = document.getElementById('arab-line-height-slider');
+    const lhDisplay = document.getElementById('arab-lh-display');
+    const lhIncBtn  = document.getElementById('arab-lh-increase');
+    const lhDecBtn  = document.getElementById('arab-lh-decrease');
+    if (lhSlider) {
+        const initLh = s.arabLineHeight ?? 2.4;
+        lhSlider.value = initLh;
+        if (lhDisplay) lhDisplay.textContent = parseFloat(initLh).toFixed(1);
+        lhSlider.addEventListener('input', () => {
+            const val = parseFloat(lhSlider.value);
+            if (lhDisplay) lhDisplay.textContent = val.toFixed(1);
+            const cur = getSettings(); cur.arabLineHeight = val;
+            saveSettings(cur); applySettings(cur);
+        });
+    }
+    if (lhIncBtn && lhSlider) {
+        lhIncBtn.addEventListener('click', () => {
+            lhSlider.value = Math.min(4.0, parseFloat(lhSlider.value) + 0.2).toFixed(1);
+            lhSlider.dispatchEvent(new Event('input'));
+        });
+    }
+    if (lhDecBtn && lhSlider) {
+        lhDecBtn.addEventListener('click', () => {
+            lhSlider.value = Math.max(1.4, parseFloat(lhSlider.value) - 0.2).toFixed(1);
+            lhSlider.dispatchEvent(new Event('input'));
+        });
+    }
+
+    // ── Word Spacing Arab ──
+    const wsSlider  = document.getElementById('arab-word-spacing-slider');
+    const wsDisplay = document.getElementById('arab-ws-display');
+    const wsIncBtn  = document.getElementById('arab-ws-increase');
+    const wsDecBtn  = document.getElementById('arab-ws-decrease');
+    if (wsSlider) {
+        const initWs = s.arabWordSpacing ?? 8;
+        wsSlider.value = initWs;
+        if (wsDisplay) wsDisplay.textContent = initWs + 'px';
+        wsSlider.addEventListener('input', () => {
+            const val = parseInt(wsSlider.value);
+            if (wsDisplay) wsDisplay.textContent = val + 'px';
+            const cur = getSettings(); cur.arabWordSpacing = val;
+            saveSettings(cur); applySettings(cur);
+        });
+    }
+    if (wsIncBtn && wsSlider) {
+        wsIncBtn.addEventListener('click', () => {
+            wsSlider.value = Math.min(24, parseInt(wsSlider.value) + 2);
+            wsSlider.dispatchEvent(new Event('input'));
+        });
+    }
+    if (wsDecBtn && wsSlider) {
+        wsDecBtn.addEventListener('click', () => {
+            wsSlider.value = Math.max(0, parseInt(wsSlider.value) - 2);
+            wsSlider.dispatchEvent(new Event('input'));
+        });
+    }
+
+    // ── Bold Arab ──
+    const boldToggle = document.getElementById('arab-bold-toggle');
+    const boldLabel  = document.getElementById('arab-bold-label');
+    if (boldToggle) {
+        boldToggle.checked = s.arabBold || false;
+        if (boldLabel) boldLabel.textContent = s.arabBold ? 'Aktif' : 'Nonaktif';
+        boldToggle.addEventListener('change', () => {
+            const cur = getSettings(); cur.arabBold = boldToggle.checked;
+            if (boldLabel) boldLabel.textContent = cur.arabBold ? 'Aktif' : 'Nonaktif';
+            saveSettings(cur); applySettings(cur);
+        });
+    }
+
+    // ── Sembunyikan Harakat ──
+    const harakatToggle = document.getElementById('hide-harakat-toggle');
+    const harakatLabel  = document.getElementById('hide-harakat-label');
+    if (harakatToggle) {
+        harakatToggle.checked = s.hideHarakat || false;
+        if (harakatLabel) harakatLabel.textContent = s.hideHarakat ? 'Aktif' : 'Nonaktif';
+        harakatToggle.addEventListener('change', () => {
+            const cur = getSettings(); cur.hideHarakat = harakatToggle.checked;
+            if (harakatLabel) harakatLabel.textContent = cur.hideHarakat ? 'Aktif' : 'Nonaktif';
+            saveSettings(cur); applySettings(cur);
+        });
+    }
+
+    // ── Text Align Arab ──
+    const alignBtns = document.querySelectorAll('.font-align-btn');
+    const initAlign = s.arabAlign || 'right';
+    alignBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.align === initAlign);
+        btn.addEventListener('click', () => {
+            alignBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const cur = getSettings(); cur.arabAlign = btn.dataset.align;
+            saveSettings(cur); applySettings(cur);
+        });
+    });
 
     // Qori select
     const qoriSelect = document.getElementById('qori-select');

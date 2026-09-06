@@ -172,12 +172,18 @@
     --ayat-bg:        #000000;
 }
 
-/* Nomor ayat putih tulang di black theme */
+/* Nomor ayat outline putih di black theme */
 .theme-dark.theme-dark-black .ayat .urutan-ayat {
-    background: #f5f0e8 !important;
+    background: transparent !important;
+}
+.theme-dark.theme-dark-black .ayat .urutan-ayat::before {
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+.theme-dark.theme-dark-black .ayat .urutan-ayat::after {
+    background: #0a0a0a !important;
 }
 .theme-dark.theme-dark-black .ayat .urutan-ayat span {
-    color: #1a1a1a !important;
+    color: #ffffff !important;
 }
 
 /* Background detail surah pure black di black theme */
