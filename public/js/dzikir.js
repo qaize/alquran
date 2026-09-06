@@ -270,6 +270,224 @@ const DZIKIR_DATA = {
                 faedah: 'Doa memohon ilmu.',
                 count: 1, sumber: 'QS. Thaha: 114',
             },
+            {
+                arab: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ، وَأَعُوذُ بِكَ مِنَ الْجُبْنِ وَالْبُخْلِ، وَأَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ',
+                latin: "Allāhumma innī a'ūdzu bika minal-hammi wal-hazan, wa a'ūdzu bika minal-'ajzi wal-kasal, wa a'ūdzu bika minal-jubni wal-bukhl, wa a'ūdzu bika min ghalabatid-dayni wa qahrir-rijāl.",
+                arti: 'Ya Allah, aku berlindung kepada-Mu dari kesusahan dan kesedihan, aku berlindung dari kelemahan dan kemalasan, aku berlindung dari sifat pengecut dan kikir, dan aku berlindung dari lilitan hutang dan tekanan orang.',
+                arti_en: 'O Allah, I seek refuge in You from grief and sadness, from weakness and laziness, from miserliness and cowardice, and from being overcome by debt and overpowered by men.',
+                faedah: 'Doa menghilangkan kesedihan dan kegalauan.',
+                count: 1, sumber: 'HR. Bukhari no. 6369',
+            },
+            {
+                arab: 'اللَّهُمَّ اغْفِرْ لِي وَارْحَمْنِي وَاهْدِنِي وَعَافِنِي وَارْزُقْنِي',
+                latin: "Allāhummaghfir lī warhamnī wahdinī wa 'āfinī warzuqnī.",
+                arti: 'Ya Allah, ampunilah aku, sayangilah aku, tunjukilah aku, sehatkanlah aku, dan berilah aku rezeki.',
+                arti_en: 'O Allah, forgive me, have mercy on me, guide me, grant me well-being, and provide for me.',
+                faedah: 'Doa ringkas penuh makna yang mencakup semua hajat.',
+                count: 1, sumber: 'HR. Muslim no. 2697',
+            },
+            {
+                arab: 'اللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِي ظُلْمًا كَثِيرًا، وَلَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ، فَاغْفِرْ لِي مَغْفِرَةً مِنْ عِنْدِكَ، وَارْحَمْنِي إِنَّكَ أَنْتَ الْغَفُورُ الرَّحِيمُ',
+                latin: "Allāhumma innī zhalamtu nafsī zhulman katsīrā, wa lā yaghfirudz-dzunūba illā anta, faghfir lī maghfiratan min 'indika, warhamnī innaka antal-ghafūrur-rahīm.",
+                arti: 'Ya Allah, aku telah banyak menzalimi diriku, dan tidak ada yang dapat mengampuni dosa kecuali Engkau. Ampunilah aku dengan ampunan dari sisi-Mu, dan sayangilah aku. Sesungguhnya Engkau Maha Pengampun lagi Maha Penyayang.',
+                arti_en: 'O Allah, I have greatly wronged myself and no one forgives sins but You. So grant me forgiveness and have mercy on me. Surely You are the Forgiving, the Merciful.',
+                faedah: 'Doa yang diajarkan Abu Bakar Ash-Shiddiq untuk dibaca dalam shalat.',
+                count: 1, sumber: 'HR. Bukhari no. 834',
+            },
+            {
+                arab: 'اللَّهُمَّ أَصْلِحْ لِي دِينِيَ الَّذِي هُوَ عِصْمَةُ أَمْرِي، وَأَصْلِحْ لِي دُنْيَايَ الَّتِي فِيهَا مَعَاشِي، وَأَصْلِحْ لِي آخِرَتِي الَّتِي فِيهَا مَعَادِي، وَاجْعَلِ الْحَيَاةَ زِيَادَةً لِي فِي كُلِّ خَيْرٍ، وَاجْعَلِ الْمَوْتَ رَاحَةً لِي مِنْ كُلِّ شَرٍّ',
+                latin: "Allāhumma ashlih lī dīniyal-ladzī huwa 'ishmatu amrī, wa ashlih lī dunyāyal-latī fīhā ma'āsyī, wa ashlih lī ākhiratiyal-latī fīhā ma'ādī, waj'alil-hayāta ziyādatan lī fī kulli khair, waj'alil-mawta rāhatan lī min kulli syarr.",
+                arti: 'Ya Allah, perbaikilah agamaku yang merupakan penjaga urusanku. Perbaikilah duniaku yang di dalamnya ada kehidupanku. Perbaikilah akhiratku yang ke sana aku kembali. Jadikanlah hidup sebagai tambahan kebaikan bagiku, dan jadikanlah kematian sebagai istirahat bagiku dari segala keburukan.',
+                arti_en: 'O Allah, set right for me my religion which is the safeguard of my affairs. Set right for me my worldly life which contains my livelihood. Set right for me my Hereafter to which I have to return. Make life an addition to every good for me and make death a rest for me from every evil.',
+                faedah: 'Doa komprehensif untuk kebaikan dunia, agama, dan akhirat.',
+                count: 1, sumber: 'HR. Muslim no. 2720',
+            },
+            {
+                arab: 'اللَّهُمَّ آتِ نَفْسِي تَقْوَاهَا، وَزَكِّهَا أَنْتَ خَيْرُ مَنْ زَكَّاهَا، أَنْتَ وَلِيُّهَا وَمَوْلَاهَا',
+                latin: "Allāhumma āti nafsī taqwāhā, wa zakkihā anta khayru man zakkāhā, anta waliyyuhā wa mawlāhā.",
+                arti: 'Ya Allah, berikanlah ketakwaan kepada jiwaku, dan sucikanlah ia, Engkau adalah sebaik-baik yang menyucikannya. Engkau adalah pelindung dan tuannya.',
+                arti_en: 'O Allah, grant my soul its piety and purify it, for You are the Best to purify it. You are its Guardian and Protector.',
+                faedah: 'Doa memohon kesucian jiwa dan ketakwaan.',
+                count: 1, sumber: 'HR. Muslim no. 2722',
+            },
+            {
+                arab: 'رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي وَاحْلُلْ عُقْدَةً مِنْ لِسَانِي يَفْقَهُوا قَوْلِي',
+                latin: "Rabbisyrah lī shadrī wa yassir lī amrī wahlul 'uqdatan min lisānī yafqahū qawlī.",
+                arti: 'Ya Rabb-ku, lapangkanlah dadaku, mudahkanlah urusanku, dan lepaskanlah kekakuan dari lidahku agar mereka mengerti perkataanku.',
+                arti_en: 'My Lord, expand my breast, ease my task for me, and remove the impediment from my speech so they may understand what I say.',
+                faedah: 'Doa Nabi Musa a.s. — dibaca saat akan berbicara penting atau presentasi.',
+                count: 1, sumber: 'QS. Thaha: 25-28',
+            },
+            {
+                arab: 'حَسْبُنَا اللهُ وَنِعْمَ الْوَكِيلُ',
+                latin: "Hasbunallāhu wa ni'mal-wakīl.",
+                arti: 'Cukuplah Allah sebagai penolong kami dan Dia adalah sebaik-baik pelindung.',
+                arti_en: 'Allah is sufficient for us and He is the Best Guardian.',
+                faedah: 'Dibaca saat menghadapi kesulitan dan tekanan.',
+                count: 1, sumber: 'QS. Ali Imran: 173',
+            },
+            {
+                arab: 'لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ',
+                latin: "Lā ilāha illā anta subhānaka innī kuntu minazh-zhālimīn.",
+                arti: 'Tidak ada Tuhan selain Engkau. Maha Suci Engkau, sesungguhnya aku termasuk orang-orang yang zalim.',
+                arti_en: 'None has the right to be worshipped except You, glory be to You, truly I was of the wrongdoers.',
+                faedah: 'Doa Nabi Yunus a.s. dalam perut ikan. Doa yang mustajab saat dalam kesulitan.',
+                count: 1, sumber: 'QS. Al-Anbiya: 87',
+            },
+            {
+                arab: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا',
+                latin: "Allāhumma innī as'aluka 'ilman nāfi'ā, wa rizqan thayyibā, wa 'amalan mutaqabbalā.",
+                arti: 'Ya Allah, aku memohon kepada-Mu ilmu yang bermanfaat, rezeki yang baik, dan amal yang diterima.',
+                arti_en: 'O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.',
+                faedah: 'Doa setelah sholat Subuh.',
+                count: 1, sumber: 'HR. Ibnu Majah no. 925',
+            },
+            {
+                arab: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عِلْمٍ لَا يَنْفَعُ، وَمِنْ قَلْبٍ لَا يَخْشَعُ، وَمِنْ نَفْسٍ لَا تَشْبَعُ، وَمِنْ دَعْوَةٍ لَا يُسْتَجَابُ لَهَا',
+                latin: "Allāhumma innī a'ūdzu bika min 'ilmin lā yanfa', wa min qalbin lā yakhsya', wa min nafsin lā tasyba', wa min da'watin lā yustajābu lahā.",
+                arti: 'Ya Allah, aku berlindung kepada-Mu dari ilmu yang tidak bermanfaat, dari hati yang tidak khusyuk, dari jiwa yang tidak pernah puas, dan dari doa yang tidak dikabulkan.',
+                arti_en: 'O Allah, I seek refuge in You from knowledge that does not benefit, from a heart that does not humble itself, from a soul that is never satisfied, and from a supplication that is not answered.',
+                faedah: 'Doa Nabi ﷺ — berlindung dari empat perkara yang merugikan.',
+                count: 1, sumber: 'HR. Muslim no. 2722',
+            },
+        ],
+    },
+    safar: {
+        id: 'safar',
+        icon: 'fa-road',
+        label_id: 'Perjalanan',
+        label_en: 'Travel Duas',
+        color: '#16a085',
+        items: [
+            {
+                arab: 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ',
+                latin: "Subhānal-ladzī sakhkhara lanā hādzā wa mā kunnā lahū muqrinīn, wa innā ilā rabbinā lamunqalibūn.",
+                arti: 'Maha Suci Allah yang telah menundukkan semua ini bagi kami, padahal kami sebelumnya tidak mampu menguasainya, dan sesungguhnya kami akan kembali kepada Rabb kami.',
+                arti_en: 'Glory be to Him who has subjected this to us, and we could never have it by our efforts, and verily to our Lord we certainly are to return.',
+                faedah: 'Doa naik kendaraan.',
+                count: 1, sumber: 'QS. Az-Zukhruf: 13-14',
+            },
+            {
+                arab: 'اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ وَالْخَلِيفَةُ فِي الْأَهْلِ',
+                latin: "Allāhumma hawwin 'alaynā safaranā hādzā wathwi 'annā bu'dah, allāhumma antas-shāhibu fis-safari wal-khalīfatu fil-ahl.",
+                arti: 'Ya Allah, mudahkanlah perjalanan kami ini dan dekatkanlah jauhnya jarak. Ya Allah, Engkau adalah teman setia dalam perjalanan dan pengganti (penjaga) bagi keluarga.',
+                arti_en: 'O Allah, make this journey easy for us and shorten the distance. O Allah, You are the companion on the journey and the guardian of the family.',
+                faedah: 'Doa saat memulai perjalanan jauh.',
+                count: 1, sumber: 'HR. Muslim no. 1342',
+            },
+            {
+                arab: 'اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى',
+                latin: "Allāhumma innā nas'aluka fī safarinā hādzal-birra wat-taqwā, wa minal-'amali mā tardhā.",
+                arti: 'Ya Allah, kami memohon kepada-Mu dalam perjalanan ini kebaikan dan ketakwaan, serta amal yang Engkau ridhai.',
+                arti_en: 'O Allah, we ask You in this journey for goodness and piety, and deeds that are pleasing to You.',
+                faedah: 'Doa safar yang diajarkan Nabi ﷺ.',
+                count: 1, sumber: 'HR. Muslim no. 1342',
+            },
+            {
+                arab: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ',
+                latin: "Allāhumma innī a'ūdzu bika min wa'tsā'is-safari, wa ka'ābatil-manzhar, wa sū'il-munqalabi fil-māli wal-ahl.",
+                arti: 'Ya Allah, aku berlindung kepada-Mu dari kesukaran perjalanan, dari pemandangan yang menyedihkan, dan dari hal-hal buruk saat pulang dalam urusan harta dan keluarga.',
+                arti_en: 'O Allah, I seek Your protection against the hardships of travel, against finding a distressing scene on return, and against a miserable fate in wealth and family.',
+                faedah: 'Doa berlindung dari kesukaran saat bepergian.',
+                count: 1, sumber: 'HR. Bukhari no. 1823',
+            },
+            {
+                arab: 'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ',
+                latin: "Allāhumma bārik lanā fīmā razaqtanā wa qinā 'adzāban-nār.",
+                arti: 'Ya Allah, berkahilah rezeki yang Engkau berikan kepada kami dan jagalah kami dari azab neraka.',
+                arti_en: 'O Allah, bless what You have provided us and protect us from the punishment of the Fire.',
+                faedah: 'Doa saat singgah di suatu tempat.',
+                count: 1, sumber: 'HR. Ibnu Sunni',
+            },
+            {
+                arab: 'اللَّهُمَّ اسْقِنَا غَيْثًا مُغِيثًا مَرِيئًا مَرِيعًا نَافِعًا غَيْرَ ضَارٍّ عَاجِلًا غَيْرَ آجِلٍ',
+                latin: "Allāhummasqinā ghaytsam mughītsan marī'an marī'an nāfi'an ghayra dhārrin 'ājilan ghayra ājil.",
+                arti: 'Ya Allah, turunkanlah hujan kepada kami yang lebat, menyegarkan, merata, bermanfaat, tidak membahayakan, segera tidak tertunda.',
+                arti_en: 'O Allah, grant us rain that is beneficial, wholesome, productive, useful, not harmful, soon and not delayed.',
+                faedah: 'Doa memohon hujan.',
+                count: 1, sumber: 'HR. Abu Dawud no. 1169',
+            },
+            {
+                arab: 'اللَّهُمَّ صَيِّبًا نَافِعًا',
+                latin: "Allāhumma shayyiban nāfi'ā.",
+                arti: 'Ya Allah, jadikanlah hujan ini hujan yang bermanfaat.',
+                arti_en: 'O Allah, make it a beneficial rain.',
+                faedah: 'Doa saat turun hujan.',
+                count: 1, sumber: 'HR. Bukhari no. 1032',
+            },
+            {
+                arab: 'أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
+                latin: "A'ūdzu bikalimātillāhit-tāmmāti min syarri mā khalaq.",
+                arti: 'Aku berlindung dengan kalimat-kalimat Allah yang sempurna dari kejahatan apa yang Dia ciptakan.',
+                arti_en: 'I seek refuge in the perfect words of Allah from the evil of what He has created.',
+                faedah: 'Dibaca saat singgah di suatu tempat — tidak ada sesuatu yang mencelakakannya.',
+                count: 3, sumber: 'HR. Muslim no. 2708',
+            },
+        ],
+    },
+    masjid: {
+        id: 'masjid',
+        icon: 'fa-mosque',
+        label_id: 'Masjid & Sholat',
+        label_en: 'Mosque & Prayer',
+        color: '#27ae60',
+        items: [
+            {
+                arab: 'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
+                latin: "Allāhummaftah lī abwāba rahmatik.",
+                arti: 'Ya Allah, bukakanlah untukku pintu-pintu rahmat-Mu.',
+                arti_en: 'O Allah, open for me the gates of Your mercy.',
+                faedah: 'Doa masuk masjid — membaca shalawat terlebih dahulu kemudian doa ini.',
+                count: 1, sumber: 'HR. Muslim no. 713',
+            },
+            {
+                arab: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ',
+                latin: "Allāhumma innī as'aluka min fadhlик.",
+                arti: 'Ya Allah, sesungguhnya aku memohon kepada-Mu karunia-Mu.',
+                arti_en: 'O Allah, I ask You from Your bounty.',
+                faedah: 'Doa keluar masjid.',
+                count: 1, sumber: 'HR. Muslim no. 713',
+            },
+            {
+                arab: 'اللَّهُمَّ اغْفِرْ لِي ذَنْبِي وَافْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
+                latin: "Allāhummaghfir lī dzanbī waftah lī abwāba rahmatik.",
+                arti: 'Ya Allah, ampunilah dosaku dan bukakanlah bagiku pintu-pintu rahmat-Mu.',
+                arti_en: 'O Allah, forgive me my sins and open the gates of Your mercy for me.',
+                faedah: 'Doa masuk masjid (versi lengkap).',
+                count: 1, sumber: 'HR. Tirmidzi no. 314',
+            },
+            {
+                arab: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الشَّيْطَانِ الرَّجِيمِ',
+                latin: "Allāhumma innī a'ūdzu bika minasy-syaythānir-rajīm.",
+                arti: 'Ya Allah, aku berlindung kepada-Mu dari setan yang terkutuk.',
+                arti_en: 'O Allah, I seek refuge in You from the accursed Satan.',
+                faedah: 'Dibaca sebelum adzan dikumandangkan.',
+                count: 1, sumber: 'HR. Muslim no. 389',
+            },
+            {
+                arab: 'اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ وَالصَّلَاةِ الْقَائِمَةِ، آتِ مُحَمَّدًا الْوَسِيلَةَ وَالْفَضِيلَةَ وَابْعَثْهُ مَقَامًا مَحْمُودًا الَّذِي وَعَدْتَهُ',
+                latin: "Allāhumma rabba hādzihid-da'watit-tāmmati wash-shalātil-qā'imah, āti muhammadanil-wasīlata wal-fadhīlata wab'atshu maqāman mahmūdanil-ladzī wa'adtah.",
+                arti: 'Ya Allah, Rabb seruan yang sempurna ini dan shalat yang didirikan, berikanlah kepada Muhammad wasilah dan keutamaan, dan bangkitkanlah ia pada kedudukan terpuji yang telah Engkau janjikan.',
+                arti_en: 'O Allah, Lord of this perfect call and of the established prayer, grant Muhammad the intercession and the privilege, and raise him to the praised station which You have promised him.',
+                faedah: 'Doa sesudah adzan — dijamin mendapat syafaat Nabi ﷺ di hari kiamat.',
+                count: 1, sumber: 'HR. Bukhari no. 614',
+            },
+            {
+                arab: 'اللَّهُمَّ اجْعَلْ فِي قَلْبِي نُورًا، وَفِي لِسَانِي نُورًا، وَفِي سَمْعِي نُورًا، وَفِي بَصَرِي نُورًا، وَمِنْ فَوْقِي نُورًا، وَمِنْ تَحْتِي نُورًا، وَعَنْ يَمِينِي نُورًا، وَعَنْ شِمَالِي نُورًا، وَمِنْ أَمَامِي نُورًا، وَمِنْ خَلْفِي نُورًا، وَاجْعَلْ لِي نُورًا',
+                latin: "Allāhummaj'al fī qalbī nūrā, wa fī lisānī nūrā, wa fī sam'ī nūrā, wa fī basharī nūrā, wa min fawqī nūrā, wa min tahtī nūrā, wa 'an yamīnī nūrā, wa 'an syimālī nūrā, wa min amāmī nūrā, wa min khalfī nūrā, waj'al lī nūrā.",
+                arti: 'Ya Allah, jadikanlah cahaya di hatiku, di lidahku, di pendengaranku, di penglihatanku, di atasku, di bawahku, di kananku, di kiriku, di depanku, di belakangku, dan jadikanlah cahaya bagiku.',
+                arti_en: 'O Allah, put light in my heart, and light in my tongue, light in my hearing, light in my sight, light behind me, light in front of me, light on my right, light on my left, light above me and light below me.',
+                faedah: 'Doa Nabi ﷺ menuju masjid untuk sholat.',
+                count: 1, sumber: 'HR. Muslim no. 763',
+            },
+            {
+                arab: 'اللَّهُمَّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ',
+                latin: "Allāhummaghfir lī wa liwālidayya wa lil-mu'minīna wal-mu'mināt.",
+                arti: 'Ya Allah, ampunilah aku, kedua orang tuaku, dan seluruh orang-orang mukmin laki-laki dan perempuan.',
+                arti_en: 'O Allah, forgive me, my parents, and all the believing men and women.',
+                faedah: 'Doa untuk diri sendiri, orang tua, dan kaum muslimin.',
+                count: 1, sumber: 'QS. Nuh: 28',
+            },
         ],
     },
 };
@@ -280,14 +498,12 @@ let _dzikirCounters  = {};
 function _dzikirKey(katId, idx) { return `${katId}_${idx}`; }
 
 /* ══════════════════════════════════════════
-   PANEL — pola persis seperti hadist
+   PANEL — grid kategori + sub-modal doa
    ══════════════════════════════════════════ */
 function openDzikirPanel() {
     let overlay = document.getElementById('dzikir-panel-overlay');
     if (overlay) {
         overlay.classList.add('open');
-        _dzikirCounters = {};
-        _renderDzikirBody();
         return;
     }
 
@@ -299,41 +515,45 @@ function openDzikirPanel() {
 
     overlay.innerHTML = `
         <div class="dzikir-panel">
-
             <div class="dzikir-panel-header">
                 <div class="dzikir-panel-title">
                     <i class="fa-solid fa-hands"></i>
                     <div>
                         <h2>${lang === 'en' ? 'Dhikr & Daily Duas' : 'Dzikir & Doa Harian'}</h2>
-                        <p id="dzikir-panel-subtitle">${lang === 'en' ? 'Morning Dhikr' : 'Dzikir Pagi'}</p>
+                        <p>${lang === 'en' ? 'Select a category' : 'Pilih kategori'}</p>
                     </div>
                 </div>
-                <button class="dzikir-panel-close" id="dzikir-panel-close" title="${typeof t === 'function' ? t('close') : 'Tutup'}">
+                <button class="dzikir-panel-close" id="dzikir-panel-close" title="Tutup">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
-            <div class="dzikir-kat-bar" id="dzikir-kat-bar">
-                ${Object.values(DZIKIR_DATA).map(k => `
-                    <button class="dzikir-kat-btn ${k.id === _dzikirActiveKat ? 'active' : ''}"
-                        data-kat="${k.id}"
-                        style="--dz-color:${k.color}">
-                        <i class="fa-solid ${k.icon}"></i>
-                        ${lang === 'en' ? k.label_en : k.label_id}
-                    </button>
-                `).join('')}
-            </div>
-
             <div class="dzikir-panel-body" id="dzikir-panel-body">
-                <div class="dzikir-loading">
-                    <i class="fa-solid fa-spinner fa-spin"></i>
-                </div>
+                <div class="dzikir-cat-grid" id="dzikir-cat-grid"></div>
             </div>
-
         </div>
     `;
 
     document.body.appendChild(overlay);
+
+    // Render grid kategori
+    const grid = overlay.querySelector('#dzikir-cat-grid');
+    Object.values(DZIKIR_DATA).forEach(kat => {
+        const card = document.createElement('button');
+        card.className = 'dzikir-cat-card';
+        card.dataset.kat = kat.id;
+        card.style.setProperty('--dz-color', kat.color);
+        const label = lang === 'en' ? kat.label_en : kat.label_id;
+        card.innerHTML = `
+            <div class="dcc-icon"><i class="fa-solid ${kat.icon}"></i></div>
+            <div class="dcc-info">
+                <span class="dcc-label">${label}</span>
+                <span class="dcc-count">${kat.items.length} ${lang === 'en' ? 'duas' : 'doa'}</span>
+            </div>
+            <i class="fa-solid fa-chevron-left dcc-arrow"></i>
+        `;
+        card.addEventListener('click', () => _openDzikirSubModal(kat.id));
+        grid.appendChild(card);
+    });
 
     // Close
     overlay.querySelector('#dzikir-panel-close').addEventListener('click', () => {
@@ -343,56 +563,77 @@ function openDzikirPanel() {
         if (e.target === overlay) overlay.classList.remove('open');
     });
 
-    // Kategori tabs
-    overlay.querySelector('#dzikir-kat-bar').addEventListener('click', e => {
-        const btn = e.target.closest('.dzikir-kat-btn');
-        if (!btn) return;
-        _dzikirActiveKat = btn.dataset.kat;
-        _dzikirCounters  = {};
-        overlay.querySelectorAll('.dzikir-kat-btn').forEach(b =>
-            b.classList.toggle('active', b.dataset.kat === _dzikirActiveKat)
-        );
-        const kat = DZIKIR_DATA[_dzikirActiveKat];
-        const sub = overlay.querySelector('#dzikir-panel-subtitle');
-        if (sub && kat) sub.textContent = lang === 'en' ? kat.label_en : kat.label_id;
-        _renderDzikirBody();
-    });
-
-    // Back button
     history.pushState({ panel: 'dzikir' }, '');
     window.addEventListener('popstate', function _dzPopstate() {
         if (!overlay.classList.contains('open')) {
             window.removeEventListener('popstate', _dzPopstate);
             return;
         }
-        overlay.classList.remove('open');
+        // Tutup sub-modal dulu kalau terbuka
+        const sub = document.getElementById('dzikir-sub-overlay');
+        if (sub && sub.classList.contains('open')) {
+            sub.classList.remove('open');
+        } else {
+            overlay.classList.remove('open');
+        }
         window.removeEventListener('popstate', _dzPopstate);
     });
 
     requestAnimationFrame(() => overlay.classList.add('open'));
+}
 
-    _dzikirCounters = {};
-    _renderDzikirBody();
+function _openDzikirSubModal(katId) {
+    const kat  = DZIKIR_DATA[katId];
+    if (!kat)  return;
+    const lang = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
 
-    // Update bahasa
-    document.addEventListener('lang-changed', () => {
-        if (!overlay.classList.contains('open')) return;
-        const l   = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
-        const h2  = overlay.querySelector('.dzikir-panel-title h2');
-        const sub = overlay.querySelector('#dzikir-panel-subtitle');
-        const kat = DZIKIR_DATA[_dzikirActiveKat];
-        if (h2)  h2.textContent  = l === 'en' ? 'Dhikr & Daily Duas' : 'Dzikir & Doa Harian';
-        if (sub && kat) sub.textContent = l === 'en' ? kat.label_en : kat.label_id;
-        overlay.querySelectorAll('.dzikir-kat-btn').forEach(b => {
-            const k = DZIKIR_DATA[b.dataset.kat];
-            if (k) b.innerHTML = `<i class="fa-solid ${k.icon}"></i> ${l === 'en' ? k.label_en : k.label_id}`;
+    // Buat sub-overlay kalau belum ada
+    let sub = document.getElementById('dzikir-sub-overlay');
+    if (!sub) {
+        sub = document.createElement('div');
+        sub.id        = 'dzikir-sub-overlay';
+        sub.className = 'dzikir-sub-overlay';
+        document.body.appendChild(sub);
+        sub.addEventListener('click', e => {
+            if (e.target === sub) sub.classList.remove('open');
         });
-        _renderDzikirBody();
+    }
+
+    _dzikirActiveKat = katId;
+    _dzikirCounters  = {};
+
+    const label = lang === 'en' ? kat.label_en : kat.label_id;
+    sub.innerHTML = `
+        <div class="dzikir-sub-panel" style="--dz-color:${kat.color}">
+            <div class="dzikir-sub-header">
+                <button class="dzikir-sub-back" id="dzikir-sub-back" title="Kembali">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <div class="dzikir-sub-title">
+                    <i class="fa-solid ${kat.icon}"></i>
+                    <span>${label}</span>
+                </div>
+                <button class="dzikir-panel-close" id="dzikir-sub-close" title="Tutup">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="dzikir-sub-body" id="dzikir-sub-body"></div>
+        </div>
+    `;
+
+    sub.querySelector('#dzikir-sub-back').addEventListener('click', () => sub.classList.remove('open'));
+    sub.querySelector('#dzikir-sub-close').addEventListener('click', () => {
+        sub.classList.remove('open');
+        const mainOverlay = document.getElementById('dzikir-panel-overlay');
+        if (mainOverlay) mainOverlay.classList.remove('open');
     });
+
+    _renderDzikirBody();
+    requestAnimationFrame(() => sub.classList.add('open'));
 }
 
 function _renderDzikirBody() {
-    const body = document.getElementById('dzikir-panel-body');
+    const body = document.getElementById('dzikir-sub-body');
     if (!body) return;
     const kat  = DZIKIR_DATA[_dzikirActiveKat];
     if (!kat)  return;
@@ -406,17 +647,13 @@ function _renderDzikirBody() {
 
         return `
             <div class="dzikir-item ${done ? 'dzikir-item-done' : ''}" id="dzi-${idx}">
-
                 <div class="dzikir-item-arab" dir="rtl">${item.arab}</div>
                 <div class="dzikir-item-latin">${item.latin}</div>
-
                 <div class="dzikir-item-arti">${arti}</div>
-
                 ${item.faedah ? `
                 <div class="dzikir-item-faedah">
                     <i class="fa-solid fa-circle-info"></i> ${item.faedah}
                 </div>` : ''}
-
                 <div class="dzikir-item-footer">
                     <span class="dzikir-item-sumber">${item.sumber}</span>
                     <div class="dzikir-counter-wrap">
@@ -433,7 +670,6 @@ function _renderDzikirBody() {
                         </button>
                     </div>
                 </div>
-
             </div>
         `;
     }).join('');
