@@ -256,23 +256,29 @@ function _renderPrayerWidget(widget) {
     const { name, time } = _ptNextPrayer;
     const icon  = PRAYER_ICONS[name];
     const label = _ptPrayerName(name);
+    const lang  = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
+    const nextLabel = lang === 'en' ? 'Next' : 'Berikutnya';
 
     widget.innerHTML = `
-        <button class="ptw-compact" id="ptw-compact" title="${t('pt_title')}">
-            <span class="ptw-icon"><i class="fa-solid ${icon}"></i></span>
-            <span class="ptw-info">
-                <span class="ptw-name">${label}</span>
-                <span class="ptw-time-val">${time}</span>
-            </span>
-            <span class="ptw-cd" id="ptw-countdown">--:--:--</span>
+        <button class="ptw-card" id="ptw-compact" title="${t('pt_title')}">
+            <div class="ptw-card-top">
+                <span class="ptw-icon"><i class="fa-solid ${icon}"></i></span>
+                <span class="ptw-info">
+                    <span class="ptw-next-label">${nextLabel}</span>
+                    <span class="ptw-name">${label}</span>
+                    <span class="ptw-time-val">${time}</span>
+                </span>
+                <span class="ptw-cd" id="ptw-countdown">--:--:--</span>
+            </div>
+            <div class="ptw-card-divider"></div>
+            <div class="ptw-card-bottom">
+                <i class="fa-solid fa-location-dot ptw-loc-icon"></i>
+                <span class="ptw-loc-text">${_ptLocation.city}</span>
+                <i class="fa-solid fa-chevron-right ptw-card-arrow"></i>
+            </div>
         </button>
-        <div class="ptw-loc-pin">
-            <i class="fa-solid fa-location-dot"></i>
-            <span>${_ptLocation.city}</span>
-        </div>
     `;
     widget.querySelector('#ptw-compact').addEventListener('click', openPrayerModal);
-    widget.querySelector('.ptw-loc-pin').addEventListener('click', openPrayerModal);
 }
 
 function _renderPrayerWidgetMobile(widget) {

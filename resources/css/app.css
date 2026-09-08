@@ -54,7 +54,6 @@
 /* ── PANELS ── */
 @import '../../public/css/panels/settings.css';
 @import '../../public/css/panels/bookmark.css';
-@import '../../public/css/panels/juz.css';
 @import '../../public/css/panels/favorites.css';
 @import '../../public/css/panels/last-read.css';
 @import '../../public/css/panels/save-lastread.css';

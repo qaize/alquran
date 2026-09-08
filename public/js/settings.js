@@ -62,7 +62,6 @@ const I18N_KEY = 'quran_lang';
 const I18N = {
     id: {
         nav_home:             'Beranda',
-        nav_juz:              'Juz',
         nav_last_read:        'Terakhir Dibaca',
         nav_bookmark:         'Bookmark',
         nav_tajwid_guide:     'Panduan Tajwid',
@@ -79,8 +78,6 @@ const I18N = {
         bm_empty:             'Belum ada bookmark.',
         bm_empty_hint:        'Buka surah, lalu arahkan kursor ke ayat — tombol ðŸ”– akan muncul di samping nomor ayat.',
         loading:              'Memuat data...',
-        juz_title:            'Daftar Juz',
-        juz_subtitle:         'Al Quran 30 Juz',
         close:                'Tutup',
         menu:                 'Menu',
         favorites_bookmark:   'Favorit & Bookmark',
@@ -290,7 +287,6 @@ const I18N = {
     },
     en: {
         nav_home:             'Home',
-        nav_juz:              'Juz',
         nav_last_read:        'Last Read',
         nav_bookmark:         'Bookmark',
         nav_tajwid_guide:     'Tajweed Guide',
@@ -307,8 +303,6 @@ const I18N = {
         bm_empty:             'No bookmarks yet.',
         bm_empty_hint:        'Open a surah, hover over a verse — the ðŸ”– button will appear next to the verse number.',
         loading:              'Loading data...',
-        juz_title:            'Juz List',
-        juz_subtitle:         'Qur\'an 30 Juz',
         close:                'Close',
         menu:                 'Menu',
         favorites_bookmark:   'Favorites & Bookmarks',

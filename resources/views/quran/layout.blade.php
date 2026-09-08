@@ -95,7 +95,6 @@
     @include('quran.partials.loading-screen')
 
     {{-- Modals & Panels --}}
-    @include('quran.partials.modals.juz-panel')
     @include('quran.partials.modals.settings')
     @include('quran.partials.modals.bookmark-panel')
     @include('quran.partials.modals.favorites-panel')

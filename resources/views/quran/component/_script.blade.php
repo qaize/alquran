@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initFavoritesNav(); } catch(e) { console.error('initFavoritesNav error:', e); }
     try { initKontenGroup(); } catch(e) { console.error('initKontenGroup error:', e); }
     try { initMobileDrawer(); } catch(e) { console.error('initMobileDrawer error:', e); }
-    try { initJuz(); } catch(e) { console.error('initJuz error:', e); }
     try { initDataSourceModal(); } catch(e) { console.error('initDataSourceModal error:', e); }
     try { initTajwidGuide(); } catch(e) { console.error('initTajwidGuide error:', e); }
     try { initSidebarRightCollapse(); } catch(e) { console.error('initSidebarRightCollapse error:', e); }
