@@ -933,6 +933,10 @@ function loadSurahDetails(nomorSurah, pushHistory = true, juzContext = null) {
                 }
             });
 
+            // Disconnect ResizeObserver dari surah-track sebelumnya (jika ada)
+            const _oldTrack = document.getElementById('surah-track');
+            if (_oldTrack?._ro) { _oldTrack._ro.disconnect(); }
+
             mainBody.innerHTML = "";
 
             componentDetailSurah(data).then((surah) => {
@@ -1099,6 +1103,23 @@ function loadSurahDetails(nomorSurah, pushHistory = true, juzContext = null) {
                 _panelNext.style.width    = `${_PW}px`;
                 _panelCurrent.style.width = `${_PW}px`;
                 _panelPrev.style.width    = `${_PW}px`;
+
+                // ── ResizeObserver: update ukuran track + panel saat container berubah ──
+                const _resizeTrack = () => {
+                    const pw = mainBody.offsetWidth;
+                    if (!pw) return;
+                    _track.style.width        = `${pw * 3}px`;
+                    _panelNext.style.width    = `${pw}px`;
+                    _panelCurrent.style.width = `${pw}px`;
+                    _panelPrev.style.width    = `${pw}px`;
+                    // Re-snap ke posisi current (tengah) tanpa animasi
+                    _track.style.transition = 'none';
+                    _track.style.transform  = `translateX(${-pw}px)`;
+                };
+                const _trackRO = new ResizeObserver(_resizeTrack);
+                _trackRO.observe(mainBody);
+                // Simpan di element agar bisa di-disconnect saat track di-destroy
+                _track._ro = _trackRO;
 
                 // Prefetch dan render panel next/prev di background
                 // Mode juz: next/prev berdasarkan JUZ_MAP, bukan suratSelanjutnya/Sebelumnya
@@ -1350,9 +1371,14 @@ function componentTitleSurah(surah) {
             <span class="title-surah-name">${surah.namaLatin ?? surah.nama_latin}</span>
             <span class="title-surah-arab">${surah.nama}</span>
         </div>
-        <button class="title-surah-collapse-btn" id="title-collapse-btn" title="Sembunyikan">
-            <i class="fa-solid fa-chevron-up"></i>
-        </button>
+        <div class="title-surah-actions">
+            <button class="title-surah-font-btn" id="title-font-btn" title="${__('settings_title','Pengaturan')}">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+            <button class="title-surah-collapse-btn" id="title-collapse-btn" title="Sembunyikan">
+                <i class="fa-solid fa-chevron-up"></i>
+            </button>
+        </div>
     </div>
     <div class="title-surah-body" id="title-surah-body">
         <p class="title-surah-arti">${surah.arti}</p>
@@ -1446,6 +1472,14 @@ function componentTitleSurah(surah) {
         }
     });
 
+    // ── Tombol font setting (gerigi) di samping collapse ──
+    const fontBtn = title.querySelector('#title-font-btn');
+    if (fontBtn) {
+        fontBtn.addEventListener('click', () => {
+            document.getElementById('open-settings-btn')?.click();
+        });
+    }
+
     return title;
 }
 
@@ -1467,6 +1501,7 @@ function componentDetailSurah(surah) {
     <div class="hide-detail" style="display:none;">
         <a id="hide-detail-button"><span><<</span></a>
         <a id="show-all-terjemahan-button"><i class="fa-solid fa-eye"></i></a>
+        <a id="detail-font-settings-btn" title="${__('settings_title','Pengaturan')}"><i class="fa-solid fa-gear"></i></a>
     </div>
     `;
 
