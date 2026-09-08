@@ -498,7 +498,7 @@ let _dzikirCounters  = {};
 function _dzikirKey(katId, idx) { return `${katId}_${idx}`; }
 
 /* ══════════════════════════════════════════
-   PANEL — grid kategori + sub-modal doa
+   PANEL — konten doa + bottom tab bar kategori
    ══════════════════════════════════════════ */
 function openDzikirPanel() {
     let overlay = document.getElementById('dzikir-panel-overlay');
@@ -512,48 +512,50 @@ function openDzikirPanel() {
     overlay.className = 'dzikir-panel-overlay';
 
     const lang = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
+    const firstKat = Object.values(DZIKIR_DATA)[0];
 
     overlay.innerHTML = `
         <div class="dzikir-panel">
-            <div class="dzikir-panel-header">
+            <div class="dzikir-panel-header" id="dzikir-panel-header"
+                 style="--dz-color:${firstKat.color}">
                 <div class="dzikir-panel-title">
-                    <i class="fa-solid fa-hands"></i>
+                    <i class="fa-solid ${firstKat.icon}" id="dzikir-header-icon"></i>
                     <div>
-                        <h2>${lang === 'en' ? 'Dhikr & Daily Duas' : 'Dzikir & Doa Harian'}</h2>
-                        <p>${lang === 'en' ? 'Select a category' : 'Pilih kategori'}</p>
+                        <h2 id="dzikir-header-title">${lang === 'en' ? firstKat.label_en : firstKat.label_id}</h2>
+                        <p id="dzikir-header-sub">${firstKat.items.length} ${lang === 'en' ? 'duas' : 'doa'}</p>
                     </div>
                 </div>
                 <button class="dzikir-panel-close" id="dzikir-panel-close" title="Tutup">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div class="dzikir-panel-body" id="dzikir-panel-body">
-                <div class="dzikir-cat-grid" id="dzikir-cat-grid"></div>
-            </div>
+            <div class="dzikir-panel-body" id="dzikir-panel-body"></div>
+            <div class="dzikir-tab-bar" id="dzikir-tab-bar"></div>
         </div>
     `;
 
     document.body.appendChild(overlay);
 
-    // Render grid kategori
-    const grid = overlay.querySelector('#dzikir-cat-grid');
-    Object.values(DZIKIR_DATA).forEach(kat => {
-        const card = document.createElement('button');
-        card.className = 'dzikir-cat-card';
-        card.dataset.kat = kat.id;
-        card.style.setProperty('--dz-color', kat.color);
+    // Render tab bar bawah
+    const tabBar = overlay.querySelector('#dzikir-tab-bar');
+    Object.values(DZIKIR_DATA).forEach((kat, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'dzikir-tab-btn' + (i === 0 ? ' active' : '');
+        btn.dataset.kat = kat.id;
+        btn.style.setProperty('--dz-color', kat.color);
         const label = lang === 'en' ? kat.label_en : kat.label_id;
-        card.innerHTML = `
-            <div class="dcc-icon"><i class="fa-solid ${kat.icon}"></i></div>
-            <div class="dcc-info">
-                <span class="dcc-label">${label}</span>
-                <span class="dcc-count">${kat.items.length} ${lang === 'en' ? 'duas' : 'doa'}</span>
-            </div>
-            <i class="fa-solid fa-chevron-left dcc-arrow"></i>
+        btn.innerHTML = `
+            <i class="fa-solid ${kat.icon} dzikir-tab-icon"></i>
+            <span class="dzikir-tab-label">${label}</span>
         `;
-        card.addEventListener('click', () => _openDzikirSubModal(kat.id));
-        grid.appendChild(card);
+        btn.addEventListener('click', () => _switchDzikirKat(kat.id));
+        tabBar.appendChild(btn);
     });
+
+    // Render konten kategori pertama
+    _dzikirActiveKat = firstKat.id;
+    _dzikirCounters  = {};
+    _renderDzikirBody();
 
     // Close
     overlay.querySelector('#dzikir-panel-close').addEventListener('click', () => {
@@ -569,71 +571,45 @@ function openDzikirPanel() {
             window.removeEventListener('popstate', _dzPopstate);
             return;
         }
-        // Tutup sub-modal dulu kalau terbuka
-        const sub = document.getElementById('dzikir-sub-overlay');
-        if (sub && sub.classList.contains('open')) {
-            sub.classList.remove('open');
-        } else {
-            overlay.classList.remove('open');
-        }
+        overlay.classList.remove('open');
         window.removeEventListener('popstate', _dzPopstate);
     });
 
     requestAnimationFrame(() => overlay.classList.add('open'));
 }
 
-function _openDzikirSubModal(katId) {
-    const kat  = DZIKIR_DATA[katId];
-    if (!kat)  return;
+function _switchDzikirKat(katId) {
+    const kat = DZIKIR_DATA[katId];
+    if (!kat || _dzikirActiveKat === katId) return;
+
     const lang = typeof getCurrentLang === 'function' ? getCurrentLang() : 'id';
 
-    // Buat sub-overlay kalau belum ada
-    let sub = document.getElementById('dzikir-sub-overlay');
-    if (!sub) {
-        sub = document.createElement('div');
-        sub.id        = 'dzikir-sub-overlay';
-        sub.className = 'dzikir-sub-overlay';
-        document.body.appendChild(sub);
-        sub.addEventListener('click', e => {
-            if (e.target === sub) sub.classList.remove('open');
-        });
-    }
+    // Update active tab
+    document.querySelectorAll('.dzikir-tab-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.kat === katId);
+    });
+
+    // Update header
+    const header = document.getElementById('dzikir-panel-header');
+    const icon   = document.getElementById('dzikir-header-icon');
+    const title  = document.getElementById('dzikir-header-title');
+    const sub    = document.getElementById('dzikir-header-sub');
+    if (header) header.style.setProperty('--dz-color', kat.color);
+    if (icon)   { icon.className = `fa-solid ${kat.icon}`; }
+    if (title)  title.textContent = lang === 'en' ? kat.label_en : kat.label_id;
+    if (sub)    sub.textContent   = `${kat.items.length} ${lang === 'en' ? 'duas' : 'doa'}`;
+
+    // Scroll body ke atas & render konten baru
+    const body = document.getElementById('dzikir-panel-body');
+    if (body) body.scrollTop = 0;
 
     _dzikirActiveKat = katId;
     _dzikirCounters  = {};
-
-    const label = lang === 'en' ? kat.label_en : kat.label_id;
-    sub.innerHTML = `
-        <div class="dzikir-sub-panel" style="--dz-color:${kat.color}">
-            <div class="dzikir-sub-header">
-                <button class="dzikir-sub-back" id="dzikir-sub-back" title="Kembali">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
-                <div class="dzikir-sub-title">
-                    <i class="fa-solid ${kat.icon}"></i>
-                    <span>${label}</span>
-                </div>
-                <button class="dzikir-panel-close" id="dzikir-sub-close" title="Tutup">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="dzikir-sub-body" id="dzikir-sub-body"></div>
-        </div>
-    `;
-
-    sub.querySelector('#dzikir-sub-back').addEventListener('click', () => sub.classList.remove('open'));
-    sub.querySelector('#dzikir-sub-close').addEventListener('click', () => {
-        sub.classList.remove('open');
-        const mainOverlay = document.getElementById('dzikir-panel-overlay');
-        if (mainOverlay) mainOverlay.classList.remove('open');
-    });
-
     _renderDzikirBody();
-    requestAnimationFrame(() => sub.classList.add('open'));
 }
 
 function _renderDzikirBody() {
-    const body = document.getElementById('dzikir-sub-body');
+    const body = document.getElementById('dzikir-panel-body');
     if (!body) return;
     const kat  = DZIKIR_DATA[_dzikirActiveKat];
     if (!kat)  return;

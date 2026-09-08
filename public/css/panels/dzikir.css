@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════
    DZIKIR & DOA HARIAN — Modal Panel
-   Pola CSS sama persis dengan hadist.css
+   Layout: header → body (scroll) → bottom tab bar
    ══════════════════════════════════════════════ */
 
 /* ── Overlay ── */
@@ -48,8 +48,9 @@
     justify-content: space-between;
     padding: 16px 18px 14px;
     background: linear-gradient(135deg, var(--navy), var(--navy-light));
-    border-bottom: 2px solid var(--gold);
+    border-bottom: 2px solid var(--dz-color, var(--gold));
     flex-shrink: 0;
+    transition: border-color 0.22s ease;
 }
 
 .dzikir-panel-title {
@@ -60,7 +61,8 @@
 
 .dzikir-panel-title > i {
     font-size: 20px;
-    color: var(--gold);
+    color: var(--dz-color, var(--gold));
+    transition: color 0.22s ease;
 }
 
 .dzikir-panel-title h2 {
@@ -98,57 +100,11 @@
     color: var(--gold);
 }
 
-/* ── Category bar (seperti kitab bar di hadist) ── */
-.dzikir-kat-bar {
-    display: flex;
-    gap: 6px;
-    padding: 10px 14px;
-    overflow-x: auto;
-    background: var(--navy);
-    border-bottom: 1px solid rgba(201, 168, 76, 0.25);
-    flex-shrink: 0;
-    scrollbar-width: none;
-}
-
-.dzikir-kat-bar::-webkit-scrollbar { display: none; }
-
-.dzikir-kat-btn {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 14px;
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50px;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 11.5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition);
-    white-space: nowrap;
-}
-
-.dzikir-kat-btn i { font-size: 11px; }
-
-.dzikir-kat-btn:hover {
-    border-color: var(--gold-light);
-    color: var(--gold-light);
-    background: rgba(201, 168, 76, 0.12);
-}
-
-.dzikir-kat-btn.active {
-    background: var(--dz-color, var(--gold));
-    border-color: var(--dz-color, var(--gold));
-    color: var(--white);
-    font-weight: 700;
-}
-
 /* ── Body — scrollable ── */
 .dzikir-panel-body {
     flex: 1;
     overflow-y: auto;
-    padding: 14px;
+    padding: 14px 14px 10px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -159,18 +115,6 @@
     background: var(--gold-light);
     border-radius: 6px;
 }
-
-/* ── Loading ── */
-.dzikir-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    color: var(--text-light);
-    font-size: 22px;
-}
-
-.dzikir-loading i { color: var(--gold); opacity: 0.5; }
 
 /* ── Dzikir item card ── */
 .dzikir-item {
@@ -313,10 +257,105 @@
     border-color: #4caf50;
 }
 
+/* ═══════════════════════════════════════════
+   BOTTOM TAB BAR KATEGORI
+   ═══════════════════════════════════════════ */
+.dzikir-tab-bar {
+    display: flex;
+    overflow-x: auto;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    scrollbar-width: none;
+    padding: 6px 4px 8px;
+    gap: 2px;
+    justify-content: safe center;
+}
+
+.dzikir-tab-bar::-webkit-scrollbar { display: none; }
+
+.dzikir-tab-btn {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 60px;
+    padding: 6px 8px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+}
+
+.dzikir-tab-btn:hover {
+    background: color-mix(in srgb, var(--dz-color) 10%, transparent);
+}
+
+/* Garis aktif di atas icon */
+.dzikir-tab-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--dz-color);
+}
+
+.dzikir-tab-icon {
+    font-size: 18px;
+    color: var(--text-light);
+    transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.dzikir-tab-btn.active .dzikir-tab-icon {
+    color: var(--dz-color);
+    transform: scale(1.15);
+}
+
+.dzikir-tab-label {
+    font-size: 9.5px;
+    font-weight: 500;
+    color: var(--text-light);
+    text-align: center;
+    line-height: 1.25;
+    max-width: 56px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    transition: color 0.18s ease;
+}
+
+.dzikir-tab-btn.active .dzikir-tab-label {
+    color: var(--dz-color);
+    font-weight: 700;
+}
+
 /* ── Dark mode ── */
 .theme-dark .dzikir-panel {
     background: var(--navy-mid);
 }
+
+.theme-dark .dzikir-tab-bar {
+    background: var(--dark-surface);
+    border-color: var(--dark-border);
+}
+
+.theme-dark .dzikir-tab-btn:hover {
+    background: color-mix(in srgb, var(--dz-color) 14%, transparent);
+}
+
+.theme-dark .dzikir-tab-icon { color: var(--dark-text-dim); }
+.theme-dark .dzikir-tab-label { color: var(--dark-text-dim); }
+.theme-dark .dzikir-tab-btn.active .dzikir-tab-icon { color: var(--dz-color); }
+.theme-dark .dzikir-tab-btn.active .dzikir-tab-label { color: var(--dz-color); }
 
 .theme-dark .dzikir-item {
     background: rgba(255, 255, 255, 0.04);
@@ -384,7 +423,7 @@
     color: var(--white);
 }
 
-/* ── Mobile (sama persis pola hadist) ── */
+/* ── Mobile ── */
 @media (max-width: 768px) {
     .dzikir-panel {
         width: 100vw;
@@ -399,184 +438,12 @@
     .dzikir-item-arab {
         font-size: 22px;
     }
-}
 
+    .dzikir-tab-btn {
+        min-width: 52px;
+        padding: 5px 6px;
+    }
 
-/* ═══════════════════════════════════════════
-   GRID KATEGORI
-   ═══════════════════════════════════════════ */
-.dzikir-cat-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 20px;
-}
-
-.dzikir-cat-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 14px;
-    border-radius: var(--radius-md);
-    border: 2px solid color-mix(in srgb, var(--dz-color) 25%, transparent);
-    background: color-mix(in srgb, var(--dz-color) 8%, var(--white));
-    cursor: pointer;
-    text-align: left;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    position: relative;
-}
-
-.dzikir-cat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px color-mix(in srgb, var(--dz-color) 20%, transparent);
-    border-color: var(--dz-color);
-}
-
-.dcc-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: color-mix(in srgb, var(--dz-color) 18%, transparent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: var(--dz-color);
-    flex-shrink: 0;
-}
-
-.dcc-info {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    flex: 1;
-    min-width: 0;
-}
-
-.dcc-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-dark);
-    line-height: 1.3;
-}
-
-.dcc-count {
-    font-size: 11px;
-    color: var(--dz-color);
-    font-weight: 500;
-}
-
-.dcc-arrow {
-    font-size: 11px;
-    color: var(--dz-color);
-    opacity: 0.6;
-    flex-shrink: 0;
-}
-
-/* Dark mode grid */
-.theme-dark .dzikir-cat-card {
-    background: color-mix(in srgb, var(--dz-color) 10%, var(--dark-surface));
-    border-color: color-mix(in srgb, var(--dz-color) 20%, transparent);
-}
-.theme-dark .dzikir-cat-card:hover {
-    background: color-mix(in srgb, var(--dz-color) 18%, var(--dark-surface));
-}
-.theme-dark .dcc-label { color: var(--dark-text); }
-
-/* Mobile: 1 kolom */
-@media (max-width: 400px) {
-    .dzikir-cat-grid { grid-template-columns: 1fr; }
-}
-
-/* ═══════════════════════════════════════════
-   SUB-MODAL DOA
-   ═══════════════════════════════════════════ */
-.dzikir-sub-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(13, 33, 55, 0.5);
-    backdrop-filter: blur(3px);
-    z-index: 5600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.22s ease, visibility 0.22s ease;
-}
-
-.dzikir-sub-overlay.open {
-    opacity: 1;
-    visibility: visible;
-}
-
-.dzikir-sub-panel {
-    width: min(680px, 96vw);
-    max-height: 92vh;
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 24px 64px rgba(13, 33, 55, 0.35);
-    transform: translateX(-30px) scale(0.97);
-    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dzikir-sub-overlay.open .dzikir-sub-panel {
-    transform: translateX(0) scale(1);
-}
-
-.dzikir-sub-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 18px;
-    background: linear-gradient(135deg, var(--navy), var(--navy-light));
-    border-bottom: 2px solid var(--dz-color, var(--gold));
-    flex-shrink: 0;
-}
-
-.dzikir-sub-back {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--white);
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.18s ease;
-}
-.dzikir-sub-back:hover { background: rgba(255,255,255,0.25); }
-
-.dzikir-sub-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--white);
-    font-family: 'Cinzel', serif;
-    letter-spacing: 0.4px;
-}
-
-.dzikir-sub-title i {
-    color: var(--dz-color, var(--gold));
-    font-size: 14px;
-}
-
-.dzikir-sub-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0;
-}
-
-/* Dark mode sub-panel */
-.theme-dark .dzikir-sub-panel {
-    background: var(--dark-surface);
+    .dzikir-tab-icon { font-size: 16px; }
+    .dzikir-tab-label { font-size: 9px; }
 }
