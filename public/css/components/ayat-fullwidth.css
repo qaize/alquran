@@ -20,7 +20,7 @@
     flex: unset;
     width: 100%;
     max-width: 100%;
-    height: calc(100vh - 160px);
+    height: calc(100dvh - 160px);
     min-height: 400px;
     text-align: right;
     padding: 16px 48px 24px 48px;
@@ -166,7 +166,6 @@
 @media (max-width: 900px) {
     .ayat.ayat-fullwidth {
         padding: 12px 20px 20px 20px;
-        /* Mobile: topbar(50px) + search(60px) + title(60px) + padding(20px) = ~190px */
-        height: calc(100vh - 190px);
+        height: calc(100dvh - 190px);
     }
 }

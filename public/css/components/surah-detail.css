@@ -61,12 +61,43 @@
     flex-shrink: 0;
     transition: background var(--transition), color var(--transition),
                 border-color var(--transition);
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
+/* ── Tombol aksi di kanan header (gerigi + collapse) ── */
+.title-surah-actions {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Font settings button */
+.title-surah-font-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 50%;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-size: 11px;
+    flex-shrink: 0;
+    transition: background var(--transition), color var(--transition),
+                border-color var(--transition), transform 0.3s ease;
+}
+
+.title-surah-font-btn:hover {
+    background: rgba(201,168,76,0.18);
+    border-color: var(--gold);
+    color: var(--gold-light);
+    transform: rotate(45deg);
+}
 .title-surah-collapse-btn:hover {
     background: rgba(201,168,76,0.2);
     border-color: var(--gold);

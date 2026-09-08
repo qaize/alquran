@@ -644,7 +644,7 @@ const SETTINGS_DEFAULT = {
     bgName: 'Putih',
     arabFont: 'Scheherazade',
     arabLineHeight: 2.4,
-    arabWordSpacing: 8,
+    arabWordSpacing: 0,
     arabBold: false,
     arabAlign: 'right',
     hideHarakat: false,
@@ -951,7 +951,7 @@ function initSettings() {
             // Sync semua nilai ke UI saat modal dibuka
             const cur = getSettings();
             if (lhSlider)  { lhSlider.value = cur.arabLineHeight ?? 2.4; if (lhDisplay) lhDisplay.textContent = parseFloat(lhSlider.value).toFixed(1); }
-            if (wsSlider)  { wsSlider.value = cur.arabWordSpacing ?? 8;  if (wsDisplay) wsDisplay.textContent = wsSlider.value + 'px'; }
+            if (wsSlider)  { wsSlider.value = cur.arabWordSpacing ?? 0;  if (wsDisplay) wsDisplay.textContent = wsSlider.value + 'px'; }
             if (boldToggle){ boldToggle.checked = cur.arabBold || false;  if (boldLabel) boldLabel.textContent = cur.arabBold ? 'Aktif' : 'Nonaktif'; }
             if (harakatToggle){ harakatToggle.checked = cur.hideHarakat || false; if (harakatLabel) harakatLabel.textContent = cur.hideHarakat ? 'Aktif' : 'Nonaktif'; }
             alignBtns.forEach(b => b.classList.toggle('active', b.dataset.align === (cur.arabAlign || 'right')));
@@ -1120,7 +1120,7 @@ function initSettings() {
     const wsIncBtn  = document.getElementById('arab-ws-increase');
     const wsDecBtn  = document.getElementById('arab-ws-decrease');
     if (wsSlider) {
-        const initWs = s.arabWordSpacing ?? 8;
+        const initWs = s.arabWordSpacing ?? 0;
         wsSlider.value = initWs;
         if (wsDisplay) wsDisplay.textContent = initWs + 'px';
         wsSlider.addEventListener('input', () => {

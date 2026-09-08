@@ -573,11 +573,11 @@
           </div>
           <div class="fsc-controls">
             <button class="fsc-btn" id="arab-ws-decrease" title="Rapat">−</button>
-            <span class="fsc-display" id="arab-ws-display">8px</span>
+            <span class="fsc-display" id="arab-ws-display">0px</span>
             <button class="fsc-btn" id="arab-ws-increase" title="Renggang">+</button>
           </div>
           <input type="range" id="arab-word-spacing-slider" class="settings-slider fsc-slider"
-            min="0" max="24" step="2" value="8">
+            min="0" max="24" step="2" value="0">
           <p class="fsc-hint">Jarak antar kata Arab</p>
         </div>
 
