@@ -99,6 +99,9 @@
     @include('quran.partials.modals.bookmark-panel')
     @include('quran.partials.modals.favorites-panel')
 
+    {{-- Mobile drawer backdrop --}}
+    <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
     {{-- Page-specific scripts (e.g. home.blade.php @section('script')) --}}
     @yield('script')
 
