@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════
-   PRAYER TIME WIDGET — compact sidebar strip
+   PRAYER TIME WIDGET — unified card sidebar
    ══════════════════════════════════════════════ */
 .prayer-time-widget {
     margin: 8px 10px 12px;
@@ -27,81 +27,137 @@
     font-size: 11px;
     cursor: pointer;
     transition: all var(--transition);
+    font-family: inherit;
 }
 .ptw-allow-btn:hover { color: var(--gold); border-color: var(--gold); }
 
-/* Compact one-line widget button */
-.ptw-compact {
+/* ── Unified card widget ── */
+.ptw-card {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(201,168,76,0.22);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition:
+        background var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition);
+    text-align: left;
+    font-family: inherit;
+    overflow: hidden;
+}
+.ptw-card:hover {
+    background: rgba(0,0,0,0.38);
+    border-color: rgba(201,168,76,0.5);
+    box-shadow: 0 2px 10px rgba(201,168,76,0.12);
+}
+
+/* Top row: icon + info + countdown */
+.ptw-card-top {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 7px 10px;
-    background: rgba(0,0,0,0.22);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: background var(--transition);
-    text-align: left;
+    padding: 9px 10px 8px;
 }
-.ptw-compact:hover { background: rgba(0,0,0,0.35); }
 
 .ptw-icon {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--gold);
-    width: 16px;
+    width: 18px;
     text-align: center;
     flex-shrink: 0;
+    filter: drop-shadow(0 0 4px rgba(201,168,76,0.4));
 }
 
 .ptw-info {
     display: flex;
-    align-items: baseline;
-    gap: 5px;
+    flex-direction: column;
+    gap: 1px;
     flex: 1;
     min-width: 0;
 }
+
+.ptw-next-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+
 .ptw-name {
     font-size: 11px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.6);
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.2;
 }
 .ptw-time-val {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    color: var(--white);
+    color: var(--gold);
     font-family: 'Cinzel', serif;
+    line-height: 1.2;
 }
 
 .ptw-cd {
     font-size: 10px;
     font-family: monospace;
     color: var(--gold);
-    background: rgba(201,168,76,0.12);
-    padding: 1px 5px;
-    border-radius: 3px;
+    background: rgba(201,168,76,0.14);
+    padding: 3px 6px;
+    border-radius: 4px;
     flex-shrink: 0;
+    letter-spacing: 0.3px;
 }
 
-.ptw-loc-pin {
+/* Thin separator between top and bottom */
+.ptw-card-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+    margin: 0 8px;
+}
+
+/* Bottom row: location */
+.ptw-card-bottom {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 3px 10px 6px;
-    font-size: 10px;
-    color: rgba(255,255,255,0.35);
-    cursor: pointer;
-    transition: color var(--transition);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    gap: 5px;
+    padding: 5px 10px 7px;
 }
-.ptw-loc-pin:hover { color: var(--gold); }
-.ptw-loc-pin i { font-size: 9px; color: var(--gold); flex-shrink: 0; }
-.ptw-loc-pin span {
+
+.ptw-loc-icon {
+    font-size: 9px;
+    color: var(--gold);
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
+.ptw-loc-text {
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    flex: 1;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    transition: color var(--transition);
+}
+
+.ptw-card-arrow {
+    font-size: 8px;
+    color: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    transition: color var(--transition), transform var(--transition);
+}
+
+.ptw-card:hover .ptw-loc-text {
+    color: rgba(255,255,255,0.7);
+}
+.ptw-card:hover .ptw-card-arrow {
+    color: var(--gold);
+    transform: translateX(2px);
 }
 
 /* ══════════════════════════════════════════════
@@ -267,8 +323,8 @@
 }
 
 /* Dark mode */
-.theme-dark .ptw-compact { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
-.theme-dark .ptw-compact:hover { background: rgba(255,255,255,0.1); }
+.theme-dark .ptw-card { background: rgba(255,255,255,0.05); border-color: rgba(201,168,76,0.18); }
+.theme-dark .ptw-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(201,168,76,0.4); }
 .theme-dark .prayer-modal { background: var(--dark-bg); }
 .theme-dark .pt-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
 .theme-dark .pt-card-name,

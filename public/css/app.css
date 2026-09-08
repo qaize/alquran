@@ -48,7 +48,6 @@
 /* ── PANELS ── */
 @import url('panels/settings.css');
 @import url('panels/bookmark.css');
-@import url('panels/juz.css');
 @import url('panels/favorites.css');
 @import url('panels/last-read.css');
 @import url('panels/save-lastread.css');

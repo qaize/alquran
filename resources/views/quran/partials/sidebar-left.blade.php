@@ -56,11 +56,6 @@
       </div>
     </div>
 
-    <a href="#" class="nav-item" id="nav-juz-btn">
-      <i class="fa-solid fa-book-open nav-icon"></i>
-      <span data-i18n="nav_juz">Juz</span>
-    </a>
-
     {{-- Terakhir Dibaca: expandable dropdown --}}
     <div class="nav-dropdown" id="nav-lastread-dropdown">
       <button class="nav-item nav-dropdown-trigger" id="nav-last-read-btn">
