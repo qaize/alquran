@@ -2188,8 +2188,12 @@ function _renderJuzSections(sections, panel, juzIndex, prefetch = false) {
     const range = JUZ_RANGES[juzIndex];
 
     // Satu container ayat untuk semua section — satu scroll tanpa pemisah
+    // Bungkus dalam .detailSurah agar dapat styling yang sama dengan detail surah
+    const detailWrapper = document.createElement('div');
+    detailWrapper.className = 'detailSurah fullwidth-mode';
+
     const ayatContainer = document.createElement('div');
-    ayatContainer.className = 'ayat';
+    ayatContainer.className = 'ayat ayat-fullwidth';
 
     let isiHtml = '';
     sections.forEach((section, sectionIdx) => {
@@ -2231,7 +2235,8 @@ function _renderJuzSections(sections, panel, juzIndex, prefetch = false) {
         });
     });
     ayatContainer.innerHTML = isiHtml;
-    panel.appendChild(ayatContainer);
+    panel.appendChild(detailWrapper);
+    detailWrapper.appendChild(ayatContainer);
 
     if (!prefetch) {
         sections.forEach(section => {

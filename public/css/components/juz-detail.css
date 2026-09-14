@@ -1,45 +1,26 @@
 /* ══════════════════════════════════════════════════════
    JUZ DETAIL — override kecil; sebagian besar pakai
-   class existing (.title-Surah, .scroll-navigation, dll.)
+   class existing (.title-Surah, .detailSurah, .ayat-fullwidth)
    ══════════════════════════════════════════════════════ */
 
-/* Bismillah lebih kecil di dalam detail juz */
-.juz-panel .ayat-bismillah {
-    padding: 8px 16px 6px;
-    gap: 8px;
-}
-
-.juz-panel .ayat-bsm-text {
-    font-size: 18px;
-}
-
-.juz-panel .ayat-bsm-line {
-    max-width: 40px;
-}
-
-/* Fix teks Arab tenggelam ke kanan.
-   Panel di-isolate agar semua konten tidak bisa
-   meluber keluar batasnya, termasuk teks RTL. */
+/* Override .surah-panel { overflow: hidden } agar
+   scroll internal di .ayat-fullwidth bisa bekerja */
 .juz-panel {
-    overflow: hidden;
-    contain: layout;
+    overflow: visible;
 }
 
-/* Chain flex min-width:0 agar item bisa shrink */
-.juz-panel .ayat,
+/* Ruang di bawah konten terakhir */
+.juz-panel .ayat-fullwidth {
+    padding-bottom: 80px;
+}
+
+/* Fix teks Arab tidak meluber di panel juz */
 .juz-panel .barisSurah,
 .juz-panel .isi-ayat,
 .juz-panel .ayat-nav {
     min-width: 0;
     max-width: 100%;
     box-sizing: border-box;
-}
-
-/* .arabic span: jadikan block agar tidak bisa inline-overflow ke kanan */
-.juz-panel .arabic {
-    display: block;
-    width: 100%;
-    overflow-wrap: break-word;
 }
 
 /* ── Pemisah surah dalam scroll juz ── */
@@ -57,7 +38,6 @@
     background: none !important;
 }
 
-/* Nama surah di atas bismillah */
 .juz-sep-name {
     display: flex;
     align-items: center;
@@ -83,7 +63,6 @@
     line-height: 1.4;
 }
 
-/* Bismillah di separator — lebih kecil */
 .juz-bsm {
     padding: 4px 20px 0 !important;
 }
@@ -96,12 +75,5 @@
     max-width: 50px !important;
 }
 
-/* Dark mode */
-.theme-dark .juz-sep-latin {
-    color: rgba(255,255,255,0.4);
-}
-
-.theme-dark .juz-sep-arab {
-    color: var(--gold-light);
-}
-
+.theme-dark .juz-sep-latin { color: rgba(255,255,255,0.4); }
+.theme-dark .juz-sep-arab  { color: var(--gold-light); }
