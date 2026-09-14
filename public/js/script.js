@@ -583,9 +583,18 @@ const JUZ_MAP = [
 // ── Home 2-panel swipe: Surah ↔ Juz ──
 // Dipanggil dari loadPagingSurah setelah kartu surah selesai dirender
 function initHomeSwipe() {
-    // Cleanup track lama jika ada
+    // Cleanup track lama jika ada — kembalikan mainBody & pagination ke parent dulu
     const oldTrack = document.getElementById('home-track');
-    if (oldTrack) oldTrack.remove();
+    if (oldTrack) {
+        const oldParent = oldTrack.parentElement;
+        if (mainBody && mainBody.closest('#home-track') && oldParent) {
+            oldParent.insertBefore(mainBody, oldTrack);
+        }
+        if (pagination && pagination.closest('#home-track') && oldParent) {
+            oldParent.insertBefore(pagination, oldTrack);
+        }
+        oldTrack.remove();
+    }
     const oldTabs = document.getElementById('home-tabs');
     if (oldTabs) oldTabs.remove();
 
@@ -841,8 +850,13 @@ function loadSurahDetails(nomorSurah, pushHistory = true, juzContext = null) {
                 requestAnimationFrame(() => _applyReadMode(window.__readMode));
             }
 
-            const nextSurah = document.getElementById("surah-next");
-            const prevSurah = document.getElementById("surah-prev");
+            // Clone tombol next/prev agar listener lama tidak menumpuk
+            const _nextSurahOld = document.getElementById("surah-next");
+            const _prevSurahOld = document.getElementById("surah-prev");
+            const nextSurah = _nextSurahOld ? _nextSurahOld.cloneNode(true) : null;
+            const prevSurah = _prevSurahOld ? _prevSurahOld.cloneNode(true) : null;
+            if (_nextSurahOld && nextSurah) _nextSurahOld.parentNode.replaceChild(nextSurah, _nextSurahOld);
+            if (_prevSurahOld && prevSurah) _prevSurahOld.parentNode.replaceChild(prevSurah, _prevSurahOld);
 
             if (juzContext !== null && typeof JUZ_MAP !== 'undefined') {
                 // Mode juz: tampilkan/sembunyikan berdasarkan ada tidaknya juz sebelum/sesudah
