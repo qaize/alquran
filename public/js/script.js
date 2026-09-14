@@ -533,6 +533,7 @@ function goHome() {
     mainBody.classList.remove('surah-swipe-clipper');
     pagination.style.display = "block";
     _titleNavCollapsed = true;
+    _activeJuzIndex = null;
     history.pushState({ view: 'list' }, '', window.location.pathname);
     loadPagingSurah(currentIndex, page * offset);
 }
@@ -709,6 +710,8 @@ function initHomeSwipe() {
     // Render kartu Juz
     if (typeof JUZ_MAP !== 'undefined') {
         JUZ_MAP.forEach((j, idx) => {
+            const endRange = typeof JUZ_RANGES !== 'undefined' && JUZ_RANGES[idx]
+                ? JUZ_RANGES[idx].end : null;
             const card = document.createElement('div');
             card.className = 'juz-home-card';
             card.innerHTML = `
@@ -718,16 +721,12 @@ function initHomeSwipe() {
                 </div>
                 <div class="jhc-info">
                     <span class="jhc-surah">${j.namaLatin}</span>
-                    <span class="jhc-ayat">Surah ${j.surah}, Ayat ${j.ayat}</span>
+                    <span class="jhc-ayat">Q.S ${j.surah}:${j.ayat}${endRange ? ' \u2013 ' + endRange.s + ':' + endRange.a : ''}</span>
                 </div>
                 <i class="fa-solid fa-chevron-left jhc-arrow"></i>
             `;
             card.addEventListener('click', () => {
-                // Set _pendingJumpAyat SEBELUM loadSurahDetails agar tidak terlewat saat cache hit
-                if (j.ayat > 1) {
-                    window._pendingJumpAyat = j.ayat;
-                }
-                loadSurahDetails(j.surah, true, { juzIndex: idx });
+                loadJuzDetails(idx, true);
             });
             juzList.appendChild(card);
         });
@@ -755,6 +754,9 @@ window.addEventListener('popstate', (e) => {
     } else if (state.view === 'detail' && state.nomor) {
         // Navigasi antar surah via back/forward
         loadSurahDetails(state.nomor, false);
+    } else if (state.view === 'juz' && typeof state.juzIndex === 'number') {
+        // Navigasi antar juz via back/forward
+        loadJuzDetails(state.juzIndex, false);
     }
 });
 
@@ -1725,3 +1727,574 @@ function numberToArabic(number) {
 
 
 
+
+
+// ══════════════════════════════════════════════════════════════
+// ── DETAIL JUZ ── tampilan ayat lintas surah per juz
+// ══════════════════════════════════════════════════════════════
+
+// Data batas awal & akhir setiap juz
+// start: surah+ayat pertama juz ini
+// end:   surah+ayat terakhir juz ini
+const JUZ_RANGES = [
+    { juz:  1, start: { s:  1, a:   1 }, end: { s:  2, a: 141 } },
+    { juz:  2, start: { s:  2, a: 142 }, end: { s:  2, a: 252 } },
+    { juz:  3, start: { s:  2, a: 253 }, end: { s:  3, a:  92 } },
+    { juz:  4, start: { s:  3, a:  93 }, end: { s:  4, a:  23 } },
+    { juz:  5, start: { s:  4, a:  24 }, end: { s:  4, a: 147 } },
+    { juz:  6, start: { s:  4, a: 148 }, end: { s:  5, a:  81 } },
+    { juz:  7, start: { s:  5, a:  82 }, end: { s:  6, a: 110 } },
+    { juz:  8, start: { s:  6, a: 111 }, end: { s:  7, a:  87 } },
+    { juz:  9, start: { s:  7, a:  88 }, end: { s:  8, a:  40 } },
+    { juz: 10, start: { s:  8, a:  41 }, end: { s:  9, a:  92 } },
+    { juz: 11, start: { s:  9, a:  93 }, end: { s: 11, a:   5 } },
+    { juz: 12, start: { s: 11, a:   6 }, end: { s: 12, a:  52 } },
+    { juz: 13, start: { s: 12, a:  53 }, end: { s: 14, a:  52 } },
+    { juz: 14, start: { s: 15, a:   1 }, end: { s: 16, a: 128 } },
+    { juz: 15, start: { s: 17, a:   1 }, end: { s: 18, a:  74 } },
+    { juz: 16, start: { s: 18, a:  75 }, end: { s: 20, a: 135 } },
+    { juz: 17, start: { s: 21, a:   1 }, end: { s: 22, a:  78 } },
+    { juz: 18, start: { s: 23, a:   1 }, end: { s: 25, a:  20 } },
+    { juz: 19, start: { s: 25, a:  21 }, end: { s: 27, a:  55 } },
+    { juz: 20, start: { s: 27, a:  56 }, end: { s: 29, a:  45 } },
+    { juz: 21, start: { s: 29, a:  46 }, end: { s: 33, a:  30 } },
+    { juz: 22, start: { s: 33, a:  31 }, end: { s: 36, a:  27 } },
+    { juz: 23, start: { s: 36, a:  28 }, end: { s: 39, a:  31 } },
+    { juz: 24, start: { s: 39, a:  32 }, end: { s: 41, a:  46 } },
+    { juz: 25, start: { s: 41, a:  47 }, end: { s: 45, a:  37 } },
+    { juz: 26, start: { s: 46, a:   1 }, end: { s: 51, a:  30 } },
+    { juz: 27, start: { s: 51, a:  31 }, end: { s: 57, a:  29 } },
+    { juz: 28, start: { s: 58, a:   1 }, end: { s: 66, a:  12 } },
+    { juz: 29, start: { s: 67, a:   1 }, end: { s: 77, a:  50 } },
+    { juz: 30, start: { s: 78, a:   1 }, end: { s: 114, a:   6 } },
+];
+
+// Cache data per-juz agar tidak re-fetch
+const _juzDataCache = new Map();
+
+/**
+ * Ambil semua ayat dalam satu juz.
+ * Return: Array of section { surahNomor, surahNamaLatin, surahNama, isFirstOfSurah, ayat[] }
+ */
+function fetchJuzData(juzIndex) {
+    if (_juzDataCache.has(juzIndex)) {
+        return Promise.resolve(_juzDataCache.get(juzIndex));
+    }
+
+    const range = JUZ_RANGES[juzIndex];
+    if (!range) return Promise.reject(new Error('Juz tidak ditemukan'));
+
+    const { start, end } = range;
+
+    // Kumpulkan nomor surah yang terlibat
+    const surahNums = [];
+    for (let s = start.s; s <= end.s; s++) surahNums.push(s);
+
+    // Fetch semua surah yang diperlukan secara paralel
+    return Promise.all(surahNums.map(n => fetchDetailInformasiSurah(n)))
+        .then(surahList => {
+            const sections = [];
+            surahList.forEach(surah => {
+                const sNum = surah.nomor;
+                const allAyat = surah.ayat;
+
+                // Tentukan range ayat untuk surah ini dalam juz
+                const ayatStart = (sNum === start.s) ? start.a : 1;
+                const ayatEnd   = (sNum === end.s)   ? end.a   : allAyat.length;
+
+                // Filter ayat sesuai range (nomorAyat 1-based)
+                const slicedAyat = allAyat.filter(ay => {
+                    const n = ay.nomorAyat ?? ay.nomor;
+                    return n >= ayatStart && n <= ayatEnd;
+                });
+
+                if (slicedAyat.length === 0) return;
+
+                sections.push({
+                    surahNomor:    sNum,
+                    surahNamaLatin: surah.namaLatin ?? surah.nama_latin,
+                    surahNama:     surah.nama,
+                    surahArti:     surah.arti,
+                    isFirstOfJuz:  sNum === start.s && ayatStart === 1,
+                    ayatStart,
+                    ayatEnd,
+                    ayat: slicedAyat,
+                });
+            });
+
+            _juzDataCache.set(juzIndex, sections);
+            return sections;
+        });
+}
+
+/**
+ * Buat elemen header/nav untuk detail juz
+ */
+function componentJuzHeader(juzNum, juzIndex) {
+    const el = document.createElement('div');
+    el.className = 'title-Surah';
+    el.id = 'juz-detail-header';
+
+    const hasPrev = juzIndex > 0;
+    const hasNext = juzIndex < JUZ_RANGES.length - 1;
+    const prevJuzNum = hasPrev ? JUZ_RANGES[juzIndex - 1].juz : null;
+    const nextJuzNum = hasNext ? JUZ_RANGES[juzIndex + 1].juz : null;
+
+    el.innerHTML = `
+    <div class="title-surah-header">
+        <div class="title-surah-header-inner">
+            <span class="title-surah-name">Juz ${juzNum}</span>
+        </div>
+        <div class="title-surah-actions">
+            <button class="title-surah-font-btn" id="juz-title-font-btn" title="${__('settings_title','Pengaturan')}">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+            <button class="title-surah-collapse-btn" id="juz-collapse-btn" title="Sembunyikan">
+                <i class="fa-solid fa-chevron-up"></i>
+            </button>
+        </div>
+    </div>
+    <div class="title-surah-body" id="juz-title-body">
+        <p class="title-surah-arti">${juzNum} / 30</p>
+        <div class="scroll-navigation">
+            <button id="juz-next-btn" ${hasNext ? '' : 'style="display:none"'}>
+                <i class="fa-solid fa-chevron-left"></i> Juz ${nextJuzNum ?? ''}
+            </button>
+            <button id="juz-prev-btn" ${hasPrev ? '' : 'style="display:none"'}>
+                Juz ${prevJuzNum ?? ''} <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="surah-trans-toggle-wrap">
+          <button id="juz-trans-toggle" class="surah-trans-btn ${window.__showTranslation !== false ? 'active' : ''}">
+            <i class="fa-solid ${window.__showTranslation !== false ? 'fa-eye' : 'fa-eye-slash'}"></i>
+            <span>${window.__showTranslation !== false ? __('trans_visible','Terjemahan') : __('trans_hidden','Terjemahan')}</span>
+          </button>
+          <button id="juz-read-mode-toggle" class="surah-trans-btn ${window.__readMode ? 'active' : ''}" title="Mode Baca">
+            <i class="fa-solid fa-book-open-reader"></i>
+            <span>${window.__readMode ? __('read_mode_on','Mode Baca') : __('read_mode_off','Mode Baca')}</span>
+          </button>
+        </div>
+    </div>
+    `;
+
+    return el;
+}
+
+/**
+ * Buat section header pemisah antar surah di dalam juz
+ */
+function componentJuzSectionHeader(section) {
+    const el = document.createElement('div');
+    el.className = 'juz-section-header';
+    el.dataset.surah = section.surahNomor;
+    el.innerHTML = `
+        <div class="jsh-inner">
+            <span class="jsh-name-latin">${section.surahNamaLatin}</span>
+            <span class="jsh-name-arab">${section.surahNama}</span>
+        </div>
+        <span class="jsh-ayat-range">${__('ayat_ref','Ayat')} ${section.ayatStart}–${section.ayatEnd}</span>
+    `;
+
+    // Bismillah di section pertama ayat pertama (kecuali At-Taubah = 9)
+    if (section.ayatStart === 1 && section.surahNomor !== 9) {
+        const bsm = document.createElement('div');
+        bsm.className = 'juz-section-bismillah';
+        bsm.innerHTML = `
+            <span class="ayat-bsm-line"></span>
+            <span class="ayat-bsm-text">&#xFDFD;</span>
+            <span class="ayat-bsm-line"></span>
+        `;
+        el.appendChild(bsm);
+    }
+
+    return el;
+}
+
+// State juz detail aktif
+let _activeJuzIndex = null;
+
+/**
+ * Entry point: tampilkan detail juz
+ */
+function loadJuzDetails(juzIndex, pushHistory = true) {
+    _destroyHomeSwipe();
+
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+    }
+
+    if (pushHistory) {
+        history.pushState({ view: 'juz', juzIndex }, '', `#juz-${juzIndex + 1}`);
+    }
+
+    _activeJuzIndex = juzIndex;
+    const range = JUZ_RANGES[juzIndex];
+    if (!range) return;
+
+    // Selalu mulai dengan nav collapsed
+    _titleNavCollapsed = true;
+
+    npStart();
+    titleSurah.innerHTML = '';
+    mainBody.innerHTML = '';
+    pagination.style.display = 'none';
+
+    // Sembunyikan widget hadist
+    const hdWidget = document.getElementById('hadist-daily-widget');
+    if (hdWidget) hdWidget.style.display = 'none';
+
+    // Render header juz ke titleSurah
+    const header = componentJuzHeader(range.juz, juzIndex);
+    titleSurah.appendChild(header);
+
+    // Collapse/expand body sama persis seperti componentTitleSurah
+    const juzBody = document.getElementById('juz-title-body');
+    const juzCollapseBtn = document.getElementById('juz-collapse-btn');
+    if (juzBody) {
+        if (_titleNavCollapsed) {
+            juzBody.classList.add('collapsed');
+            juzBody.style.maxHeight = '0px';
+            if (juzCollapseBtn) juzCollapseBtn.classList.add('is-collapsed');
+        } else {
+            juzBody.style.transition = 'none';
+            juzBody.classList.remove('collapsed');
+            juzBody.style.maxHeight = 'none';
+            requestAnimationFrame(() => { juzBody.style.transition = ''; });
+        }
+        if (juzCollapseBtn) {
+            juzCollapseBtn.addEventListener('click', () => {
+                const isCollapsed = juzBody.classList.contains('collapsed');
+                if (isCollapsed) {
+                    juzBody.style.maxHeight = juzBody.scrollHeight + 'px';
+                    juzBody.classList.remove('collapsed');
+                    juzCollapseBtn.classList.remove('is-collapsed');
+                    setTimeout(() => { juzBody.style.maxHeight = 'none'; }, 400);
+                } else {
+                    juzBody.style.maxHeight = juzBody.scrollHeight + 'px';
+                    requestAnimationFrame(() => {
+                        juzBody.classList.add('collapsed');
+                        juzBody.style.maxHeight = '0px';
+                        juzCollapseBtn.classList.add('is-collapsed');
+                    });
+                }
+                _titleNavCollapsed = !isCollapsed;
+            });
+        }
+    }
+
+    // Bind tombol font-settings di header juz
+    const fontBtn = document.getElementById('juz-title-font-btn');
+    if (fontBtn) {
+        fontBtn.addEventListener('click', () => {
+            document.getElementById('open-settings-btn')?.click();
+        });
+    }
+
+    // Bind tombol prev/next juz
+    _bindJuzNavButtons(juzIndex);
+
+    // Bind tombol terjemahan
+    const juzTransBtn = document.getElementById('juz-trans-toggle');
+    if (juzTransBtn) {
+        juzTransBtn.addEventListener('click', () => {
+            const cur = typeof getSettings === 'function' ? getSettings() : {};
+            cur.showTranslation = !(cur.showTranslation !== false);
+            if (typeof saveSettings === 'function') saveSettings(cur);
+            if (typeof applySettings === 'function') applySettings(cur);
+            const isOn = cur.showTranslation;
+            juzTransBtn.classList.toggle('active', isOn);
+            juzTransBtn.querySelector('i').className = `fa-solid ${isOn ? 'fa-eye' : 'fa-eye-slash'}`;
+            juzTransBtn.querySelector('span').textContent = isOn
+                ? __('trans_visible', 'Terjemahan') : __('trans_hidden', 'Terjemahan');
+            const settingsToggle = document.getElementById('show-translation-toggle');
+            if (settingsToggle) settingsToggle.checked = isOn;
+        });
+    }
+
+    // Bind tombol mode baca (apply setelah render selesai — dipanggil di bawah)
+    const juzReadModeBtn = document.getElementById('juz-read-mode-toggle');
+    if (juzReadModeBtn) {
+        juzReadModeBtn.addEventListener('click', () => {
+            window.__readMode = !window.__readMode;
+            localStorage.setItem('quran_read_mode', window.__readMode ? '1' : '0');
+            _applyReadMode(window.__readMode);
+            juzReadModeBtn.classList.toggle('active', window.__readMode);
+            juzReadModeBtn.querySelector('i').className = 'fa-solid fa-book-open-reader';
+            juzReadModeBtn.querySelector('span').textContent = window.__readMode
+                ? __('read_mode_on', 'Mode Baca') : __('read_mode_off', 'Mode Baca');
+        });
+    }
+
+    mainBody.classList.add('surah-swipe-clipper');
+
+    fetchJuzData(juzIndex)
+        .then(sections => {
+            // Layout track: [next | current | prev]
+            // Swipe kiri (dx<0) → next juz (geser ke translateX(-2PW))
+            // Swipe kanan (dx>0) → prev juz (geser ke translateX(0))
+            // TAPI user minta: swipe kanan-ke-kiri = next juz
+            // Jadi layout: [prev | current | next]
+            // dx > 0 (geser kanan) → lihat next  → translateX(0) → _panelNext
+            // dx < 0 (geser kiri)  → lihat prev  → translateX(-2PW) → _panelPrev
+            // ─ Sesuaikan: letakkan next di KIRI (index 0), prev di KANAN (index 2)
+            const _track = document.createElement('div');
+            _track.id = 'surah-track';
+            _track.className = 'surah-swipe-track';
+
+            // Panel next — di KIRI (swipe kanan untuk ke sini)
+            const _panelNext    = document.createElement('div');
+            _panelNext.className = 'surah-panel surah-panel-next juz-panel';
+
+            const _panelCurrent = document.createElement('div');
+            _panelCurrent.className = 'surah-panel surah-panel-current juz-panel';
+
+            // Panel prev — di KANAN (swipe kiri untuk ke sini)
+            const _panelPrev    = document.createElement('div');
+            _panelPrev.className = 'surah-panel surah-panel-prev juz-panel';
+
+            _track.appendChild(_panelNext);
+            _track.appendChild(_panelCurrent);
+            _track.appendChild(_panelPrev);
+            mainBody.appendChild(_track);
+
+            // Set ukuran
+            const _PW = mainBody.offsetWidth;
+            _track.style.width          = `${_PW * 3}px`;
+            _panelPrev.style.width      = `${_PW}px`;
+            _panelCurrent.style.width   = `${_PW}px`;
+            _panelNext.style.width      = `${_PW}px`;
+            _track.style.transform      = `translateX(${-_PW}px)`;
+
+            // ResizeObserver
+            const _ro = new ResizeObserver(() => {
+                const pw = mainBody.offsetWidth;
+                if (!pw) return;
+                _track.style.width        = `${pw * 3}px`;
+                _panelPrev.style.width    = `${pw}px`;
+                _panelCurrent.style.width = `${pw}px`;
+                _panelNext.style.width    = `${pw}px`;
+                _track.style.transition   = 'none';
+                _track.style.transform    = `translateX(${-pw}px)`;
+            });
+            _ro.observe(mainBody);
+            _track._ro = _ro;
+
+            // Render ayat ke panel current
+            _renderJuzSections(sections, _panelCurrent, juzIndex);
+
+            // Apply read mode jika aktif
+            if (window.__readMode) {
+                requestAnimationFrame(() => requestAnimationFrame(() => _applyReadMode(true)));
+            }
+
+            // Prefetch panel prev/next di background
+            const hasPrev = juzIndex > 0;
+            const hasNext = juzIndex < JUZ_RANGES.length - 1;
+
+            if (hasPrev) {
+                fetchJuzData(juzIndex - 1).then(prevSections => {
+                    _renderJuzSections(prevSections, _panelPrev, juzIndex - 1, true);
+                }).catch(() => {});
+            }
+            if (hasNext) {
+                fetchJuzData(juzIndex + 1).then(nextSections => {
+                    _renderJuzSections(nextSections, _panelNext, juzIndex + 1, true);
+                }).catch(() => {});
+            }
+
+            // Swipe touch handler
+            let _swipeStartX = null, _swipeStartY = null, _swipeActive = false;
+
+            _track.addEventListener('touchstart', (e) => {
+                if (_track._swipeLocked) return;
+                _swipeStartX = e.touches[0].clientX;
+                _swipeStartY = e.touches[0].clientY;
+                _swipeActive = false;
+                _track.style.transition = 'none';
+            }, { passive: true });
+
+            _track.addEventListener('touchmove', (e) => {
+                if (_track._swipeLocked || _swipeStartX === null) return;
+                const dx = e.touches[0].clientX - _swipeStartX;
+                const dy = e.touches[0].clientY - _swipeStartY;
+                if (!_swipeActive) {
+                    if (Math.abs(dx) < 8) return;
+                    if (Math.abs(dy) > Math.abs(dx)) { _swipeStartX = null; return; }
+                    _swipeActive = true;
+                }
+                if (dx > 0 && !hasNext) return;
+                if (dx < 0 && !hasPrev) return;
+                const pw = mainBody.offsetWidth;
+                _track.style.transform = `translateX(${-pw + dx}px)`;
+            }, { passive: true });
+
+            const _juzSnapBack = () => {
+                const pw = mainBody.offsetWidth;
+                _track.style.transition = 'transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94)';
+                _track.style.transform  = `translateX(${-pw}px)`;
+            };
+
+            _track.addEventListener('touchend', (e) => {
+                if (_track._swipeLocked || _swipeStartX === null) return;
+                if (!_swipeActive) { _swipeStartX = null; return; }
+                const dx = e.changedTouches[0].clientX - _swipeStartX;
+                const dy = e.changedTouches[0].clientY - _swipeStartY;
+                _swipeStartX = null;
+                const pw = mainBody.offsetWidth;
+                const threshold = pw * 0.35;
+                const shouldSwipe = Math.abs(dx) > threshold && Math.abs(dx) > Math.abs(dy) * 1.2;
+
+                if (shouldSwipe && dx > 0 && hasNext) {
+                    _track._swipeLocked = true;
+                    _track.style.transition = 'transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94)';
+                    _track.style.transform  = 'translateX(0px)';
+                    _track.addEventListener('transitionend', () => {
+                        loadJuzDetails(juzIndex + 1, true);
+                    }, { once: true });
+                } else if (shouldSwipe && dx < 0 && hasPrev) {
+                    _track._swipeLocked = true;
+                    _track.style.transition = 'transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94)';
+                    _track.style.transform  = `translateX(${-pw * 2}px)`;
+                    _track.addEventListener('transitionend', () => {
+                        loadJuzDetails(juzIndex - 1, true);
+                    }, { once: true });
+                } else {
+                    _juzSnapBack();
+                }
+            }, { passive: true });
+
+            _track.addEventListener('touchcancel', () => {
+                _swipeStartX = null;
+                _juzSnapBack();
+            }, { passive: true });
+
+            npDone();
+        })
+        .catch(err => {
+            npDone();
+            console.error(err);
+            mainBody.innerHTML = `<p style="padding:32px;text-align:center;color:var(--text-light)">Gagal memuat data juz.</p>`;
+        });
+}
+
+/**
+ * Render ayat lintas-surah ke dalam panel target
+ * @param {Array}   sections   - hasil fetchJuzData
+ * @param {Element} panel      - DOM element target
+ * @param {number}  juzIndex   - indeks juz yang dirender (untuk binding action)
+ * @param {boolean} prefetch   - jika true, skip terjemahan/action binding (background)
+ */
+function _renderJuzSections(sections, panel, juzIndex, prefetch = false) {
+    const range = JUZ_RANGES[juzIndex];
+
+    // Satu container ayat untuk semua section — satu scroll tanpa pemisah
+    const ayatContainer = document.createElement('div');
+    ayatContainer.className = 'ayat';
+
+    let isiHtml = '';
+    sections.forEach((section, sectionIdx) => {
+        // Bismillah pemisah: tampil di awal setiap surah baru yang dimulai dari ayat 1,
+        // kecuali section pertama juz (sudah ada di atas) dan kecuali At-Taubah (9)
+        if (sectionIdx > 0 && section.ayatStart === 1 && section.surahNomor !== 9) {
+            isiHtml += `
+            <div class="barisSurah juz-surah-separator">
+                <div class="juz-sep-name">
+                    <span class="juz-sep-latin">${section.surahNamaLatin}</span>
+                    <span class="juz-sep-arab">${section.surahNama}</span>
+                </div>
+                <div class="ayat-bismillah juz-bsm">
+                    <span class="ayat-bsm-line"></span>
+                    <span class="ayat-bsm-text">&#xFDFD;</span>
+                    <span class="ayat-bsm-line"></span>
+                </div>
+            </div>
+            `;
+        }
+        section.ayat.forEach(ay => {
+            const nomorAyat = ay.nomorAyat ?? ay.nomor;
+            const teksArab  = ay.teksArab ?? ay.ar;
+            isiHtml += `
+            <div class="barisSurah">
+            <div id="isi-ayat-${section.surahNomor}-${nomorAyat}"
+                 class="isi-ayat"
+                 data-surah="${section.surahNomor}"
+                 data-ayat="${nomorAyat}">
+                <div class="ayat-nav">
+                    <span class="arabic">${teksArab}</span>
+                    <span class="ayat-nomor-inline">
+                        <div class="urutan-ayat"><span>${numberToArabic(nomorAyat)}</span></div>
+                    </span>
+                </div>
+            </div>
+            </div>
+            `;
+        });
+    });
+    ayatContainer.innerHTML = isiHtml;
+    panel.appendChild(ayatContainer);
+
+    if (!prefetch) {
+        sections.forEach(section => {
+            section.ayat.forEach(ay => {
+                const nomorAyat = ay.nomorAyat ?? ay.nomor;
+                const elId = `isi-ayat-${section.surahNomor}-${nomorAyat}`;
+                const ayatEl = panel.querySelector(`#${elId}`);
+                if (!ayatEl) return;
+
+                ComponentTerjemahan(ay, section.surahNomor).then(terjEl => {
+                    ayatEl.appendChild(terjEl);
+
+                    const bodyTerj = terjEl.querySelector(`#terjemahan${nomorAyat}`);
+                    if (bodyTerj) {
+                        bodyTerj.style.display = (window.__showTranslation !== false) ? 'block' : 'none';
+                    }
+
+                    const audioBtn    = terjEl.querySelector(`#audio-btn-${nomorAyat}`);
+                    const bookmarkBtn = terjEl.querySelector(`#bookmark-btn-${nomorAyat}`);
+                    const lastreadBtn = terjEl.querySelector(`#lastread-btn-${nomorAyat}`);
+                    const asbabBtn    = terjEl.querySelector(`#asbab-btn-${nomorAyat}`);
+                    const tafsirBtn   = terjEl.querySelector(`#tafsir-btn-${nomorAyat}`);
+                    const copyBtn     = terjEl.querySelector(`#copy-btn-${nomorAyat}`);
+
+                    if (audioBtn)    audioBtn.addEventListener('click', () =>
+                        playAyatAudio(section.surahNomor, nomorAyat, audioBtn));
+                    if (bookmarkBtn) bookmarkBtn.addEventListener('click', () =>
+                        toggleBookmarkAyat(section.surahNomor, section.surahNamaLatin, nomorAyat));
+                    if (lastreadBtn) lastreadBtn.addEventListener('click', () =>
+                        showSaveLastReadSlide(section.surahNomor, section.surahNamaLatin, nomorAyat));
+                    if (asbabBtn)    asbabBtn.addEventListener('click', () =>
+                        openAsbabunNuzul(section.surahNomor, nomorAyat));
+                    if (tafsirBtn)   tafsirBtn.addEventListener('click', () =>
+                        openTafsir(section.surahNomor, nomorAyat));
+                    if (copyBtn)     copyBtn.addEventListener('click', () =>
+                        copyAyat(section.surahNomor, nomorAyat, section.surahNamaLatin, copyBtn));
+                });
+            });
+        });
+    }
+}
+
+/**
+ * Bind click handler untuk tombol prev/next juz di header
+ */
+function _bindJuzNavButtons(juzIndex) {
+    // Clone dulu untuk hapus listener lama
+    const prevBtnOld = document.getElementById('juz-prev-btn');
+    const nextBtnOld = document.getElementById('juz-next-btn');
+
+    if (prevBtnOld) {
+        const prevBtn = prevBtnOld.cloneNode(true);
+        prevBtnOld.parentNode.replaceChild(prevBtn, prevBtnOld);
+        prevBtn.addEventListener('click', () => {
+            if (juzIndex > 0) loadJuzDetails(juzIndex - 1, true);
+        });
+    }
+
+    if (nextBtnOld) {
+        const nextBtn = nextBtnOld.cloneNode(true);
+        nextBtnOld.parentNode.replaceChild(nextBtn, nextBtnOld);
+        nextBtn.addEventListener('click', () => {
+            if (juzIndex < JUZ_RANGES.length - 1) loadJuzDetails(juzIndex + 1, true);
+        });
+    }
+}
