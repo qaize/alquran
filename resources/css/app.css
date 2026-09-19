@@ -51,6 +51,9 @@
 /* ── HOME SWIPE ── */
 @import '../../public/css/components/home-swipe.css';
 
+/* ── SHARE AYAT ── */
+@import '../../public/css/components/share-ayat.css';
+
 /* ── PANELS ── */
 @import '../../public/css/panels/settings.css';
 @import '../../public/css/panels/bookmark.css';

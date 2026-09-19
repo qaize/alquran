@@ -1,0 +1,384 @@
+/* ============================================================
+   share-ayat.css — Styling Modal & Komponen Share Ayat
+   ============================================================ */
+
+/* ── Body lock saat modal buka ── */
+.sa-body-lock {
+    overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════════
+   MODAL CONTAINER
+   ══════════════════════════════════════════════════ */
+.sa-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    align-items: flex-end;      /* Slide dari bawah di mobile */
+    justify-content: center;
+}
+
+.sa-modal.sa-modal-open {
+    display: flex;
+}
+
+/* ── Backdrop / overlay ── */
+.sa-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: sa-fade-in 0.2s ease;
+}
+
+@keyframes sa-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ── Panel utama ── */
+.sa-container {
+    position: relative;
+    z-index: 1;
+    background: var(--bg-secondary, #1a2535);
+    border-radius: 20px 20px 0 0;
+    padding: 0 0 env(safe-area-inset-bottom, 16px);
+    width: 100%;
+    max-width: 560px;
+    max-height: 92dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    animation: sa-slide-up 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    -webkit-overflow-scrolling: touch;
+
+    /* Scrollbar tipis */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+.sa-container::-webkit-scrollbar {
+    width: 4px;
+}
+.sa-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sa-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+}
+
+@keyframes sa-slide-up {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Desktop: tampil sebagai dialog tengah ── */
+@media (min-width: 640px) {
+    .sa-modal {
+        align-items: center;
+    }
+
+    .sa-container {
+        border-radius: 20px;
+        max-height: 85dvh;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+        animation: sa-zoom-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes sa-zoom-in {
+        from { transform: scale(0.92); opacity: 0; }
+        to   { transform: scale(1);    opacity: 1; }
+    }
+}
+
+/* ══════════════════════════════════════════════════
+   HEADER
+   ══════════════════════════════════════════════════ */
+.sa-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    position: sticky;
+    top: 0;
+    background: var(--bg-secondary, #1a2535);
+    z-index: 2;
+}
+
+.sa-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary, #e8f0f8);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sa-title i {
+    color: var(--accent-gold, #c9a84c);
+    font-size: 14px;
+}
+
+.sa-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary, #94a3b8);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+
+.sa-close:hover,
+.sa-close:focus-visible {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary, #e8f0f8);
+    outline: 2px solid var(--accent-gold, #c9a84c);
+    outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════
+   SECTIONS
+   ══════════════════════════════════════════════════ */
+.sa-section {
+    padding: 16px 20px;
+}
+
+.sa-section + .sa-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sa-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary, #64748b);
+    margin: 0 0 10px;
+}
+
+/* ══════════════════════════════════════════════════
+   PILIH TEMA
+   ══════════════════════════════════════════════════ */
+.sa-themes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sa-theme-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+}
+
+.sa-theme-btn:hover {
+    transform: scale(1.1);
+}
+
+.sa-theme-btn.active {
+    border-color: var(--accent-gold, #c9a84c);
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.3);
+    transform: scale(1.12);
+}
+
+.sa-theme-btn:focus-visible {
+    outline: 2px solid var(--accent-gold, #c9a84c);
+    outline-offset: 3px;
+}
+
+/* ══════════════════════════════════════════════════
+   PREVIEW AREA
+   ══════════════════════════════════════════════════ */
+.sa-preview-wrap {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Gambar preview hasil generate */
+.sa-preview-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+}
+
+/* ── Loading indicator ── */
+.sa-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 24px;
+    color: var(--text-secondary, #94a3b8);
+    font-size: 13px;
+}
+
+.sa-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--accent-gold, #c9a84c);
+    border-radius: 50%;
+    animation: sa-spin 0.7s linear infinite;
+}
+
+@keyframes sa-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ══════════════════════════════════════════════════
+   TOMBOL AKSI
+   ══════════════════════════════════════════════════ */
+.sa-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 20px 20px;
+}
+
+.sa-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s, background 0.2s;
+    min-height: 46px;
+}
+
+.sa-btn:active {
+    transform: scale(0.97);
+}
+
+.sa-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.sa-btn:focus-visible {
+    outline: 2px solid var(--accent-gold, #c9a84c);
+    outline-offset: 2px;
+}
+
+/* Sekunder: Download */
+.sa-btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary, #e8f0f8);
+}
+
+.sa-btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+/* Primer: Share */
+.sa-btn-primary {
+    background: linear-gradient(135deg, #c9a84c, #f0c75e);
+    color: #1a0f00;
+}
+
+.sa-btn-primary:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+/* ══════════════════════════════════════════════════
+   HIDDEN CARD — di luar viewport, di-screenshot h2c
+   ══════════════════════════════════════════════════ */
+.sa-offscreen {
+    position: fixed;
+    left: -9999px;
+    top: 0;
+    pointer-events: none;
+    /* JANGAN pakai visibility:hidden atau display:none —
+       html2canvas tidak bisa render elemen yang hidden */
+    opacity: 0;
+    z-index: -1;
+}
+
+/* ══════════════════════════════════════════════════
+   TOMBOL SHARE DI ACTION BAR AYAT
+   ══════════════════════════════════════════════════ */
+.btn-share-ayat {
+    /* Inherit style dari .aab-btn, hanya override warna icon */
+    color: inherit;
+}
+
+.btn-share-ayat:hover {
+    color: var(--accent-gold, #c9a84c);
+}
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE overrides
+   ══════════════════════════════════════════════════ */
+@media (prefers-color-scheme: light) {
+    .sa-container {
+        background: #ffffff;
+    }
+
+    .sa-header {
+        background: #ffffff;
+        border-bottom-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .sa-close {
+        background: rgba(0, 0, 0, 0.06);
+        color: #475569;
+    }
+
+    .sa-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        color: #1e293b;
+    }
+
+    .sa-section + .sa-section {
+        border-top-color: rgba(0, 0, 0, 0.06);
+    }
+
+    .sa-label {
+        color: #94a3b8;
+    }
+
+    .sa-preview-wrap {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    .sa-btn-secondary {
+        background: rgba(0, 0, 0, 0.07);
+        color: #1e293b;
+    }
+
+    .sa-btn-secondary:hover:not(:disabled) {
+        background: rgba(0, 0, 0, 0.12);
+    }
+}
+
+/* Dark mode class (dari settings.js) */
+body.dark-mode .sa-container {
+    background: #0f1b2d;
+}
+body.dark-mode .sa-header {
+    background: #0f1b2d;
+}

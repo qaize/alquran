@@ -1622,6 +1622,13 @@ function initiateTerjemah(listAyat, nomorSurah, namaLatin) {
                     openTafsir(nomorSurah, nomorAyat));
                 if (copyBtn)     copyBtn.addEventListener('click', () =>
                     copyAyat(nomorSurah, nomorAyat, namaLatin, copyBtn));
+
+                const shareBtn = document.getElementById(`share-btn-${nomorAyat}`);
+                if (shareBtn)    shareBtn.addEventListener('click', () => {
+                    if (typeof openShareAyat === 'function') {
+                        openShareAyat(nomorSurah, namaLatin, nomorAyat);
+                    }
+                });
             });
         });
         resolve();
@@ -1681,6 +1688,11 @@ function ComponentTerjemahan(ayat, nomorSurah) {
                     id="copy-btn-${nomorAyat}"
                     title="${__("copy_ayat", "Salin")}">
                     <i class="fa-regular fa-copy"></i>
+                </button>
+                <button class="aab-btn btn-share-ayat"
+                    id="share-btn-${nomorAyat}"
+                    title="${__("share_ayat", "Bagikan")}">
+                    <i class="fa-solid fa-share-nodes"></i>
                 </button>
             </div>
         </div>

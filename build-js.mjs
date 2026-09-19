@@ -16,6 +16,12 @@ import { createHash } from 'crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// html2canvas UMD build — expose global window.html2canvas
+const HTML2CANVAS_PATH = resolve(
+    __dirname,
+    'node_modules/html2canvas/dist/html2canvas.min.js'
+);
+
 const JS_FILES = [
     'toast.js',
     'settings.js',
@@ -35,14 +41,16 @@ const JS_FILES = [
     'prayer-time.js',
     'dzikir.js',
     'pwa.js',
+    'share-ayat.js',
 ];
 
 const jsDir       = resolve(__dirname, 'public/js');
 const buildDir    = resolve(__dirname, 'public/build/assets');
 const manifestPath = resolve(__dirname, 'public/build/manifest.json');
 
-// 1. Concat semua file
-const combined = JS_FILES
+// 1. Concat semua file (html2canvas dulu agar tersedia sebelum share-ayat.js)
+const html2canvasCode = readFileSync(HTML2CANVAS_PATH, 'utf8');
+const combined = html2canvasCode + '\n\n' + JS_FILES
     .map(f => readFileSync(resolve(jsDir, f), 'utf8'))
     .join('\n\n');
 

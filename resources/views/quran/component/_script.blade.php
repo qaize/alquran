@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
     try { initIbadahGroup();   } catch(e) { console.error('initIbadahGroup error:', e); }
     try { initDzikir();        } catch(e) { console.error('initDzikir error:', e); }
     try { initPwa();           } catch(e) { console.error('initPwa error:', e); }
+    try { initShareAyat();    } catch(e) { console.error('initShareAyat error:', e); }
 });
 
 </script>
