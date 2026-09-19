@@ -81,9 +81,25 @@
     }
 
     function openShareAyat(nomorSurah, namaLatin, nomorAyat) {
-        const ayatEl = document.getElementById('isi-ayat' + nomorAyat);
+        // Pastikan nomorAyat selalu number untuk konsistensi
+        nomorAyat = parseInt(nomorAyat, 10);
+
+        // Cari elemen ayat — bisa pakai ID format surah (isi-ayat5)
+        // atau format juz (isi-ayat-2-5), cek data-surah & data-ayat untuk akurasi
+        let ayatEl = null;
+        const candidate = document.getElementById('isi-ayat' + nomorAyat);
+        if (candidate && parseInt(candidate.dataset.surah, 10) === nomorSurah
+                      && parseInt(candidate.dataset.ayat,  10) === nomorAyat) {
+            ayatEl = candidate;
+        }
+        // Fallback: cari lewat data attribute (mode juz pakai id berbeda)
         if (!ayatEl) {
-            console.warn('[ShareAyat] #isi-ayat tidak ditemukan:', nomorAyat);
+            ayatEl = document.querySelector(
+                `.isi-ayat[data-surah="${nomorSurah}"][data-ayat="${nomorAyat}"]`
+            );
+        }
+        if (!ayatEl) {
+            console.warn('[ShareAyat] isi-ayat tidak ditemukan:', nomorSurah, nomorAyat);
             return;
         }
 
@@ -91,26 +107,36 @@
         const arabEl   = ayatEl.querySelector('.arabic');
         const arabText = arabEl ? arabEl.innerHTML.trim() : '';
 
-        // ── Terjemahan: ambil dari cache data API via getAyatData()
-        //    Ini lebih reliable daripada DOM karena tidak bergantung timing async
+        // ── Terjemahan: ambil dari data-terjemah attribute (paling reliable & sinkron),
+        //    fallback ke .terjemahan DOM, fallback ke getAyatData
         let terjemahText = '';
-        if (typeof getAyatData === 'function') {
-            const ayatData = getAyatData(nomorAyat);
-            if (ayatData) {
-                const raw = ayatData.teksIndonesia ?? ayatData.idn ?? '';
-                terjemahText = raw.replace(/^["""'']+|["""'']+$/g, '').trim();
-            }
+
+        // 1. Dari data-terjemah attribute — disimpan saat render awal, selalu sinkron
+        const dataTerjemah = ayatEl.dataset.terjemah;
+        if (dataTerjemah) {
+            terjemahText = dataTerjemah.trim()
+                .replace(/^["""''""]+|["""''""]+$/g, '')
+                .trim();
         }
 
-        // Fallback: ambil dari DOM jika getAyatData tidak ada atau kosong
+        // 2. Fallback: cari p.terjemahan di DOM (jika data-terjemah tidak ada)
         if (!terjemahText) {
             const terjemahEl = ayatEl.querySelector('.terjemahan');
             if (terjemahEl) {
                 terjemahText = terjemahEl.textContent.trim()
                     .replace(/^artinya:\s*/i, '')
                     .replace(/^meaning:\s*/i, '')
-                    .replace(/^["""'']+|["""'']+$/g, '')
+                    .replace(/^["""''""]+|["""''""]+$/g, '')
                     .trim();
+            }
+        }
+
+        // 3. Fallback ke getAyatData (hanya untuk surah aktif di audio cache)
+        if (!terjemahText && typeof getAyatData === 'function') {
+            const ayatData = getAyatData(nomorAyat);
+            if (ayatData) {
+                const raw = ayatData.teksIndonesia ?? ayatData.idn ?? '';
+                terjemahText = raw.replace(/^["""''""]+|["""''""]+$/g, '').trim();
             }
         }
 
@@ -369,7 +395,7 @@
                     line-height:2.1;
                     color:${theme.text};
                     margin-bottom:24px;
-                    word-spacing:5px;">
+                    word-spacing:0px;">
                     ${data.arab}
                 </div>
 

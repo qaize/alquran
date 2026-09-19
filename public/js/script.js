@@ -1534,9 +1534,10 @@ function componentDetailSurah(surah) {
         surah.ayat.forEach((ayat) => {
             const nomorAyat = ayat.nomorAyat ?? ayat.nomor;
             const teksArab = ayat.teksArab ?? ayat.ar;
+            const teksIdn  = (ayat.teksIndonesia ?? ayat.idn ?? '').replace(/"/g, '&quot;');
             isiAyat += `
         <div class="barisSurah">
-        <div id="isi-ayat${nomorAyat}" class="isi-ayat" data-surah="${surah.nomor}" data-ayat="${nomorAyat}">
+        <div id="isi-ayat${nomorAyat}" class="isi-ayat" data-surah="${surah.nomor}" data-ayat="${nomorAyat}" data-terjemah="${teksIdn}">
             <div class="ayat-nav">
                 <span class="arabic">${teksArab}</span>
                 <span class="ayat-nomor-inline">
@@ -2229,12 +2230,14 @@ function _renderJuzSections(sections, panel, juzIndex, prefetch = false) {
         section.ayat.forEach(ay => {
             const nomorAyat = ay.nomorAyat ?? ay.nomor;
             const teksArab  = ay.teksArab ?? ay.ar;
+            const teksIdn   = (ay.teksIndonesia ?? ay.idn ?? '').replace(/"/g, '&quot;');
             isiHtml += `
             <div class="barisSurah">
             <div id="isi-ayat-${section.surahNomor}-${nomorAyat}"
                  class="isi-ayat"
                  data-surah="${section.surahNomor}"
-                 data-ayat="${nomorAyat}">
+                 data-ayat="${nomorAyat}"
+                 data-terjemah="${teksIdn}">
                 <div class="ayat-nav">
                     <span class="arabic">${teksArab}</span>
                     <span class="ayat-nomor-inline">
@@ -2272,6 +2275,7 @@ function _renderJuzSections(sections, panel, juzIndex, prefetch = false) {
                     const asbabBtn    = terjEl.querySelector(`#asbab-btn-${nomorAyat}`);
                     const tafsirBtn   = terjEl.querySelector(`#tafsir-btn-${nomorAyat}`);
                     const copyBtn     = terjEl.querySelector(`#copy-btn-${nomorAyat}`);
+                    const shareBtn    = terjEl.querySelector(`#share-btn-${nomorAyat}`);
 
                     if (audioBtn)    audioBtn.addEventListener('click', () =>
                         playAyatAudio(section.surahNomor, nomorAyat, audioBtn));
@@ -2285,6 +2289,11 @@ function _renderJuzSections(sections, panel, juzIndex, prefetch = false) {
                         openTafsir(section.surahNomor, nomorAyat));
                     if (copyBtn)     copyBtn.addEventListener('click', () =>
                         copyAyat(section.surahNomor, nomorAyat, section.surahNamaLatin, copyBtn));
+                    if (shareBtn)    shareBtn.addEventListener('click', () => {
+                        if (typeof openShareAyat === 'function') {
+                            openShareAyat(section.surahNomor, section.surahNamaLatin, nomorAyat);
+                        }
+                    });
                 });
             });
         });
