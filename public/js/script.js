@@ -12,30 +12,25 @@ if (typeof NProgress !== 'undefined') {
 function npStart() { if (typeof NProgress !== 'undefined') NProgress.start(); }
 function npDone()  { if (typeof NProgress !== 'undefined') NProgress.done();  }
 
-const mainBody = document.getElementById("main-body");
+const mainBody    = document.getElementById("main-body");
 const surahDetail = document.getElementById("surah_detail");
-const prevButton = document.getElementById("prev");
-const nextButton = document.getElementById("next");
 const searchButton = document.getElementById("search-button");
-const searchInput = document.getElementById("search-input");
-const pagination = document.getElementById("pagination");
-const titleSurah = document.getElementById("title-detail-surah");
+const searchInput  = document.getElementById("search-input");
+const titleSurah   = document.getElementById("title-detail-surah");
 
 let partialSurah = [];
 let allDataSurahPromise = null;
 let isDataLoaded = false;
-let searchSurah = "";
-// Cache raw list surah (tanpa filter) agar tidak re-fetch saat search berubah
+let searchSurah  = "";
 let rawSurahListCache = null;
-
 let nomorSurah = 0;
 
-const offset = 12;
-let page = 1;
-let totalPage = 0;
-let currentIndex = 0;
-let overflow = 0;
-let totalData = page * offset;
+// ── Infinite scroll state ──
+let _allSurahData  = [];
+let _renderedCount = 0;
+let _scrollObserver = null;
+const _isMobile  = () => window.innerWidth <= 768;
+const _batchSize = () => _isMobile() ? 8 : 12;
 
 // Helper: ambil terjemahan dari sistem i18n (_script.blade.php)
 // Fallback ke string Indonesia jika t() belum tersedia
@@ -127,11 +122,9 @@ function triggerSearch(query) {
     closeSuggestion();
     searchSurah = (query !== undefined ? query : searchInput.value).trim();
     searchInput.value = searchSurah;
-    page = 1;
-    currentIndex = 0;
     mainBody.innerHTML = "";
     updateClearButton();
-    loadPagingSurah(currentIndex, page * offset);
+    loadPagingSurah();
 }
 
 // -- Clear button --
@@ -278,24 +271,6 @@ document.addEventListener("mousedown", (e) => {
     }
 });
 
-prevButton.addEventListener("click", () => {
-    if (page > 1) {
-        page--;
-        currentIndex = currentIndex - offset;
-    }
-    loadPagingSurah(currentIndex, page * offset);
-});
-
-nextButton.addEventListener("click", () => {
-    if (totalPage > page) {
-        page++;
-        currentIndex = currentIndex + offset;
-        loadPagingSurah(currentIndex, page * offset);
-    }
-    if (totalPage == page) {
-        loadPagingSurah(currentIndex, currentIndex + overflow);
-    }
-});
 
 /*
     Halaman Utama
@@ -361,12 +336,21 @@ function surahCard(surah) {
     const card = document.createElement("div");
     card.classList.add("surah-card");
 
-    // Animate.css � fadeInUp dengan stagger delay
-    card.classList.add("animate__animated", "animate__fadeInUp");
-    const delay = Math.min(_cardAnimIndex * 50, 400); // max 400ms agar tidak terlalu lama
-    card.style.animationDelay = delay + "ms";
-    card.style.animationDuration = "0.4s";
+    // Scroll reveal — hidden → visible via double rAF + stagger
+    card.classList.add("surah-card-hidden");
+    const delay = Math.min(_cardAnimIndex * 40, 320);
     _cardAnimIndex++;
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            card.style.transitionDelay = delay + "ms";
+            card.classList.remove("surah-card-hidden");
+            card.classList.add("surah-card-visible");
+            card.addEventListener("transitionend", () => {
+                card.style.transitionDelay = "0ms";
+            }, { once: true });
+        });
+    });
 
     const favClass =
         (typeof isFavorite === 'function' && isFavorite(surah.nomor))
@@ -407,9 +391,51 @@ function surahCard(surah) {
     return card;
 }
 
-// muat daftar surah dengan paginasi
-function loadPagingSurah(currentIndex, totalData) {
-    _cardAnimIndex = 0; // reset stagger setiap load halaman baru
+// ── Hancurkan sentinel IntersectionObserver ──
+function _destroyScrollObserver() {
+    if (_scrollObserver) { _scrollObserver.disconnect(); _scrollObserver = null; }
+    const s = document.getElementById('surah-scroll-sentinel');
+    if (s) s.remove();
+}
+
+// ── Render satu batch kartu ke mainBody ──
+function _renderBatch() {
+    const batch = _allSurahData.slice(_renderedCount, _renderedCount + _batchSize());
+    if (batch.length === 0) { _destroyScrollObserver(); return; }
+    _cardAnimIndex = 0;
+    batch.forEach(surah => mainBody.appendChild(surahCard(surah)));
+    _renderedCount += batch.length;
+    if (typeof isFavorite === 'function') {
+        batch.forEach(surah => {
+            if (isFavorite(surah.nomor)) {
+                const btn = document.getElementById(`star-${surah.nomor}`);
+                if (btn) { btn.classList.add('favorited'); btn.title = __('remove_favorite', 'Hapus dari favorit'); }
+            }
+        });
+    }
+    if (_renderedCount < _allSurahData.length) { _attachSentinel(); }
+    else { _destroyScrollObserver(); }
+}
+
+// ── Pasang sentinel + IntersectionObserver ──
+function _attachSentinel() {
+    const old = document.getElementById('surah-scroll-sentinel');
+    if (old) old.remove();
+    const sentinel = document.createElement('div');
+    sentinel.id = 'surah-scroll-sentinel';
+    sentinel.style.cssText = 'height:1px;width:100%;';
+    mainBody.insertAdjacentElement('afterend', sentinel);
+    if (_scrollObserver) _scrollObserver.disconnect();
+    _scrollObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) _renderBatch();
+    }, { rootMargin: '200px', threshold: 0 });
+    _scrollObserver.observe(sentinel);
+}
+
+// muat daftar surah dengan infinite scroll reveal
+function loadPagingSurah() {
+    _cardAnimIndex = 0;
+    _destroyScrollObserver();
     npStart();
     showLoadingScreen();
     loadAllSurah()
@@ -418,80 +444,22 @@ function loadPagingSurah(currentIndex, totalData) {
             hideLoadingScreen();
             titleSurah.innerHTML = "";
             mainBody.innerHTML = "";
-
-
-            // Tampilkan kembali widget hadist harian
             const hdWidget = document.getElementById('hadist-daily-widget');
             if (hdWidget) hdWidget.style.display = '';
-            const data = allData;
-            totalPage = Math.ceil(data.length / offset);
-            overflow = data.length % offset;
-
-            if (totalPage > 1) {
-                pagination.style.display = "block";
-            } else {
-                pagination.style.display = "none";
-            }
-
-            if (totalPage == page) {
-                nextButton.style.display = "none";
-            } else {
-                nextButton.style.display = "inline-block";
-            }
-
-            if (page > 1) {
-                prevButton.style.display = "inline-block";
-            } else {
-                prevButton.style.display = "none";
-            }
-
-            if (data.length == 1) {
-                loadSurahDetails(data[0].nomor);
-            } else if (data.length == 0) {
+            _allSurahData  = allData;
+            _renderedCount = 0;
+            if (allData.length === 0) {
                 const notFound = document.createElement("h1");
                 notFound.classList.add("data-empty");
-                notFound.innerHTML = __(
-                    "data_not_found",
-                    "Data tidak ditemukan",
-                );
+                notFound.innerHTML = __("data_not_found", "Data tidak ditemukan");
                 mainBody.appendChild(notFound);
-            } else {
-                for (
-                    currentIndex - 1;
-                    currentIndex < totalData;
-                    currentIndex++
-                ) {
-                    if (typeof data[currentIndex] === "undefined") {
-                        break;
-                    }
-                    mainBody.appendChild(surahCard(data[currentIndex]));
-                }
-
-                if (typeof isFavorite === "function") {
-                    data.forEach((surah) => {
-                        if (isFavorite(surah.nomor)) {
-                            const starBtn = document.getElementById(
-                                `star-${surah.nomor}`,
-                            );
-                            if (starBtn) {
-                                starBtn.classList.add("favorited");
-                                starBtn.title = __(
-                                    "remove_favorite",
-                                    "Hapus dari favorit",
-                                );
-                            }
-                        }
-                    });
-                }
-
-                // Inisialisasi home swipe (Surah ↔ Juz)
-                initHomeSwipe();
+                return;
             }
+            if (allData.length === 1) { loadSurahDetails(allData[0].nomor); return; }
+            _renderBatch();
+            initHomeSwipe();
         })
-        .catch((error) => {
-            npDone();
-            console.error(error);
-        });
+        .catch((error) => { npDone(); hideLoadingScreen(); console.error(error); });
 }
 
 // Cleanup home swipe track saat pindah ke detail atau kembali ke home
@@ -506,10 +474,6 @@ function _destroyHomeSwipe() {
     if (mainBody && mainBody.closest('#home-track')) {
         parent.insertBefore(mainBody, track);
     }
-    // Kembalikan #pagination ke parent track jika sedang di dalam panel
-    if (pagination && pagination.closest('#home-track')) {
-        parent.insertBefore(pagination, track);
-    }
 
     track.remove();
     tabs && tabs.remove();
@@ -519,23 +483,23 @@ function _destroyHomeSwipe() {
 // Set initial history state agar back dari detail bisa kembali ke list
 history.replaceState({ view: 'list' }, '', window.location.href);
 
-loadPagingSurah(currentIndex, totalData);
+loadPagingSurah();
 // ── Klik logo (desktop sidebar & mobile topbar) → kembali ke menu utama ──
 function goHome() {
     searchSurah = "";
     searchInput.value = "";
     updateClearButton();
-    page = 1;
-    currentIndex = 0;
     titleSurah.innerHTML = "";
     _destroyHomeSwipe();
+    _destroyScrollObserver();
     mainBody.innerHTML = "";
     mainBody.classList.remove('surah-swipe-clipper');
-    pagination.style.display = "block";
+    _allSurahData  = [];
+    _renderedCount = 0;
     _titleNavCollapsed = true;
     _activeJuzIndex = null;
     history.pushState({ view: 'list' }, '', window.location.pathname);
-    loadPagingSurah(currentIndex, page * offset);
+    loadPagingSurah();
 }
 
 document.getElementById('sidebar-logo')?.addEventListener('click', goHome);
@@ -584,15 +548,12 @@ const JUZ_MAP = [
 // ── Home 2-panel swipe: Surah ↔ Juz ──
 // Dipanggil dari loadPagingSurah setelah kartu surah selesai dirender
 function initHomeSwipe() {
-    // Cleanup track lama jika ada — kembalikan mainBody & pagination ke parent dulu
+    // Cleanup track lama jika ada — kembalikan mainBody ke parent dulu
     const oldTrack = document.getElementById('home-track');
     if (oldTrack) {
         const oldParent = oldTrack.parentElement;
         if (mainBody && mainBody.closest('#home-track') && oldParent) {
             oldParent.insertBefore(mainBody, oldTrack);
-        }
-        if (pagination && pagination.closest('#home-track') && oldParent) {
-            oldParent.insertBefore(pagination, oldTrack);
         }
         oldTrack.remove();
     }
@@ -617,7 +578,7 @@ function initHomeSwipe() {
     track.id = 'home-track';
     track.className = 'home-track';
 
-    // Panel Surah — pindahkan mainBody + pagination ke dalamnya
+    // Panel Surah — pindahkan mainBody ke dalamnya
     const panelSurah = document.createElement('div');
     panelSurah.className = 'home-panel home-panel-surah';
 
@@ -628,10 +589,9 @@ function initHomeSwipe() {
     juzList.className = 'juz-home-list';
     panelJuz.appendChild(juzList);
 
-    // Pindahkan #main-body dan #pagination ke panel surah
+    // Pindahkan #main-body ke panel surah
     const mbClone = mainBody.parentNode;
     panelSurah.appendChild(mainBody);
-    panelSurah.appendChild(pagination);
 
     track.appendChild(panelSurah);
     track.appendChild(panelJuz);
@@ -741,16 +701,15 @@ window.addEventListener('popstate', (e) => {
         searchSurah = "";
         searchInput.value = "";
         updateClearButton();
-        page = 1;
-        currentIndex = 0;
+        _allSurahData  = [];
+        _renderedCount = 0;
         titleSurah.innerHTML = "";
         _destroyHomeSwipe();
+        _destroyScrollObserver();
         mainBody.innerHTML = "";
         mainBody.classList.remove('surah-swipe-clipper');
-
-        pagination.style.display = "block";
-        _titleNavCollapsed = true; // reset state navigasi saat kembali ke list
-        loadPagingSurah(currentIndex, page * offset);
+        _titleNavCollapsed = true;
+        loadPagingSurah();
     } else if (state.view === 'detail' && state.nomor) {
         // Navigasi antar surah via back/forward
         loadSurahDetails(state.nomor, false);
@@ -1359,8 +1318,7 @@ function loadSurahDetails(nomorSurah, pushHistory = true, juzContext = null) {
 
 
             });
-
-            pagination.style.display = "none";
+            _destroyScrollObserver();
             npDone();
         })
         .catch((error) => {
@@ -1368,7 +1326,7 @@ function loadSurahDetails(nomorSurah, pushHistory = true, juzContext = null) {
             console.error(error);
             titleSurah.innerHTML = "";
             mainBody.innerHTML = "";
-            loadPagingSurah(0, page * offset);
+            loadPagingSurah();
         });
 }
 
@@ -1950,7 +1908,7 @@ function loadJuzDetails(juzIndex, pushHistory = true) {
     npStart();
     titleSurah.innerHTML = '';
     mainBody.innerHTML = '';
-    pagination.style.display = 'none';
+    _destroyScrollObserver();
 
     // Sembunyikan widget hadist
     const hdWidget = document.getElementById('hadist-daily-widget');
